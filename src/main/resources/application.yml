@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sms_data
+    username: auwal
+    password: 051992
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
+vaadin:
+  production-mode: false
+  launch-browser: true
+
+mybatis:
+  mapper-locations: classpath*:com/ems/mapper/*.xml
+  type-aliases-package: com.ems.mapper
+  configuration:
+    map-underscore-to-camel-case: true # Converts first_name to firstName
