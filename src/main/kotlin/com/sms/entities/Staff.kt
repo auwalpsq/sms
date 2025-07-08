@@ -22,25 +22,8 @@ data class Staff(
     @CollectionTable(name = "staff_subjects", joinColumns = [JoinColumn(name = "staff_id")])
     val subjects: Set<String> = emptySet(),
 
-    override val id: Long = 0,
-    override val firstName: String = "",
-    override val middleName: String? = null,
-    override val lastName: String = "",
-    override val gender: Gender = Gender.UNSPECIFIED,
-    override val dateOfBirth: LocalDate = LocalDate.now(),
-    override val phoneNumber: String = "",
-    override val email: String? = null,
-    override val address: String = "",
-    override val city: String = "",
-    override val state: String = "",
-    override val photo: ByteArray? = null,
-    override val createdAt: LocalDateTime = LocalDateTime.now(),
-    override val updatedAt: LocalDateTime = LocalDateTime.now()
-) : Person(
-    id, "STAFF", firstName, middleName, lastName, gender, dateOfBirth,
-    phoneNumber, email, address, city, state, photo, createdAt, updatedAt
-) {
-    constructor() : this(staffId = "")
+) : ContactPerson() {
+    //constructor() : this(staffId = "")
 
     fun getYearsOfService(): Int = Period.between(employmentDate, LocalDate.now()).years
 }

@@ -6,46 +6,43 @@ import java.time.*
 @Entity
 @Table(name = "students")
 @DiscriminatorValue("STUDENT")
-data class Student(
-    @Column(unique = true)
-    val admissionNumber: String = "",
+class Student(
+    @Column(unique = true, nullable = false)
+    val admissionNumber: String? = null,
 
+    @Column(nullable = false)
     val admissionDate: LocalDate = LocalDate.now(),
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "class_id")
-    val currentClass: SchoolClass = SchoolClass(),
+    val currentClass: SchoolClass,
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     val schoolLevel: SchoolLevel = SchoolLevel.PRIMARY,
 
     val bloodGroup: String? = null,
     val genotype: String? = null,
     val knownAllergies: String? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guardian_id")
-    val primaryGuardian: Guardian = Guardian(),
+    @Lob
+    val photo: ByteArray? = null,
 
-    override val id: Long = 0,
-    override val firstName: String = "",
-    override val middleName: String? = null,
-    override val lastName: String = "",
-    override val gender: Gender = Gender.UNSPECIFIED,
-    override val dateOfBirth: LocalDate = LocalDate.now(),
-    override val phoneNumber: String = "",
-    override val email: String? = null,
-    override val address: String = "",
-    override val city: String = "",
-    override val state: String = "",
-    override val photo: ByteArray? = null,
-    override val createdAt: LocalDateTime = LocalDateTime.now(),
-    override val updatedAt: LocalDateTime = LocalDateTime.now()
-) : Person(
-    id, "STUDENT", firstName, middleName, lastName, gender, dateOfBirth,
-    phoneNumber, email, address, city, state, photo, createdAt, updatedAt
-) {
-    constructor() : this(admissionNumber = "")
+    @Enumerated(EnumType.STRING)
+    val applicationStatus: ApplicationStatus = ApplicationStatus.PENDING,
+    val previousSchoolName: String? = null,
+    val previousClass: String? = null
+) : Person() {
+    val currentAge: Int
+        get() = Period.between(dateOfBirth, LocalDate.now()).years
 
-    fun getCurrentAge(): Int = Period.between(dateOfBirth, LocalDate.now()).years
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Student) return false
+        return admissionNumber == other.admissionNumber
+    }
+
+    override fun hashCode(): Int = admissionNumber.hashCode()
+
+    enum class ApplicationStatus { PENDING, APPROVED, REJECTED, ADMITTED }
 }

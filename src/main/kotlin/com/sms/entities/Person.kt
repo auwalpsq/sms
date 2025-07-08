@@ -1,47 +1,42 @@
 package com.sms.entities
 
 import jakarta.persistence.*
-import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.*
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "persons")
-@DiscriminatorColumn(name = "person_type")
-open class Person(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+@DiscriminatorColumn(name = "person_type", discriminatorType = DiscriminatorType.STRING)
+abstract class Person(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     open val id: Long = 0,
 
-    @Column(name = "person_type", insertable = false, updatable = false)
-    open val personType: String = "PERSON",
+    @Column(nullable = false)
+    open val firstName: String? = "",
 
-    open val firstName: String = "",
     open val middleName: String? = null,
-    open val lastName: String = "",
+
+    @Column(nullable = false)
+    open val lastName: String? = "",
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     open val gender: Gender = Gender.UNSPECIFIED,
 
-    open val dateOfBirth: LocalDate = LocalDate.now(),
+    @Column(nullable = false)
+    open val dateOfBirth: LocalDate? = null,
 
-    @Column(unique = true)
-    open val phoneNumber: String = "",
-
-    open val email: String? = null,
-
-    open val address: String = "",
-    open val city: String = "",
-    open val state: String = "",
-
-    @Lob
-    open val photo: ByteArray? = null,
-
+    @CreationTimestamp
+    @Column(updatable = false)
     open val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    @UpdateTimestamp
     open val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
     open fun getFullName(): String = "$lastName ${middleName?.let { "$it " } ?: ""}$firstName"
-
-    protected constructor() : this(personType = "PERSON")
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
