@@ -1,0 +1,109 @@
+package com.sms.services
+
+import com.sms.entities.User
+import com.sms.mappers.RoleMapper
+import com.sms.mappers.UserMapper
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.provisioning.UserDetailsManager
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.crypto.password.PasswordEncoder
+
+@Service
+class MyUserDetailsManager(
+    private val userMapper: UserMapper,
+    private val roleMapper: RoleMapper,
+    private val passwordEncoder: PasswordEncoder
+) : UserDetailsManager {
+
+    @Transactional
+    override fun createUser(user: UserDetails) {
+        if (userExists(user.username)) {
+            throw IllegalArgumentException("User already exists: ${user.username}")
+        }
+
+        val newUser = (user as? User)?.copy(
+            password = passwordEncoder.encode(user.password)
+        ) ?: User(
+            username = user.username,
+            password = passwordEncoder.encode(user.password),
+            email = "", // Set default or extract from UserDetails
+            enabled = user.isEnabled,
+            accountNonExpired = user.isAccountNonExpired,
+            accountNonLocked = user.isAccountNonLocked,
+            credentialsNonExpired = user.isCredentialsNonExpired
+        )
+
+        userMapper.insertUser(newUser)
+    }
+
+    @Transactional
+    override fun updateUser(user: UserDetails) {
+        val existingUser = loadUserByUsername(user.username) as User
+        val updatedUser = existingUser.copy(
+            password = passwordEncoder.encode(user.password),
+            enabled = user.isEnabled,
+            accountNonExpired = user.isAccountNonExpired,
+            accountNonLocked = user.isAccountNonLocked,
+            credentialsNonExpired = user.isCredentialsNonExpired
+        )
+
+        userMapper.updateUser(updatedUser)
+    }
+
+    @Transactional
+    override fun deleteUser(username: String) {
+        if (!userExists(username)) {
+            throw UsernameNotFoundException("User not found: $username")
+        }
+        userMapper.deleteUser(username)
+    }
+
+    @Transactional
+    override fun changePassword(oldPassword: String, newPassword: String) {
+        // Implement based on your security context
+        throw UnsupportedOperationException("Change password not implemented")
+    }
+
+    override fun userExists(username: String): Boolean {
+        return userMapper.existsByUsername(username)
+    }
+
+    @Transactional(readOnly = true)
+    override fun loadUserByUsername(username: String): UserDetails {
+        val user = userMapper.findByUsername(username)
+            ?: throw UsernameNotFoundException("User not found: $username")
+
+        val roles = userMapper.findRolesByUsername(username)
+        return user.copy(roles = roles.toSet())
+    }
+
+    @Transactional
+    fun createUserWithRoles(
+        username: String,
+        password: String,
+        email: String,
+        roleNames: Set<String>,
+        enabled: Boolean = true
+    ): User {
+        if (userExists(username)) {
+            throw IllegalArgumentException("User already exists: $username")
+        }
+
+        val roles = roleNames.mapNotNull { roleMapper.findByName(it) }.toSet()
+
+        val user = User(
+            username = username,
+            password = passwordEncoder.encode(password),
+            email = email,
+            roles = roles,
+            enabled = enabled
+        )
+
+        userMapper.insertUser(user)
+        // You'll need to implement user_roles insertion in a separate method
+
+        return user
+    }
+}

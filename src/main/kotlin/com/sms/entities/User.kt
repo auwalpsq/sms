@@ -8,7 +8,7 @@ import java.util.*
 
 @Entity
 @Table(name = "users")
-class User(
+data class User(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 

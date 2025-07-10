@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mappers.UserMapper">
+
+    <resultMap id="userResultMap" type="com.sms.entities.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="enabled" column="enabled"/>
+        <result property="accountNonExpired" column="account_non_expired"/>
+        <result property="accountNonLocked" column="account_non_locked"/>
+        <result property="credentialsNonExpired" column="credentials_non_expired"/>
+        <association property="person" javaType="com.sms.entities.Person">
+            <id property="id" column="person_id"/>
+            <!-- Other person properties if needed -->
+        </association>
+    </resultMap>
+
+    <select id="findByUsername" resultMap="userResultMap">
+        SELECT * FROM users WHERE username = #{username}
+    </select>
+
+    <select id="existsByUsername" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM users WHERE username = #{username}
+    </select>
+
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (username, password, email, enabled,
+        account_non_expired, account_non_locked,
+        credentials_non_expired, person_id)
+        VALUES (#{username}, #{password}, #{email}, #{enabled},
+        #{accountNonExpired}, #{accountNonLocked},
+        #{credentialsNonExpired}, #{person.id})
+    </insert>
+
+    <update id="updateUser">
+        UPDATE users SET
+        password = #{password},
+        email = #{email},
+        enabled = #{enabled},
+        account_non_expired = #{accountNonExpired},
+        account_non_locked = #{accountNonLocked},
+        credentials_non_expired = #{credentialsNonExpired},
+        person_id = #{person.id}
+        WHERE username = #{username}
+    </update>
+
+    <delete id="deleteUser">
+        DELETE FROM users WHERE username = #{username}
+    </delete>
+
+    <select id="findRolesByUsername" resultType="com.sms.entities.Role">
+        SELECT r.* FROM roles r
+        JOIN user_roles ur ON r.id = ur.role_id
+        JOIN users u ON ur.user_id = u.id
+        WHERE u.username = #{username}
+    </select>
+</mapper>
