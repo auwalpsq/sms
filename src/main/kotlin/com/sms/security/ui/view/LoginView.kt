@@ -17,6 +17,7 @@ class LoginView : Main(), BeforeEnterObserver {
     private val login: LoginForm
 
     init {
+        println("login view loaded")
         addClassNames(
             LumoUtility.Display.FLEX,
             LumoUtility.JustifyContent.CENTER,

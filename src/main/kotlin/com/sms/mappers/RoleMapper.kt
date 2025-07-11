@@ -4,10 +4,11 @@ import com.sms.entities.Role
 import org.apache.ibatis.annotations.Mapper
 import org.apache.ibatis.annotations.Param
 
+
 @Mapper
 interface RoleMapper {
     fun findById(id: Long): Role?
-    fun findByName(@Param("name") name: String): Role?
+    fun findByName(name: String): Role?
     fun findAll(): List<Role>
     fun insertRole(role: Role): Int
     fun updateRole(role: Role): Int

@@ -14,7 +14,7 @@
         SELECT * FROM roles WHERE id = #{id}
     </select>
 
-    <select id="findByName" resultMap="roleResultMap" parameterType="String">
+    <select id="findByName" resultMap="roleResultMap">
         SELECT * FROM roles WHERE name = #{name}
     </select>
 

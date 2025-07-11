@@ -57,16 +57,3 @@ data class User(
     override fun isAccountNonLocked() = accountNonLocked
     override fun isCredentialsNonExpired() = credentialsNonExpired
 }
-
-@Entity
-@Table(name = "roles")
-class Role(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-
-    @Column(unique = true, nullable = false)
-    val name: String,
-
-    @Column(nullable = false)
-    val description: String
-)
