@@ -9,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
@@ -22,17 +21,6 @@ class SecurityConfig(
     override fun configure(http: HttpSecurity) {
         super.configure(http)
 
-        http.authorizeHttpRequests { auth ->
-            auth.requestMatchers(
-                "/",
-                "/login",
-                "/public/**",
-                "/icons/**",
-                "/images/**",
-                "/VAADIN/**"
-            ).permitAll()
-        }
-
         setLoginView(http, LoginView::class.java)
     }
 
@@ -44,10 +32,5 @@ class SecurityConfig(
             .passwordEncoder(passwordEncoder)
 
         return builder.build()
-    }
-
-    @Bean
-    fun userDetailsService(): UserDetailsService {
-        return userDetailsManager
     }
 }

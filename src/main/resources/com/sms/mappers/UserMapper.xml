@@ -13,10 +13,10 @@
         <result property="accountNonExpired" column="account_non_expired"/>
         <result property="accountNonLocked" column="account_non_locked"/>
         <result property="credentialsNonExpired" column="credentials_non_expired"/>
-        <association property="person" javaType="com.sms.entities.Person">
-            <id property="id" column="person_id"/>
-            <!-- Other person properties if needed -->
-        </association>
+<!--        <association property="person" javaType="com.sms.entities.Person">-->
+<!--            <id property="id" column="person_id"/>-->
+<!--            &lt;!&ndash; Other person properties if needed &ndash;&gt;-->
+<!--        </association>-->
     </resultMap>
 
     <select id="findByUsername" resultMap="userResultMap">
