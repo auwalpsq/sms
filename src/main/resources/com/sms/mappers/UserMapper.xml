@@ -27,7 +27,7 @@
         SELECT COUNT(*) > 0 FROM users WHERE username = #{username}
     </select>
 
-    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO users (username, password, email, enabled,
         account_non_expired, account_non_locked,
         credentials_non_expired, person_id)

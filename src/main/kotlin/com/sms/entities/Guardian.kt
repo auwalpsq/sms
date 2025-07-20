@@ -8,18 +8,17 @@ import java.time.*
 @DiscriminatorValue("GUARDIAN")
 data class Guardian(
     @Column(unique = true)
-    val guardianId: String = "",
+    var guardianId: String? = null,
 
     @Enumerated(EnumType.STRING)
-    val relationshipToStudent: RelationshipType = RelationshipType.OTHER,
+    var relationshipToStudent: RelationshipType = RelationshipType.OTHER,
 
-    val occupation: String? = null,
-    val employer: String? = null,
+    var occupation: String? = null,
+    var employer: String? = null,
 
-    val alternatePhone: String? = null
-) : ContactPerson() {
-    enum class RelationshipType {
-        FATHER, MOTHER, BROTHER, SISTER, UNCLE, AUNT,
-        GRANDFATHER, GRANDMOTHER, OTHER
-    }
+    var alternatePhone: String? = null
+) : ContactPerson()
+enum class RelationshipType {
+    FATHER, MOTHER, BROTHER, SISTER, UNCLE, AUNT,
+    GRANDFATHER, GRANDMOTHER, OTHER
 }

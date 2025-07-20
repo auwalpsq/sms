@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mappers.GuardianMapper">
+
+    <!-- Result Map -->
+    <resultMap id="GuardianResultMap" type="com.sms.entities.Guardian">
+        <id property="id" column="id" javaType="long"/>
+
+        <!-- Person -->
+        <result property="firstName" column="first_name"/>
+        <result property="middleName" column="middle_name"/>
+        <result property="lastName" column="last_name"/>
+        <result property="gender" column="gender" javaType="com.sms.entities.Gender"/>
+        <result property="dateOfBirth" column="date_of_birth" javaType="java.time.LocalDate"/>
+
+        <!-- ContactPerson -->
+        <result property="email" column="email"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="address" column="address"/>
+        <result property="city" column="city"/>
+        <result property="state" column="state"/>
+
+        <!-- Guardian -->
+        <result property="guardianId" column="guardian_id"/>
+        <result property="relationshipToStudent" column="relationship_to_student" javaType="com.sms.entities.RelationshipType"/>
+        <result property="occupation" column="occupation"/>
+        <result property="employer" column="employer"/>
+        <result property="alternatePhone" column="alternate_phone"/>
+    </resultMap>
+
+    <!-- Insert Steps -->
+    <insert id="insertIntoPersons" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.sms.entities.Guardian">
+        INSERT INTO persons (first_name, middle_name, last_name, gender, date_of_birth, person_type)
+        VALUES (#{firstName}, #{middleName}, #{lastName}, #{gender}, #{dateOfBirth}, 'GUARDIAN')
+        RETURNING id
+    </insert>
+
+    <insert id="insertIntoContactDetails">
+        INSERT INTO contact_details (id, email, phone_number, address, city, state)
+        VALUES (#{id}, #{email}, #{phoneNumber}, #{address}, #{city}, #{state})
+    </insert>
+
+    <insert id="insertIntoGuardians">
+        INSERT INTO guardians (id, guardian_id, relationship_to_student, occupation, employer, alternate_phone)
+        VALUES (#{id}, #{guardianId}, #{relationshipToStudent}, #{occupation}, #{employer}, #{alternatePhone})
+    </insert>
+
+    <!-- Update -->
+    <update id="update">
+        UPDATE persons
+        SET first_name = #{firstName},
+        middle_name = #{middleName},
+        last_name = #{lastName},
+        gender = #{gender},
+        date_of_birth = #{dateOfBirth}
+        WHERE id = #{id};
+
+        UPDATE contact_details
+        SET email = #{email},
+        phone_number = #{phoneNumber},
+        address = #{address},
+        city = #{city},
+        state = #{state}
+        WHERE id = #{id};
+
+        UPDATE guardians
+        SET guardian_id = #{guardianId},
+        relationship_to_student = #{relationshipToStudent},
+        occupation = #{occupation},
+        employer = #{employer},
+        alternate_phone = #{alternatePhone}
+        WHERE id = #{id};
+    </update>
+
+    <!-- Delete -->
+    <delete id="delete" parameterType="long">
+        DELETE FROM guardians WHERE id = #{id};
+        DELETE FROM contact_details WHERE id = #{id};
+        DELETE FROM persons WHERE id = #{id};
+    </delete>
+
+    <!-- Find by ID -->
+    <select id="findById" parameterType="long" resultMap="GuardianResultMap">
+        SELECT
+        p.id,
+        p.first_name,
+        p.middle_name,
+        p.last_name,
+        p.gender,
+        p.date_of_birth,
+
+        c.email,
+        c.phone_number,
+        c.address,
+        c.city,
+        c.state,
+
+        g.guardian_id,
+        g.relationship_to_student,
+        g.occupation,
+        g.employer,
+        g.alternate_phone
+        FROM persons p
+        JOIN contact_details c ON p.id = c.id
+        JOIN guardians g ON c.id = g.id
+        WHERE p.id = #{id}
+    </select>
+
+    <!-- Find all -->
+    <select id="findAll" resultMap="GuardianResultMap">
+        SELECT
+        p.id,
+        p.first_name,
+        p.middle_name,
+        p.last_name,
+        p.gender,
+        p.date_of_birth,
+
+        c.email,
+        c.phone_number,
+        c.address,
+        c.city,
+        c.state,
+
+        g.guardian_id,
+        g.relationship_to_student,
+        g.occupation,
+        g.employer,
+        g.alternate_phone
+        FROM persons p
+        JOIN contact_details c ON p.id = c.id
+        JOIN guardians g ON c.id = g.id
+    </select>
+
+    <!-- Check if email exists -->
+    <select id="existsByEmail" parameterType="string" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM contact_details WHERE lower(email) = lower(#{email})
+    </select>
+
+</mapper>

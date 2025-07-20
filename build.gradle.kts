@@ -23,6 +23,7 @@ repositories {
 extra["vaadinVersion"] = "24.8.2"
 
 dependencies {
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")

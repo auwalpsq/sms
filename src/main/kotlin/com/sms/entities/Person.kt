@@ -15,22 +15,21 @@ abstract class Person(
     open val id: Long = 0,
 
     @Column(nullable = false)
-    open val firstName: String? = "",
+    open var firstName: String? = "",
 
-    open val middleName: String? = null,
+    open var middleName: String? = null,
 
     @Column(nullable = false)
-    open val lastName: String? = "",
+    open var lastName: String? = "",
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    open val gender: Gender = Gender.UNSPECIFIED,
+    @Column(nullable = true)
+    open var gender: Gender = Gender.UNSPECIFIED,
 
-    @Column(nullable = false)
-    open val dateOfBirth: LocalDate? = null,
+    open var dateOfBirth: LocalDate? = null,
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(updatable = true)
     open val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @UpdateTimestamp

@@ -6,18 +6,15 @@ import jakarta.persistence.*
 @Table(name = "contact_details")
 @DiscriminatorValue("PERSON")
 class ContactPerson(
-    @Column(unique = true, nullable = false)
-    val phoneNumber: String? = null,
+    @Column(unique = true)
+    open var phoneNumber: String? = null,
 
     @Column(unique = true)
-    val email: String? = null,
+    open var email: String? = null,
 
-    @Column(nullable = false)
-    val address: String? = null,
+    open var address: String? = null,
 
-    @Column(nullable = false)
-    val city: String? = null,
+    open var city: String? = null,
 
-    @Column(nullable = false)
-    val state: String? = null
+    open var state: String? = null
 ) : Person()

@@ -30,8 +30,15 @@ class Student(
 
     @Enumerated(EnumType.STRING)
     val applicationStatus: ApplicationStatus = ApplicationStatus.PENDING,
+
     val previousSchoolName: String? = null,
-    val previousClass: String? = null
+    val previousClass: String? = null,
+
+    // ✅ New field: Student linked to Guardian
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "guardian_id")
+    val guardian: Guardian
+
 ) : Person() {
     val currentAge: Int
         get() = Period.between(dateOfBirth, LocalDate.now()).years
