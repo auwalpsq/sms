@@ -2,6 +2,8 @@ package com.sms.ui.components
 
 import com.sms.entities.Guardian
 import com.sms.ui.common.BaseFormDialog
+import com.sms.util.launchUiCoroutine
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.TextField
@@ -66,6 +68,12 @@ class GuardianDialogForm(
                     else !isEmailTaken(trimmed)
                 }
             }, "Email already registered").bind(Guardian::email) { g, v -> g.email = v }
+    }
+    private fun showDeleteConfirmation(
+        guardian: Guardian,
+        onDelete: suspend (Guardian) -> Unit
+    ) {
+        
     }
     init{
         configureDialogAppearance()

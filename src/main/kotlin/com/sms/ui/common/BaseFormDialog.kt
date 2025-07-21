@@ -5,6 +5,7 @@ import com.sms.util.withUi
 import com.vaadin.flow.component.*
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.html.H3
@@ -130,7 +131,29 @@ abstract class BaseFormDialog<T : Any>(
         binder.readBean(currentEntity)
         open()
     }
-
+    protected open fun showDeleteConfirmation() {
+        val dialog = ConfirmDialog().apply {
+            setHeader("Confirm Delete")
+            setText("Are you sure you want to delete this item?")
+            setCancelText("Cancel")
+            setConfirmText("Delete")
+            addConfirmListener {
+                launchUiCoroutine {
+                    onDelete(currentEntity)
+                    ui?.withUi {
+                        onChange()
+                        close()
+                        Notification.show(
+                            "Deleted successfully",
+                            3000,
+                            Notification.Position.TOP_CENTER
+                        )
+                    }
+                }
+            }
+        }
+        dialog.open()
+    }
     protected abstract fun buildForm(formLayout: FormLayout)
     protected abstract fun configureBinder()
     protected abstract fun createNewInstance(): T
