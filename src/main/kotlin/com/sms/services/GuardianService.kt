@@ -18,7 +18,6 @@ class GuardianService(
             guardianMapper.insertIntoPersons(guardian)
             guardianMapper.insertIntoContactDetails(guardian)
             guardian.guardianId = generateGuardianId(guardian.id)
-            println(guardian.id)
             guardianMapper.insertIntoGuardians(guardian)
         } else {
             guardianMapper.update(guardian)

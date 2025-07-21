@@ -5,10 +5,14 @@ import com.vaadin.flow.component.html.H1
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.component.sidenav.SideNav
+import com.vaadin.flow.component.sidenav.SideNavItem
 import com.vaadin.flow.router.RouterLink
 import com.vaadin.flow.theme.lumo.LumoUtility.*
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.server.menu.MenuConfiguration
+import com.vaadin.flow.server.menu.MenuEntry
 import jakarta.annotation.security.RolesAllowed
 
 @PageTitle("Admin Dashboard")
@@ -28,23 +32,21 @@ class AdminView : AppLayout() {
     }
 
     private fun createDrawer() {
-        val layout = VerticalLayout()
-        layout.addClassNames(Padding.SMALL)
-
-        layout.add(
-            createNavLink("Guardians", "admin/guardian", VaadinIcon.USER.create()),
-//            createNavLink("Applications", "admin/application", VaadinIcon.CLIPBOARD_TEXT.create()),
-//            createNavLink("Students", "admin/student", VaadinIcon.GROUP.create()),
-//            createNavLink("Settings", "admin/setting", VaadinIcon.COG.create())
-        )
-
-        addToDrawer(layout)
+        addToDrawer(createSideNav())
     }
 
-    private fun createNavLink(text: String, route: String, icon: Icon): RouterLink {
-        val link = RouterLink(text, Class.forName("com.sms.ui.admin." + route.removePrefix("admin/").replaceFirstChar { it.uppercase() } + "View") as Class<out com.vaadin.flow.component.Component>)
-        link.add(icon)
-        link.addClassNames(Display.FLEX, AlignItems.CENTER, Gap.SMALL)
-        return link
+    private fun createSideNav(): SideNav {
+        val nav = SideNav()
+        nav.addClassNames(Margin.Horizontal.MEDIUM)
+        MenuConfiguration.getMenuEntries().forEach { entry -> nav.addItem(createSideNavItem(entry)) }
+
+        return nav
+    }
+    private fun createSideNavItem (menuEntry : MenuEntry) : SideNavItem{
+        if(menuEntry.icon != null){
+            return SideNavItem(menuEntry.title, menuEntry.path, Icon(menuEntry.icon))
+        }else{
+            return SideNavItem(menuEntry.title, menuEntry.path)
+        }
     }
 }

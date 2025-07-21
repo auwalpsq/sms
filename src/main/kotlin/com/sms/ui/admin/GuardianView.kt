@@ -11,36 +11,54 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.router.Menu
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import jakarta.annotation.security.RolesAllowed
 
-@Route("admin/guardians", layout= AdminView::class)
+@Route("admin/guardians", layout = AdminView::class)
 @RolesAllowed("ADMIN")
+@PageTitle("Guardian Management")
+@Menu(order = 0.0, icon = "vaadin:user", title = "Gurdians")
 class GuardianView(
     private val guardianService: GuardianService
 ) : VerticalLayout() {
-    val ui = UI.getCurrent()
 
+    private val ui = UI.getCurrent()
     private val grid = Grid(Guardian::class.java)
-    private val dialog = GuardianDialogForm(
-        isEmailTaken = { email -> guardianService.existsByEmail(email) },
-        onSave = { guardian -> guardianService.save(guardian) },
-        onDelete = { guardian -> guardianService.delete(guardian) },
-        onChange = { refreshGrid() }
-    )
+    private lateinit var dialog: GuardianDialogForm
+
     init {
         setSizeFull()
         spacing = "true"
+
+        // Initialize dialog first
+        dialog = createDialog()
+
         configureGrid()
         addToolbar()
         add(grid)
         refreshGrid()
     }
 
+    private fun createDialog(): GuardianDialogForm {
+        return GuardianDialogForm(
+            isEmailTaken = { email -> guardianService.existsByEmail(email) },
+            onSave = { guardian ->
+                guardianService.save(guardian)
+                refreshGrid()
+            },
+            onDelete = { guardian ->
+                guardianService.delete(guardian)
+                refreshGrid()
+            },
+            onChange = { refreshGrid() }
+        )
+    }
+
     private fun configureGrid() {
         grid.setSizeFull()
-        grid.setColumns("firstName", "lastName", "email")
+        grid.setColumns("firstName", "lastName", "email", "phoneNumber")
         grid.addItemDoubleClickListener { event ->
             dialog.open(event.item)
         }

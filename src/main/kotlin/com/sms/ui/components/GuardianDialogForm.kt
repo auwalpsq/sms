@@ -14,32 +14,50 @@ class GuardianDialogForm(
     onSave: suspend (Guardian) -> Unit,
     onDelete: suspend (Guardian) -> Unit,
     onChange: () -> Unit
-) : BaseFormDialog<Guardian>(onSave, onDelete, onChange) {
+) : BaseFormDialog<Guardian>(
+    dialogTitle = "Guardian",
+    onSave = onSave,
+    onDelete = onDelete,
+    onChange = onChange
+) {
 
-    private val firstName = TextField("First Name")
-    private val lastName = TextField("Last Name")
-    private val email = EmailField("Email")
+    private val firstName = TextField("First Name").apply {
+        isRequired = true
+        setRequiredIndicatorVisible(true)
+    }
+
+    private val lastName = TextField("Last Name").apply {
+        isRequired = true
+        setRequiredIndicatorVisible(true)
+    }
+
+    private val email = EmailField("Email").apply {
+        isRequired = true
+        setRequiredIndicatorVisible(true)
+    }
 
     override fun buildForm(formLayout: FormLayout) {
-        formLayout.add(firstName, lastName, email)
+        formLayout.add(firstName)
+        formLayout.add(lastName)
+        formLayout.add(email)
+
+        // Configure responsive behavior
+        formLayout.setColspan(email, 2)
     }
 
     override fun configureBinder() {
         val nameValidator = StringLengthValidator("Must be at least 2 characters", 2, null)
 
         binder.forField(firstName)
-            .asRequired("First name is required")
             .withValidator(nameValidator)
             .bind(Guardian::firstName) { g, v -> g.firstName = v }
 
         binder.forField(lastName)
-            .asRequired("Last name is required")
             .withValidator(nameValidator)
             .bind(Guardian::lastName) { g, v -> g.lastName = v }
 
         binder.forField(email)
-            .asRequired("Email is required")
-            .withValidator(EmailValidator("Invalid email"))
+            .withValidator(EmailValidator("Invalid email address"))
             .withValidator( { value ->
                 runBlocking {
                     val trimmed = value?.trim().orEmpty()
@@ -47,11 +65,10 @@ class GuardianDialogForm(
                     if (trimmed.equals(existing, ignoreCase = true)) true
                     else !isEmailTaken(trimmed)
                 }
-            }, "Email already registered")
-            .bind(Guardian::email) { g, v -> g.email = v }
+            }, "Email already registered").bind(Guardian::email) { g, v -> g.email = v }
     }
-    init {
-        myInit()
+    init{
+        configureDialogAppearance()
     }
     override fun createNewInstance(): Guardian = Guardian()
     override fun getEntityType(): Class<Guardian> = Guardian::class.java
