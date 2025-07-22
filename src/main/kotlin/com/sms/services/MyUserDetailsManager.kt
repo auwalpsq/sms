@@ -3,6 +3,7 @@ package com.sms.services
 import com.sms.entities.User
 import com.sms.mappers.RoleMapper
 import com.sms.mappers.UserMapper
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.provisioning.UserDetailsManager
 import org.springframework.stereotype.Service
@@ -62,9 +63,20 @@ class MyUserDetailsManager(
 
     @Transactional
     override fun changePassword(oldPassword: String, newPassword: String) {
-        // Implement based on your security context
-        throw UnsupportedOperationException("Change password not implemented")
+        val auth = SecurityContextHolder.getContext().authentication
+            ?: throw IllegalStateException("No authentication found")
+
+        val currentUsername = auth.name
+        val user = loadUserByUsername(currentUsername) as User
+
+        if (!passwordEncoder.matches(oldPassword, user.password)) {
+            throw IllegalArgumentException("Old password does not match")
+        }
+
+        val updatedUser = user.copy(password = passwordEncoder.encode(newPassword))
+        userMapper.updateUser(updatedUser)
     }
+
 
     override fun userExists(username: String): Boolean {
         return userMapper.existsByUsername(username)
@@ -102,7 +114,8 @@ class MyUserDetailsManager(
         )
 
         userMapper.insertUser(user)
-        // You'll need to implement user_roles insertion in a separate method
+        val userId = user.id
+        roles.forEach { role -> roleMapper.addRoleToUser(userId, role.id) }
 
         return user
     }
