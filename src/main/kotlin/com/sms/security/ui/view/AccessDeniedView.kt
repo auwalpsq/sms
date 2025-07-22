@@ -1,6 +1,5 @@
 package com.sms.security.ui.view
 
-import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.icon.Icon
