@@ -6,7 +6,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -22,3 +22,8 @@ mybatis:
   type-aliases-package: com.sms.entities
   configuration:
     map-underscore-to-camel-case: true # Converts first_name to firstName
+
+server:
+  servlet:
+    session:
+      timeout: 1m

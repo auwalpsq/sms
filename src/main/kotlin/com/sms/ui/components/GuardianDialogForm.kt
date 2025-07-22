@@ -3,8 +3,11 @@ package com.sms.ui.components
 import com.sms.entities.Guardian
 import com.sms.ui.common.BaseFormDialog
 import com.sms.util.launchUiCoroutine
+import com.sms.util.withUi
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import com.vaadin.flow.component.formlayout.FormLayout
+import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.validator.EmailValidator
@@ -38,13 +41,17 @@ class GuardianDialogForm(
         setRequiredIndicatorVisible(true)
     }
 
-    override fun buildForm(formLayout: FormLayout) {
-        formLayout.add(firstName)
-        formLayout.add(lastName)
-        formLayout.add(email)
+    private val phoneNumber = TextField("Phone Number").apply {
+        isRequired = true
+        setRequiredIndicatorVisible(true)
+        setPlaceholder("08012345678")
+    }
 
-        // Configure responsive behavior
-        formLayout.setColspan(email, 2)
+    override fun buildForm(formLayout: FormLayout) {
+        formLayout.apply{
+            responsiveSteps = listOf(FormLayout.ResponsiveStep("0", 1))
+        }
+        formLayout.add(firstName, lastName, email, phoneNumber)
     }
 
     override fun configureBinder() {
@@ -68,12 +75,34 @@ class GuardianDialogForm(
                     else !isEmailTaken(trimmed)
                 }
             }, "Email already registered").bind(Guardian::email) { g, v -> g.email = v }
+        binder.forField(phoneNumber)
+            .withValidator({ value ->
+                value != null && value.matches(Regex("^0\\d{10}$"))
+            }, "Phone number must be exactly 11 digits and start with 0")
+            .bind(Guardian::phoneNumber) { g, v -> g.phoneNumber = v }
     }
-    private fun showDeleteConfirmation(
-        guardian: Guardian,
-        onDelete: suspend (Guardian) -> Unit
-    ) {
-        
+    override fun showDeleteConfirmation() {
+        val dialog = ConfirmDialog().apply {
+            setHeader("Delete Guardian")
+            setText("Are you sure you want to delete ${currentEntity.firstName} ${currentEntity.lastName}?")
+            setCancelText("Cancel")
+            setConfirmText("Delete")
+            val ui : UI? = UI.getCurrent()
+            addConfirmListener {
+                launchUiCoroutine {
+                    onDelete(currentEntity)
+                    ui?.withUi {
+                        close()
+                        Notification.show(
+                            "Guardian deleted successfully",
+                            3000,
+                            Notification.Position.TOP_CENTER
+                        )
+                    }
+                }
+            }
+        }
+        dialog.open()
     }
     init{
         configureDialogAppearance()

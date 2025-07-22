@@ -15,12 +15,15 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.binder.Binder
 import com.vaadin.flow.theme.lumo.LumoUtility
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 abstract class BaseFormDialog<T : Any>(
-    private val dialogTitle: String,
-    private val onSave: suspend (T) -> Unit,
-    private val onDelete: suspend (T) -> Unit,
-    private val onChange: () -> Unit
+    protected val dialogTitle: String,
+    protected val onSave: suspend (T) -> Unit,
+    protected val onDelete: suspend (T) -> Unit,
+    protected val onChange: () -> Unit
 ) : Dialog() {
     val ui: UI? = UI.getCurrent()
 
@@ -48,6 +51,8 @@ abstract class BaseFormDialog<T : Any>(
         // Dialog behavior
         isCloseOnEsc = true
         isCloseOnOutsideClick = false
+        width = "25%"
+        minWidth = "400px"
         setDraggable(true)
         setResizable(true)
         configureButtonActions()
@@ -67,14 +72,8 @@ abstract class BaseFormDialog<T : Any>(
         }
 
         deleteBtn.addClickListener {
-            launchUiCoroutine {
-                onDelete(currentEntity)
-                ui?.withUi {
-                    onChange()
-                    close()
-                    Notification.show("Deleted successfully", 3000, Notification.Position.TOP_CENTER)
-                }
-            }
+            showDeleteConfirmation()
+            close()
         }
 
         cancelBtn.addClickListener {
@@ -137,11 +136,11 @@ abstract class BaseFormDialog<T : Any>(
             setText("Are you sure you want to delete this item?")
             setCancelText("Cancel")
             setConfirmText("Delete")
+            val ui : UI? = UI.getCurrent()
             addConfirmListener {
-                launchUiCoroutine {
+                CoroutineScope(Dispatchers.IO).launch {
                     onDelete(currentEntity)
                     ui?.withUi {
-                        onChange()
                         close()
                         Notification.show(
                             "Deleted successfully",

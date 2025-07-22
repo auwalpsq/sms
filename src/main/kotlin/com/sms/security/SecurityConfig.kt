@@ -15,13 +15,27 @@ import org.springframework.security.crypto.password.PasswordEncoder
 @EnableWebSecurity
 class SecurityConfig(
     private val userDetailsManager: MyUserDetailsManager,
-    private val passwordEncoder: PasswordEncoder // now injected, not defined here!
+    private val passwordEncoder: PasswordEncoder, // now injected, not defined here!
+    private val successHandler: RoleBasedAuthenticationSuccessHandler
 ) : VaadinWebSecurity() {
 
     override fun configure(http: HttpSecurity) {
         super.configure(http)
 
-        setLoginView(http, LoginView::class.java)
+        http
+            .formLogin { form ->
+                form
+                    .loginPage("/login")  // path handled by your LoginView
+                    .permitAll()
+                    .successHandler(successHandler)
+            }
+            .logout { logout ->
+                logout.logoutSuccessUrl("/login?logout")
+            }
+            .exceptionHandling { exceptions ->
+                exceptions.accessDeniedPage("/access-denied")
+            }
+        //setLoginView(http, LoginView::class.java)
     }
 
     @Bean
