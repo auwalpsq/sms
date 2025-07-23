@@ -25,7 +25,7 @@ class GuardianService(
                 username = guardian.email,
                 password = guardian.phoneNumber,
                 email = guardian.email,
-                roleNames = setOf("GUARDIAN"),
+                roleNames = setOf("ROLE_GUARDIAN"),
                 enabled = true,
                 guardian
             )

@@ -65,7 +65,7 @@ class GuardianProfileView(
         }
     }
 
-    private suspend fun getCurrentGuardian(): Guardian? {
+    private fun getCurrentGuardian(): Guardian? {
         val authentication = SecurityContextHolder.getContext().authentication
         val user = authentication?.principal as? User
         return user?.person as? Guardian

@@ -46,32 +46,25 @@ class GuardianProfileForm(
 
     init {
         setSizeFull()
+        justifyContentMode = FlexComponent.JustifyContentMode.CENTER
+        setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER)
+        alignItems = FlexComponent.Alignment.CENTER
         spacing = "true"
         isPadding = true
 
         // Configure form layout
         val formLayout = FormLayout().apply {
+            width = "50%"
             responsiveSteps = listOf(
                 FormLayout.ResponsiveStep("0", 1),
                 FormLayout.ResponsiveStep("500px", 2)
             )
+            alignItems = FlexComponent.Alignment.CENTER
         }
 
         // Add fields to form
         with(formLayout) {
-            addFormItem(firstName, "First Name")
-            addFormItem(middleName, "Middle Name")
-            addFormItem(lastName, "Last Name")
-            addFormItem(phoneNumber, "Phone Number")
-            addFormItem(email, "Email")
-            addFormItem(address, "Address")
-            addFormItem(city, "City")
-            addFormItem(state, "State")
-            addFormItem(guardianId, "Guardian ID")
-            addFormItem(relationship, "Relationship")
-            addFormItem(occupation, "Occupation")
-            addFormItem(employer, "Employer")
-            addFormItem(alternatePhone, "Alternate Phone")
+            add(firstName, middleName, lastName, phoneNumber, email, address, city, state, guardianId, relationship, occupation, employer, alternatePhone)
         }
 
         // Configure relationship combo box
