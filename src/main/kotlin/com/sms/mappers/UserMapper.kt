@@ -14,4 +14,5 @@ interface UserMapper {
     fun updateUser(user: User): Int
     fun deleteUser(username: String): Int
     fun findRolesByUsername(username: String): Set<Role>
+    fun findAllUsers(): List<User>
 }

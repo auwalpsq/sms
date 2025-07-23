@@ -58,4 +58,8 @@
         JOIN users u ON ur.user_id = u.id
         WHERE u.username = #{username}
     </select>
+
+    <select id="findAllUsers" resultMap="userResultMap">
+        SELECT * FROM users
+    </select>
 </mapper>

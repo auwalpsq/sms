@@ -11,16 +11,29 @@ import java.time.LocalDate
 @Service
 @Transactional
 class GuardianService(
-    private val guardianMapper: GuardianMapper
+    private val guardianMapper: GuardianMapper,
+    private val userDetailsManager: MyUserDetailsManager
 ) {
-    suspend fun save(guardian: Guardian): Int = withContext(Dispatchers.IO) {
+    suspend fun save(guardian: Guardian): Guardian = withContext(Dispatchers.IO) {
         if (guardian.id == 0L) {
             guardianMapper.insertIntoPersons(guardian)
             guardianMapper.insertIntoContactDetails(guardian)
             guardian.guardianId = generateGuardianId(guardian.id)
             guardianMapper.insertIntoGuardians(guardian)
+
+            userDetailsManager.createUserWithRoles(
+                username = guardian.email,
+                password = guardian.phoneNumber,
+                email = guardian.email,
+                roleNames = setOf("GUARDIAN"),
+                enabled = true,
+                guardian
+            )
+            guardian
         } else {
             guardianMapper.update(guardian)
+
+            guardian
         }
 
     }

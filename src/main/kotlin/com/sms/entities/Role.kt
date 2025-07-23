@@ -17,6 +17,5 @@ class Role(
     @Column(unique = true, nullable = false)
     val name: String,
 
-    @Column(nullable = false)
-    val description: String
+    val description: String? = null
 )

@@ -7,10 +7,10 @@ import jakarta.persistence.*
 @DiscriminatorValue("PERSON")
 class ContactPerson(
     @Column(unique = true)
-    open var phoneNumber: String? = null,
+    open var phoneNumber: String = "",
 
     @Column(unique = true)
-    open var email: String? = null,
+    open var email: String = "",
 
     open var address: String? = null,
 

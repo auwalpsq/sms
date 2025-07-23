@@ -1,5 +1,7 @@
 package com.sms.services
 
+import com.sms.entities.Person
+import com.sms.entities.Role
 import com.sms.entities.User
 import com.sms.mappers.RoleMapper
 import com.sms.mappers.UserMapper
@@ -97,26 +99,42 @@ class MyUserDetailsManager(
         password: String,
         email: String,
         roleNames: Set<String>,
-        enabled: Boolean = true
+        enabled: Boolean = true,
+        person: Person
     ): User {
         if (userExists(username)) {
             throw IllegalArgumentException("User already exists: $username")
         }
 
-        val roles = roleNames.mapNotNull { roleMapper.findByName(it) }.toSet()
+        val roles = roleNames.map { roleName ->
+            roleMapper.findByName(roleName) ?: run {
+                val newRole = Role(name = roleName)
+                roleMapper.insertRole(newRole)
+                newRole
+            }
+        }.toSet()
 
         val user = User(
             username = username,
             password = passwordEncoder.encode(password),
             email = email,
             roles = roles,
-            enabled = enabled
+            enabled = enabled,
+            person = person
         )
 
         userMapper.insertUser(user)
+
         val userId = user.id
         roles.forEach { role -> roleMapper.addRoleToUser(userId, role.id) }
 
         return user
+    }
+
+    fun findAllUsers(): List<User> {
+        return userMapper.findAllUsers().map { user ->
+            val roles = userMapper.findRolesByUsername(user.username)
+            user.copy(roles = roles.toSet())
+        }
     }
 }
