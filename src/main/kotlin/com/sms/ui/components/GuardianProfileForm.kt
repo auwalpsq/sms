@@ -35,7 +35,10 @@ class GuardianProfileForm(
 
     // Guardian fields
     private val guardianId = TextField("Guardian ID")
-    private val relationship = ComboBox<RelationshipType>("Relationship to Student")
+    val relationship = ComboBox<RelationshipType>("Relationship to Student").apply {
+        setItems(*RelationshipType.values())
+        setItemLabelGenerator { it.name.lowercase().replaceFirstChar { ch -> ch.uppercase() } }
+    }
     private val occupation = TextField("Occupation")
     private val employer = TextField("Employer")
     private val alternatePhone = TextField("Alternate Phone")
@@ -45,21 +48,21 @@ class GuardianProfileForm(
     private val cancelButton = Button("Cancel")
 
     init {
-        setSizeFull()
+        //setSizeFull()
         justifyContentMode = FlexComponent.JustifyContentMode.CENTER
-        setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER)
         alignItems = FlexComponent.Alignment.CENTER
         spacing = "true"
         isPadding = true
 
         // Configure form layout
         val formLayout = FormLayout().apply {
-            width = "50%"
             responsiveSteps = listOf(
                 FormLayout.ResponsiveStep("0", 1),
-                FormLayout.ResponsiveStep("500px", 2)
+                FormLayout.ResponsiveStep("500px", 2),
+                FormLayout.ResponsiveStep("1000px", 3)
             )
             alignItems = FlexComponent.Alignment.CENTER
+            justifyContentMode = FlexComponent.JustifyContentMode.CENTER
         }
 
         // Add fields to form
@@ -67,16 +70,13 @@ class GuardianProfileForm(
             add(firstName, middleName, lastName, phoneNumber, email, address, city, state, guardianId, relationship, occupation, employer, alternatePhone)
         }
 
-        // Configure relationship combo box
-        relationship.setItems(RelationshipType.values().toList())
-
         // Configure binder
         configureBinder()
 
         // Button layout
         val buttonLayout = HorizontalLayout(saveButton, cancelButton).apply {
             setWidthFull()
-            justifyContentMode = FlexComponent.JustifyContentMode.END
+            justifyContentMode = FlexComponent.JustifyContentMode.CENTER
             spacing = "true"
         }
 
@@ -136,12 +136,16 @@ class GuardianProfileForm(
     fun setGuardian(guardian: Guardian) {
         currentGuardian = guardian
         binder.readBean(guardian)
+        //relationship.value = RelationshipType.valueOf(guardian.relationshipToStudent.name)
         setFieldsReadOnly()
     }
 
     private fun setFieldsReadOnly() {
         readOnlyFields.forEach { fieldName ->
             when (fieldName) {
+                "firstName" -> firstName.isReadOnly = true
+                "lastName" -> lastName.isReadOnly = true
+                "middleName" -> middleName.isReadOnly = true
                 "guardianId" -> guardianId.isReadOnly = true
                 "email" -> email.isReadOnly = true
                 "phoneNumber" -> phoneNumber.isReadOnly = true

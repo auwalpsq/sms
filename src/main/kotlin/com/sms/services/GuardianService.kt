@@ -42,7 +42,7 @@ class GuardianService(
         guardian.id?.let { guardianMapper.delete(it) } ?: 0
     }
 
-    suspend fun findById(id: Long): Guardian? = withContext(Dispatchers.IO) {
+    suspend fun findById(id: Long?): Guardian? = withContext(Dispatchers.IO) {
         guardianMapper.findById(id)
     }
 

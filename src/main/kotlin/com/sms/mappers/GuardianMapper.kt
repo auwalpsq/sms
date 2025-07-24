@@ -11,7 +11,7 @@ interface GuardianMapper {
     fun insertIntoGuardians(guardian: Guardian): Int
     fun update(guardian: Guardian): Int
     fun delete(@Param("id") id: Long): Int
-    fun findById(@Param("id") id: Long): Guardian?
+    fun findById(@Param("id") id: Long?): Guardian?
     fun findAll(): List<Guardian>
     fun existsByEmail(@Param("email") email: String): Boolean
 }

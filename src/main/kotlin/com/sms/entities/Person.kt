@@ -9,7 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "persons")
 @DiscriminatorColumn(name = "person_type", discriminatorType = DiscriminatorType.STRING)
-abstract class Person(
+class Person(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     open val id: Long = 0,

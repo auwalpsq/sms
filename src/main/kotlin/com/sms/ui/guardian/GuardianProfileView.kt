@@ -1,6 +1,5 @@
 package com.sms.ui.guardian
 
-import com.sms.entities.Guardian
 import com.sms.entities.User
 import com.sms.services.GuardianService
 import com.sms.ui.components.GuardianProfileForm
@@ -23,7 +22,7 @@ class GuardianProfileView(
 
     private val ui = UI.getCurrent()
     private val form = GuardianProfileForm(
-        readOnlyFields = setOf("guardianId", "email", "phoneNumber") // Admin-initiated fields
+        readOnlyFields = setOf("firstName", "middleName", "lastName", "guardianId", "email", "phoneNumber") // Admin-initiated fields
     )
 
     init {
@@ -53,8 +52,9 @@ class GuardianProfileView(
     }
 
     private fun loadGuardianData() {
+        val guardianId = getCurrentGuardianId()
         launchUiCoroutine {
-            val guardian = getCurrentGuardian()
+            val guardian = guardianService.findById(guardianId)
             ui.withUi {
                 if (guardian != null) {
                     form.setGuardian(guardian)
@@ -65,9 +65,10 @@ class GuardianProfileView(
         }
     }
 
-    private fun getCurrentGuardian(): Guardian? {
+    private fun getCurrentGuardianId(): Long? {
         val authentication = SecurityContextHolder.getContext().authentication
         val user = authentication?.principal as? User
-        return user?.person as? Guardian
+        val guardianId = user?.person?.id
+        return guardianId
     }
 }

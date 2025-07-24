@@ -18,6 +18,7 @@ data class Guardian(
 
     var alternatePhone: String? = null
 ) : ContactPerson()
+
 enum class RelationshipType {
     FATHER, MOTHER, BROTHER, SISTER, UNCLE, AUNT,
     GRANDFATHER, GRANDMOTHER, OTHER

@@ -88,9 +88,12 @@ class MyUserDetailsManager(
     override fun loadUserByUsername(username: String): UserDetails {
         val user = userMapper.findByUsername(username)
             ?: throw UsernameNotFoundException("User not found: $username")
-
+        
         val roles = userMapper.findRolesByUsername(username)
-        return user.copy(roles = roles.toSet())
+        return user.copy(
+            roles = roles.toSet(),
+            person = user.person
+        )
     }
 
     @Transactional
