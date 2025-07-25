@@ -82,7 +82,7 @@ class AdminView : AppLayout() {
         userMenuItem.subMenu.addItem("Manage Settings").isEnabled = false
         userMenuItem.subMenu.addItem("Logout"){
             VaadinServletRequest.getCurrent().logout()
-            UI.getCurrent().page.setLocation("/login")
+            //UI.getCurrent().page.setLocation("/login")
         }
 
         return userMenu

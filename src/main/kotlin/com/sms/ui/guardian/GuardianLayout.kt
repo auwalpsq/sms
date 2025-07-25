@@ -96,7 +96,7 @@ class GuardianLayout : AppLayout() {
         userMenuItem.subMenu.addItem("Change Password").isEnabled = false // Implement as needed
         userMenuItem.subMenu.addItem("Logout") {
             VaadinServletRequest.getCurrent().logout()
-            UI.getCurrent().page.setLocation("/login")
+            //UI.getCurrent().page.setLocation("/login")
         }
 
         return userMenu
