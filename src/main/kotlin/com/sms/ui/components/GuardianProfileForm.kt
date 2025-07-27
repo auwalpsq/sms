@@ -36,7 +36,7 @@ class GuardianProfileForm(
     // Guardian fields
     private val guardianId = TextField("Guardian ID")
     val relationship = ComboBox<RelationshipType>("Relationship to Student").apply {
-        setItems(*RelationshipType.values())
+        //setItems(*RelationshipType.values())
         setItemLabelGenerator { it.name.lowercase().replaceFirstChar { ch -> ch.uppercase() } }
     }
     private val occupation = TextField("Occupation")
@@ -61,8 +61,6 @@ class GuardianProfileForm(
                 FormLayout.ResponsiveStep("500px", 2),
                 FormLayout.ResponsiveStep("1000px", 3)
             )
-            alignItems = FlexComponent.Alignment.CENTER
-            justifyContentMode = FlexComponent.JustifyContentMode.CENTER
         }
 
         // Add fields to form
@@ -131,12 +129,14 @@ class GuardianProfileForm(
 
         binder.forField(alternatePhone)
             .bind(Guardian::alternatePhone, Guardian::alternatePhone::set)
+
+        relationship.setItems(RelationshipType.values().toSet())
+        relationship.value = currentGuardian?.relationshipToStudent
     }
 
     fun setGuardian(guardian: Guardian) {
         currentGuardian = guardian
         binder.readBean(guardian)
-        //relationship.value = RelationshipType.valueOf(guardian.relationshipToStudent.name)
         setFieldsReadOnly()
     }
 
