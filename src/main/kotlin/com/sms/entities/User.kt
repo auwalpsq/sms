@@ -1,6 +1,8 @@
 package com.sms.entities
 
 import jakarta.persistence.*
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -21,16 +23,18 @@ data class User(
     @Column(nullable = false)
     val email: String,
 
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
         joinColumns = [JoinColumn(name = "user_id")],
-        inverseJoinColumns = [JoinColumn(name = "role_id")]
+        inverseJoinColumns = [JoinColumn(name = "role_id")],
     )
     val roles: Set<Role> = HashSet(),
 
     @OneToOne
     @JoinColumn(name = "person_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     val person: Person? = null,
 
     @Column(nullable = false)

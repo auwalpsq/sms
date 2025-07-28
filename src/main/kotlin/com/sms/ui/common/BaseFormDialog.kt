@@ -65,7 +65,7 @@ abstract class BaseFormDialog<T : Any>(
                     ui?.withUi {
                         onChange()
                         close()
-                        Notification.show("Saved successfully", 3000, Notification.Position.TOP_CENTER)
+                        showSuccess("Saved successfully")
                     }
                 }
             }

@@ -2,6 +2,8 @@ package com.sms.ui.guardian
 
 import com.sms.entities.User
 import com.sms.services.GuardianService
+import com.sms.ui.common.showError
+import com.sms.ui.common.showSuccess
 import com.sms.ui.components.GuardianProfileForm
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
@@ -35,7 +37,7 @@ class GuardianProfileView(
             launchUiCoroutine {
                 guardianService.save(guardian)
                 ui.withUi {
-                    Notification.show("Profile updated successfully", 3000, Notification.Position.TOP_CENTER)
+                    showSuccess("Profile updated successfully")
                 }
             }
         }
@@ -59,7 +61,7 @@ class GuardianProfileView(
                 if (guardian != null) {
                     form.setGuardian(guardian)
                 } else {
-                    Notification.show("Error loading your profile", 3000, Notification.Position.MIDDLE)
+                    showError("Error loading your profile")
                 }
             }
         }

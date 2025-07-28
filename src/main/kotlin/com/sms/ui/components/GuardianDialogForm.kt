@@ -2,6 +2,7 @@ package com.sms.ui.components
 
 import com.sms.entities.Guardian
 import com.sms.ui.common.BaseFormDialog
+import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -31,6 +32,8 @@ class GuardianDialogForm(
         setRequiredIndicatorVisible(true)
     }
 
+    private val middleName = TextField("Middle Name")
+
     private val lastName = TextField("Last Name").apply {
         isRequired = true
         setRequiredIndicatorVisible(true)
@@ -44,14 +47,14 @@ class GuardianDialogForm(
     private val phoneNumber = TextField("Phone Number").apply {
         isRequired = true
         setRequiredIndicatorVisible(true)
-        setPlaceholder("08012345678")
+        setPlaceholder("example 08012345678")
     }
 
     override fun buildForm(formLayout: FormLayout) {
         formLayout.apply{
             responsiveSteps = listOf(FormLayout.ResponsiveStep("0", 1))
         }
-        formLayout.add(firstName, lastName, email, phoneNumber)
+        formLayout.add(firstName, middleName, lastName, email, phoneNumber)
     }
 
     override fun configureBinder() {
@@ -60,6 +63,9 @@ class GuardianDialogForm(
         binder.forField(firstName)
             .withValidator(nameValidator)
             .bind(Guardian::firstName) { g, v -> g.firstName = v }
+
+        binder.forField(middleName)
+            .bind(Guardian::middleName, Guardian::middleName::set)
 
         binder.forField(lastName)
             .withValidator(nameValidator)
@@ -93,11 +99,7 @@ class GuardianDialogForm(
                     onDelete(currentEntity)
                     ui?.withUi {
                         close()
-                        Notification.show(
-                            "Guardian deleted successfully",
-                            3000,
-                            Notification.Position.TOP_CENTER
-                        )
+                        showSuccess("Guardian deleted successfully")
                     }
                 }
             }

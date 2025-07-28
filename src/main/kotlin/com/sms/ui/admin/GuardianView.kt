@@ -8,7 +8,6 @@ import com.sms.util.withUi
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
-import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.Menu
@@ -58,7 +57,7 @@ class GuardianView(
 
     private fun configureGrid() {
         grid.setSizeFull()
-        grid.setColumns("firstName", "lastName", "email", "phoneNumber")
+        grid.setColumns("firstName", "middleName", "lastName", "email", "phoneNumber")
         grid.addItemDoubleClickListener { event ->
             dialog.open(event.item)
         }

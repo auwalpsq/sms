@@ -1,0 +1,13 @@
+.success-notification {
+  --lumo-primary-color: green;
+  color: white;
+  background-color: #2e7d32; /* dark green */
+  /*border-radius: var(--lumo-border-radius-m);*/
+}
+
+.error-notification {
+  --lumo-primary-color: red;
+  color: white;
+  background-color: #c62828; /* dark red */
+  /*border-radius: var(--lumo-border-radius-m);*/
+}

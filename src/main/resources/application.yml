@@ -8,10 +8,14 @@ spring:
     hibernate:
       ddl-auto: update
     properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-    show-sql: false
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate.format_sql: true
+      hibernate.hbm2ddl.auto: update
+    show-sql: true
+    sql:
+      init:
+        mode: always
+        continue-on-error: true
 
 vaadin:
   production-mode: false
