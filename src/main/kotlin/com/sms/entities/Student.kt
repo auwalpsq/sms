@@ -15,7 +15,7 @@ class Student(
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "class_id")
-    val currentClass: SchoolClass,
+    val currentClass: SchoolClass? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -29,7 +29,7 @@ class Student(
     val photo: ByteArray? = null,
 
     @Enumerated(EnumType.STRING)
-    val applicationStatus: ApplicationStatus = ApplicationStatus.PENDING,
+    var applicationStatus: ApplicationStatus = ApplicationStatus.PENDING,
 
     val previousSchoolName: String? = null,
     val previousClass: String? = null,
@@ -37,7 +37,7 @@ class Student(
     // ✅ New field: Student linked to Guardian
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "guardian_id")
-    val guardian: Guardian
+    var guardian: Guardian? = null
 
 ) : Person() {
     val currentAge: Int
