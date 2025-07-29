@@ -6,40 +6,80 @@
 <mapper namespace="com.sms.mappers.StudentMapper">
 
     <resultMap id="studentResultMap" type="com.sms.entities.Student">
-        <id property="id" column="id"/>
-        <result property="firstName" column="first_name"/>
-        <result property="lastName" column="last_name"/>
-        <result property="gender" column="gender"/>
-        <result property="dateOfBirth" column="date_of_birth"/>
-        <result property="admissionStatus" column="admission_status"/>
-        <result property="guardian.id" column="guardian_id"/>
+        <result property="admissionNumber" column="admission_number"/>
+        <result property="admissionDate" column="admission_date"/>
+        <association property="currentClass" javaType="com.sms.entities.SchoolClass">
+            <id property="id" column="class_id"/>
+        </association>
+        <result property="schoolLevel" column="school_level"/>
+        <result property="bloodGroup" column="blood_group"/>
+        <result property="genotype" column="genotype"/>
+        <result property="knownAllergies" column="known_allergies"/>
+        <result property="photo" column="photo"/>
+        <result property="applicationStatus" column="application_status"/>
+        <result property="previousSchoolName" column="previous_school_name"/>
+        <result property="previousClass" column="previous_class"/>
+        <association property="guardian" javaType="com.sms.entities.Guardian">
+            <id property="id" column="guardian_id"/>
+        </association>
     </resultMap>
 
     <select id="findByGuardianId" resultMap="studentResultMap">
-        SELECT * FROM students WHERE guardian_id = #{guardianId}
+        SELECT * FROM students s
+        JOIN persons p ON s.id = p.id
+        WHERE s.guardian_id = #{guardianId}
     </select>
 
-    <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO students (
-        first_name, last_name, gender, date_of_birth, admission_status, guardian_id
+    <!-- STEP 1: Insert into persons -->
+    <insert id="insertIntoPerson" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO persons (
+        first_name, middle_name, last_name, gender, date_of_birth
         ) VALUES (
-        #{firstName}, #{lastName}, #{gender}, #{dateOfBirth}, #{admissionStatus}, #{guardian.id}
+        #{firstName}, #{middleName}, #{lastName}, #{gender}, #{dateOfBirth}
+        )
+    </insert>
+
+    <!-- STEP 2: Insert into students -->
+    <insert id="save" parameterType="com.sms.entities.Student">
+        INSERT INTO students (
+        id, admission_number, admission_date, class_id, school_level,
+        blood_group, genotype, known_allergies, photo, application_status,
+        previous_school_name, previous_class, guardian_id
+        ) VALUES (
+        #{id}, #{admissionNumber}, #{admissionDate}, #{currentClass.id}, #{schoolLevel},
+        #{bloodGroup}, #{genotype}, #{knownAllergies}, #{photo}, #{applicationStatus},
+        #{previousSchoolName}, #{previousClass}, #{guardian.id}
         )
     </insert>
 
     <update id="update" parameterType="com.sms.entities.Student">
-        UPDATE students
-        SET
+        UPDATE persons SET
         first_name = #{firstName},
+        middle_name = #{middleName},
         last_name = #{lastName},
         gender = #{gender},
-        date_of_birth = #{dateOfBirth},
-        admission_status = #{admissionStatus}
-        WHERE id = #{id}
+        date_of_birth = #{dateOfBirth}
+        WHERE id = #{id};
+
+        UPDATE students SET
+        admission_number = #{admissionNumber},
+        admission_date = #{admissionDate},
+        class_id = #{currentClass.id},
+        school_level = #{schoolLevel},
+        blood_group = #{bloodGroup},
+        genotype = #{genotype},
+        known_allergies = #{knownAllergies},
+        photo = #{photo},
+        application_status = #{applicationStatus},
+        previous_school_name = #{previousSchoolName},
+        previous_class = #{previousClass},
+        guardian_id = #{guardian.id}
+        WHERE id = #{id};
     </update>
 
     <delete id="delete" parameterType="long">
-        DELETE FROM students WHERE id = #{id}
+        DELETE FROM students WHERE id = #{id};
+        DELETE FROM persons WHERE id = #{id};
     </delete>
 
 </mapper>
