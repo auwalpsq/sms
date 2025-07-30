@@ -8,6 +8,7 @@ import com.sms.services.GuardianService
 import com.sms.services.StudentService
 import com.sms.ui.components.AdmissionFormDialog
 import com.sms.ui.guardian.GuardianLayout
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.grid.Grid
@@ -31,6 +32,7 @@ class GuardianAdmissionView(
     val user = SecurityContextHolder.getContext().authentication.principal as User
     private val grid = Grid(Student::class.java, false)
     private val formDialog: AdmissionFormDialog
+    val ui: UI? = UI.getCurrent()
 
     init {
         add(H2("Admission Applications"))
@@ -45,7 +47,7 @@ class GuardianAdmissionView(
             },
             onDelete = { student ->
                 studentService.delete(student.id!!)
-                refreshGrid()
+                ui?.access { refreshGrid() }
             },
             onChange = { refreshGrid() }
         )

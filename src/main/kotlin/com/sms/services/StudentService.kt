@@ -10,8 +10,12 @@ class StudentService(private val studentMapper: StudentMapper) {
 
     @Transactional
     fun save(student: Student): Student {
-        studentMapper.insertIntoPerson(student) // inserts into persons and sets student.id
-        studentMapper.save(student) // inserts into students using student.id
+        if(student.id == null) {
+            studentMapper.insertIntoPerson(student) // inserts into persons and sets student.id
+            studentMapper.save(student) // inserts into students using student.id
+        }else{
+            studentMapper.update(student)
+        }
         return student
     }
 
