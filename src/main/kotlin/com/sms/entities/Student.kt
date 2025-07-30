@@ -43,13 +43,13 @@ class Student(
     val currentAge: Int
         get() = Period.between(dateOfBirth, LocalDate.now()).years
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Student) return false
-        return admissionNumber == other.admissionNumber
-    }
-
-    override fun hashCode(): Int = admissionNumber.hashCode()
+//    override fun equals(other: Any?): Boolean {
+//        if (this === other) return true
+//        if (other !is Student) return false
+//        return admissionNumber == other.admissionNumber
+//    }
+//
+//    override fun hashCode(): Int = admissionNumber.hashCode()
 
     enum class ApplicationStatus { PENDING, APPROVED, REJECTED, ADMITTED }
 }

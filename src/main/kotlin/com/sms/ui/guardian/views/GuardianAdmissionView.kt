@@ -38,7 +38,6 @@ class GuardianAdmissionView(
         formDialog = AdmissionFormDialog(
             onSave = { student ->
                 val guardianId = user?.person?.id
-                print(guardianId)
                 val guardian = guardianService.findById(guardianId)
                 student.guardian = guardian
                 student.applicationStatus = Student.ApplicationStatus.PENDING
@@ -46,6 +45,7 @@ class GuardianAdmissionView(
             },
             onDelete = { student ->
                 studentService.delete(student.id!!)
+                refreshGrid()
             },
             onChange = { refreshGrid() }
         )
@@ -83,7 +83,6 @@ class GuardianAdmissionView(
 
     private fun refreshGrid() {
         val guardianId = user?.person?.id
-        println(guardianId)
         val guardian = guardianMapper.findById(guardianId)
         guardian?.id?.let { guardianId ->
             val applications = studentService.findByGuardianId(guardianId)

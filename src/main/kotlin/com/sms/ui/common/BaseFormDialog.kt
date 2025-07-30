@@ -142,11 +142,7 @@ abstract class BaseFormDialog<T : Any>(
                     onDelete(currentEntity)
                     ui?.withUi {
                         close()
-                        Notification.show(
-                            "Deleted successfully",
-                            3000,
-                            Notification.Position.TOP_CENTER
-                        )
+                        showError("Deleted Successfully")
                     }
                 }
             }
