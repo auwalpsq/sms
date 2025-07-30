@@ -13,8 +13,8 @@ class Student(
     @Column(nullable = false)
     val admissionDate: LocalDate = LocalDate.now(),
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "class_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "class_id", nullable = true)
     val currentClass: SchoolClass? = null,
 
     @Enumerated(EnumType.STRING)

@@ -3,6 +3,8 @@ package com.sms.ui.guardian.views
 import com.sms.entities.Guardian
 import com.sms.entities.Student
 import com.sms.entities.User
+import com.sms.mappers.GuardianMapper
+import com.sms.services.GuardianService
 import com.sms.services.StudentService
 import com.sms.ui.components.AdmissionFormDialog
 import com.sms.ui.guardian.GuardianLayout
@@ -22,10 +24,11 @@ import org.springframework.security.core.context.SecurityContextHolder
 @Route(value = "guardian/admissions", layout = GuardianLayout::class)
 @RolesAllowed("GUARDIAN")
 class GuardianAdmissionView(
-    private val studentService:
-    StudentService
+    private val studentService: StudentService,
+    private val guardianService: GuardianService,
+    private val guardianMapper: GuardianMapper
 ) : VerticalLayout() {
-
+    val user = SecurityContextHolder.getContext().authentication.principal as User
     private val grid = Grid(Student::class.java, false)
     private val formDialog: AdmissionFormDialog
 
@@ -34,8 +37,10 @@ class GuardianAdmissionView(
 
         formDialog = AdmissionFormDialog(
             onSave = { student ->
-                val user = SecurityContextHolder.getContext().authentication.principal as User
-                student.guardian = user?.person as? Guardian
+                val guardianId = user?.person?.id
+                print(guardianId)
+                val guardian = guardianService.findById(guardianId)
+                student.guardian = guardian
                 student.applicationStatus = Student.ApplicationStatus.PENDING
                 studentService.save(student)
             },
@@ -77,8 +82,9 @@ class GuardianAdmissionView(
     }
 
     private fun refreshGrid() {
-        val user = SecurityContextHolder.getContext().authentication.principal as User
-        val guardian = user?.person as? Guardian
+        val guardianId = user?.person?.id
+        println(guardianId)
+        val guardian = guardianMapper.findById(guardianId)
         guardian?.id?.let { guardianId ->
             val applications = studentService.findByGuardianId(guardianId)
             grid.setItems(applications)

@@ -1,25 +1,27 @@
-ALTER TABLE users
-DROP CONSTRAINT IF EXISTS fkmvbq8q4vpi6csivw9wcnq6ho5;
+ALTER TABLE students ALTER COLUMN class_id DROP NOT NULL;
 
--- Step 2: Re-add the constraint with ON DELETE CASCADE
-ALTER TABLE users
-ADD CONSTRAINT fk_users_person
-FOREIGN KEY (person_id) REFERENCES persons(id)
-ON DELETE CASCADE;
-
-ALTER TABLE users
-DROP CONSTRAINT IF EXISTS fk_users_person;
-
-ALTER TABLE users
-ADD CONSTRAINT fk_users_person
-FOREIGN KEY (person_id) REFERENCES persons(id)
-ON DELETE CASCADE;
-
-ALTER TABLE user_roles
-DROP CONSTRAINT IF EXISTS fkhfh9dx7w3ubf1co1vdev94g3f;
-
--- Step 2: Recreate it with ON DELETE CASCADE
-ALTER TABLE user_roles
-ADD CONSTRAINT fk_user_roles_user
-FOREIGN KEY (user_id) REFERENCES users(id)
-ON DELETE CASCADE;
+--ALTER TABLE users
+--DROP CONSTRAINT IF EXISTS fkmvbq8q4vpi6csivw9wcnq6ho5;
+--
+---- Step 2: Re-add the constraint with ON DELETE CASCADE
+--ALTER TABLE users
+--ADD CONSTRAINT fk_users_person
+--FOREIGN KEY (person_id) REFERENCES persons(id)
+--ON DELETE CASCADE;
+--
+--ALTER TABLE users
+--DROP CONSTRAINT IF EXISTS fk_users_person;
+--
+--ALTER TABLE users
+--ADD CONSTRAINT fk_users_person
+--FOREIGN KEY (person_id) REFERENCES persons(id)
+--ON DELETE CASCADE;
+--
+--ALTER TABLE user_roles
+--DROP CONSTRAINT IF EXISTS fkhfh9dx7w3ubf1co1vdev94g3f;
+--
+---- Step 2: Recreate it with ON DELETE CASCADE
+--ALTER TABLE user_roles
+--ADD CONSTRAINT fk_user_roles_user
+--FOREIGN KEY (user_id) REFERENCES users(id)
+--ON DELETE CASCADE;
