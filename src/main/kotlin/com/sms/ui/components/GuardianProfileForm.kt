@@ -1,9 +1,7 @@
 package com.sms.ui.components
 
 import com.sms.entities.Guardian
-import com.sms.entities.RelationshipType
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.html.H3
 import com.vaadin.flow.component.orderedlayout.FlexComponent
@@ -35,10 +33,7 @@ class GuardianProfileForm(
 
     // Guardian fields
     private val guardianId = TextField("Guardian ID")
-    val relationship = ComboBox<RelationshipType>("Relationship to Student").apply {
-        //setItems(*RelationshipType.values())
-        setItemLabelGenerator { it.name.lowercase().replaceFirstChar { ch -> ch.uppercase() } }
-    }
+
     private val occupation = TextField("Occupation")
     private val employer = TextField("Employer")
     private val alternatePhone = TextField("Alternate Phone")
@@ -65,7 +60,7 @@ class GuardianProfileForm(
 
         // Add fields to form
         with(formLayout) {
-            add(firstName, middleName, lastName, phoneNumber, email, address, city, state, guardianId, relationship, occupation, employer, alternatePhone)
+            add(firstName, middleName, lastName, phoneNumber, email, address, city, state, guardianId, occupation, employer, alternatePhone)
         }
 
         // Configure binder
@@ -117,10 +112,6 @@ class GuardianProfileForm(
         binder.forField(guardianId)
             .bind({ it.guardianId }, null) // Read-only binding
 
-        binder.forField(relationship)
-            .asRequired("Relationship is required")
-            .bind(Guardian::relationshipToStudent, Guardian::relationshipToStudent::set)
-
         binder.forField(occupation)
             .bind(Guardian::occupation, Guardian::occupation::set)
 
@@ -130,8 +121,6 @@ class GuardianProfileForm(
         binder.forField(alternatePhone)
             .bind(Guardian::alternatePhone, Guardian::alternatePhone::set)
 
-        relationship.setItems(RelationshipType.values().toSet())
-        relationship.value = currentGuardian?.relationshipToStudent
     }
 
     fun setGuardian(guardian: Guardian) {

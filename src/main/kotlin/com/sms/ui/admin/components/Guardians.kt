@@ -1,4 +1,4 @@
-package com.sms.ui.admin
+package com.sms.ui.admin.components
 
 import com.sms.entities.Guardian
 import com.sms.services.GuardianService
@@ -10,16 +10,9 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
-import com.vaadin.flow.router.Menu
-import com.vaadin.flow.router.PageTitle
-import com.vaadin.flow.router.Route
-import jakarta.annotation.security.RolesAllowed
 
-@Route("admin/guardians", layout = AdminView::class)
-@RolesAllowed("ADMIN")
-@PageTitle("Guardian Management")
-@Menu(order = 0.0, icon = "vaadin:user", title = "Gurdians")
-class GuardianView(
+
+class Guardians(
     private val guardianService: GuardianService
 ) : VerticalLayout() {
 

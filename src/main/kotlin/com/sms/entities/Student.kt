@@ -1,19 +1,34 @@
 package com.sms.entities
 
-import jakarta.persistence.*
-import java.time.*
+import com.sms.entities.Guardian
+import com.sms.entities.Person
+import com.sms.entities.SchoolClass
+import com.sms.entities.SchoolLevel
+import jakarta.persistence.Column
+import jakarta.persistence.DiscriminatorValue
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.Lob
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
+import java.time.LocalDate
+import java.time.Period
 
 @Entity
 @Table(name = "students")
 @DiscriminatorValue("STUDENT")
 class Student(
+
     @Column(unique = true, nullable = false)
     val admissionNumber: String? = null,
 
     @Column(nullable = false)
     val admissionDate: LocalDate = LocalDate.now(),
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "class_id", nullable = true)
     val currentClass: SchoolClass? = null,
 
@@ -28,28 +43,12 @@ class Student(
     @Lob
     val photo: ByteArray? = null,
 
-    @Enumerated(EnumType.STRING)
-    var applicationStatus: ApplicationStatus = ApplicationStatus.PENDING,
-
-    val previousSchoolName: String? = null,
-    val previousClass: String? = null,
-
-    // ✅ New field: Student linked to Guardian
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "guardian_id")
-    var guardian: Guardian? = null
+    val guardian: Guardian? = null
 
 ) : Person() {
+
     val currentAge: Int
         get() = Period.between(dateOfBirth, LocalDate.now()).years
-
-//    override fun equals(other: Any?): Boolean {
-//        if (this === other) return true
-//        if (other !is Student) return false
-//        return admissionNumber == other.admissionNumber
-//    }
-//
-//    override fun hashCode(): Int = admissionNumber.hashCode()
-
-    enum class ApplicationStatus { PENDING, APPROVED, REJECTED, ADMITTED }
 }

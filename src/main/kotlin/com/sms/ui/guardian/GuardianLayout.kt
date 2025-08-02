@@ -1,6 +1,6 @@
 package com.sms.ui.guardian
 
-import com.sms.ui.guardian.views.GuardianAdmissionView
+import com.sms.ui.guardian.views.GuardianApplicationView
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
@@ -58,7 +58,7 @@ class GuardianLayout : AppLayout() {
 //            SideNavItem("My Students", GuardianStudentsView::class.java, VaadinIcon.ACADEMY_CAP.create())
 //        )
         nav.addItem(
-            SideNavItem("Apply for Admission", GuardianAdmissionView::class.java, VaadinIcon.PLUS_CIRCLE.create())
+            SideNavItem("Apply for Admission", GuardianApplicationView::class.java, VaadinIcon.PLUS_CIRCLE.create())
         )
 //        nav.addItem(
 //            SideNavItem("Payments", GuardianPaymentsView::class.java, VaadinIcon.MONEY.create())

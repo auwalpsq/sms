@@ -141,6 +141,7 @@ abstract class BaseFormDialog<T : Any>(
                 CoroutineScope(Dispatchers.IO).launch {
                     onDelete(currentEntity)
                     ui?.withUi {
+                        onChange
                         close()
                         showError("Deleted Successfully")
                     }
@@ -148,6 +149,9 @@ abstract class BaseFormDialog<T : Any>(
             }
         }
         dialog.open()
+    }
+    open fun populateForm(entity: T) {
+        binder.readBean(entity)
     }
     protected abstract fun buildForm(formLayout: FormLayout)
     protected abstract fun configureBinder()

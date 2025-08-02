@@ -25,7 +25,6 @@
 
         <!-- Guardian -->
         <result property="guardianId" column="guardian_id"/>
-        <result property="relationshipToStudent" column="relationship_to_student" javaType="com.sms.entities.RelationshipType"/>
         <result property="occupation" column="occupation"/>
         <result property="employer" column="employer"/>
         <result property="alternatePhone" column="alternate_phone"/>
@@ -44,8 +43,8 @@
     </insert>
 
     <insert id="insertIntoGuardians">
-        INSERT INTO guardians (id, guardian_id, relationship_to_student, occupation, employer, alternate_phone)
-        VALUES (#{id}, #{guardianId}, #{relationshipToStudent}, #{occupation}, #{employer}, #{alternatePhone})
+        INSERT INTO guardians (id, guardian_id, occupation, employer, alternate_phone)
+        VALUES (#{id}, #{guardianId}, #{occupation}, #{employer}, #{alternatePhone})
     </insert>
 
     <!-- Update -->
@@ -68,7 +67,6 @@
 
         UPDATE guardians
         SET guardian_id = #{guardianId},
-        relationship_to_student = #{relationshipToStudent},
         occupation = #{occupation},
         employer = #{employer},
         alternate_phone = #{alternatePhone}
@@ -99,7 +97,6 @@
         c.state,
 
         g.guardian_id,
-        g.relationship_to_student,
         g.occupation,
         g.employer,
         g.alternate_phone

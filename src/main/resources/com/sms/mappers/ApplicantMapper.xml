@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mappers.ApplicantMapper">
+
+    <resultMap id="applicantResultMap" type="com.sms.entities.Applicant">
+        <!-- Person fields -->
+        <id property="id" column="id" javaType="long"/>
+        <result property="firstName" column="first_name" javaType="string"/>
+        <result property="middleName" column="middle_name" javaType="string"/>
+        <result property="lastName" column="last_name" javaType="string"/>
+        <result property="gender" column="gender" javaType="com.sms.entities.Gender"/>
+        <result property="dateOfBirth" column="date_of_birth" javaType="java.time.LocalDate"/>
+
+        <!-- Applicant-specific fields -->
+        <result property="applicationNumber" column="application_number" javaType="string"/>
+        <result property="applicationStatus" column="application_status" javaType="com.sms.entities.Applicant$ApplicationStatus"/>
+        <result property="paymentStatus" column="payment_status" javaType="com.sms.entities.Applicant$PaymentStatus"/>
+        <result property="submissionDate" column="submission_date" javaType="java.time.LocalDate"/>
+        <result property="relationshipToGuardian" column="relationship_to_guardian" javaType="com.sms.entities.RelationshipType"/>
+
+        <association property="guardian" javaType="com.sms.entities.Guardian">
+            <id property="id" column="guardian_id" javaType="long"/>
+        </association>
+    </resultMap>
+
+    <select id="findByGuardianId" resultMap="applicantResultMap">
+        SELECT a.*, p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        WHERE a.guardian_id = #{guardianId}
+    </select>
+
+    <insert id="insertIntoPerson" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO persons (first_name, middle_name, last_name, gender, date_of_birth, person_type)
+        VALUES (#{firstName}, #{middleName}, #{lastName}, #{gender}, #{dateOfBirth}, 'APPLICANT')
+        RETURNING id
+    </insert>
+
+    <insert id="insertIntoApplicant" parameterType="com.sms.entities.Applicant">
+        INSERT INTO applicants (
+        id, application_number, application_status, payment_status,
+        submission_date, guardian_id, relationship_to_guardian
+        ) VALUES (
+        #{id}, #{applicationNumber}, #{applicationStatus}, #{paymentStatus},
+        #{submissionDate}, #{guardian.id}, #{relationshipToStudent}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.sms.entities.Applicant">
+        UPDATE persons SET
+        first_name = #{firstName},
+        middle_name = #{middleName},
+        last_name = #{lastName},
+        gender = #{gender},
+        date_of_birth = #{dateOfBirth}
+        WHERE id = #{id};
+
+        UPDATE applicants SET
+        application_status = #{applicationStatus},
+        payment_status = #{paymentStatus},
+        relationship_to_guardian = #{relationshipToGuardian},
+        submission_date = #{submissionDate}
+        WHERE id = #{id};
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM applicants WHERE id = #{id};
+        DELETE FROM persons WHERE id = #{id};
+    </delete>
+
+    <select id="findLatestApplicationNumberForToday" resultType="string">
+        SELECT application_number FROM applicants
+        WHERE application_number LIKE CONCAT('APP-', #{datePrefix}, '%')
+        ORDER BY application_number DESC
+        LIMIT 1
+    </select>
+
+    <select id="findByStatus" resultMap="applicantResultMap" parameterType="string">
+        SELECT a.*, p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        WHERE a.application_status = #{status}
+    </select>
+</mapper>
