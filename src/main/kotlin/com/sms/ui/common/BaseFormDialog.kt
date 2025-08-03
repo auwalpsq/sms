@@ -51,7 +51,7 @@ abstract class BaseFormDialog<T : Any>(
         // Dialog behavior
         isCloseOnEsc = true
         isCloseOnOutsideClick = false
-        width = "25%"
+        width = "50%"
         minWidth = "400px"
         setDraggable(true)
         setResizable(true)

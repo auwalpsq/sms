@@ -22,12 +22,15 @@ class Applicant(
     @Enumerated(EnumType.STRING)
     var relationshipToGuardian: RelationshipType = RelationshipType.OTHER,
 
-    val previousSchoolName: String? = null,
-    val previousClass: String? = null,
+    var previousSchoolName: String? = null,
+    var previousClass: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "guardian_id")
-    var guardian: Guardian? = null
+    var guardian: Guardian? = null,
+
+    var applicationLevel: SchoolLevel? = null,
+    var intendedClass: SchoolClass? = null
 
 ) : Person() {
 

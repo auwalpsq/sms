@@ -34,11 +34,17 @@ class ApplicationFormDialog(
         //setItems(*RelationshipType.values())
         setItemLabelGenerator { it.name.lowercase().replaceFirstChar { ch -> ch.uppercase() } }
     }
+    val previousSchoolName = TextField("Previous School")
+    val previousClass = TextField("Previous Class")
     override fun buildForm(formLayout: FormLayout) {
         formLayout.apply{
-            responsiveSteps = listOf(FormLayout.ResponsiveStep("0", 1))
+            responsiveSteps = listOf(
+                FormLayout.ResponsiveStep("0", 1),
+                FormLayout.ResponsiveStep("500px", 2)
+            )
         }
-        formLayout.add(firstName, lastName, middleName, gender, dateOfBirth, relationship)
+        formLayout.add(firstName, lastName, middleName, gender, dateOfBirth,
+            relationship, previousSchoolName, previousClass)
     }
 
     override fun configureBinder() {
@@ -70,6 +76,11 @@ class ApplicationFormDialog(
 
         relationship.setItems(RelationshipType.values().toSet())
         //relationship.value = currentEntity?.relationshipToStudent
+
+        binder.forField(previousSchoolName)
+            .bind(Applicant::previousSchoolName, Applicant::previousSchoolName::set)
+        binder.forField(previousClass)
+            .bind(Applicant::previousClass, Applicant::previousClass::set)
     }
     init{
         configureDialogAppearance()

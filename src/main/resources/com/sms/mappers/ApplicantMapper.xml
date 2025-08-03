@@ -13,6 +13,8 @@
         <result property="lastName" column="last_name" javaType="string"/>
         <result property="gender" column="gender" javaType="com.sms.entities.Gender"/>
         <result property="dateOfBirth" column="date_of_birth" javaType="java.time.LocalDate"/>
+        <result property="createdAt" column="created_at" javaType="java.time.LocalDateTime" />
+        <result property="updatedAt" column="updated_at" javaType="java.time.LocalDateTime" />
 
         <!-- Applicant-specific fields -->
         <result property="applicationNumber" column="application_number" javaType="string"/>
@@ -20,6 +22,8 @@
         <result property="paymentStatus" column="payment_status" javaType="com.sms.entities.Applicant$PaymentStatus"/>
         <result property="submissionDate" column="submission_date" javaType="java.time.LocalDate"/>
         <result property="relationshipToGuardian" column="relationship_to_guardian" javaType="com.sms.entities.RelationshipType"/>
+        <result property="previousSchoolName" column="previous_school_name" javaType="string"/>
+        <result property="previousClass" column="previous_class" javaType="string"/>
 
         <association property="guardian" javaType="com.sms.entities.Guardian">
             <id property="id" column="guardian_id" javaType="long"/>
@@ -34,18 +38,23 @@
     </select>
 
     <insert id="insertIntoPerson" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO persons (first_name, middle_name, last_name, gender, date_of_birth, person_type)
-        VALUES (#{firstName}, #{middleName}, #{lastName}, #{gender}, #{dateOfBirth}, 'APPLICANT')
+        INSERT INTO persons (first_name, middle_name, last_name, gender, date_of_birth, person_type,
+        created_at, updated_at)
+        VALUES (#{firstName}, #{middleName}, #{lastName}, #{gender}, #{dateOfBirth}, 'APPLICANT',
+        #{createdAt}, #{updatedAt})
         RETURNING id
     </insert>
 
     <insert id="insertIntoApplicant" parameterType="com.sms.entities.Applicant">
         INSERT INTO applicants (
         id, application_number, application_status, payment_status,
-        submission_date, guardian_id, relationship_to_guardian
+        submission_date, guardian_id, relationship_to_guardian,
+        previous_school_name, previous_class
         ) VALUES (
         #{id}, #{applicationNumber}, #{applicationStatus}, #{paymentStatus},
-        #{submissionDate}, #{guardian.id}, #{relationshipToStudent}
+        #{submissionDate}, #{guardian.id}, #{relationshipToStudent},
+        #{previousSchoolName}, #{previousClass}
+
         )
     </insert>
 
@@ -55,14 +64,17 @@
         middle_name = #{middleName},
         last_name = #{lastName},
         gender = #{gender},
-        date_of_birth = #{dateOfBirth}
+        date_of_birth = #{dateOfBirth},
+        updated_at = #{updatedAt}
         WHERE id = #{id};
 
         UPDATE applicants SET
         application_status = #{applicationStatus},
         payment_status = #{paymentStatus},
         relationship_to_guardian = #{relationshipToGuardian},
-        submission_date = #{submissionDate}
+        submission_date = #{submissionDate},
+        previous_school_name = #{previousSchoolName},
+        previous_class = #{previousClass}
         WHERE id = #{id};
     </update>
 

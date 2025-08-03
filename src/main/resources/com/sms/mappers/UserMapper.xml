@@ -19,6 +19,8 @@
             <result property="lastName" column="person_last_name"/>
             <result property="gender" column="person_gender"/>
             <result property="dateOfBirth" column="person_date_of_birth"/>
+            <result property="createdAt" column="created_at" javaType="java.time.LocalDateTime" />
+            <result property="updatedAt" column="updated_at" javaType="java.time.LocalDateTime" />
         </association>
     </resultMap>
 
