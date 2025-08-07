@@ -1,5 +1,7 @@
 package com.sms.entities
 
+import com.sms.enums.Section
+import com.sms.enums.Term
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -14,36 +16,18 @@ data class SchoolClass(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val level: SchoolLevel = SchoolLevel.PRIMARY,
+    val section: Section = Section.PRIMARY,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id")
+    val academicSession: AcademicSession? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")
     val classTeacher: Staff? = null,
 
-    @OneToMany(mappedBy = "currentClass")
-    val students: MutableSet<Student> = mutableSetOf(),
-
-    @ElementCollection
-    @CollectionTable(name = "class_subjects", joinColumns = [JoinColumn(name = "class_id")])
-    @Column(name = "subject")
-    val subjects: MutableSet<String> = mutableSetOf(),
-
-    @Column(nullable = false)
-    val academicYear: String = LocalDate.now().year.toString(),
-
-    @Column(nullable = false)
-    val term: Term = Term.FIRST
+    @OneToMany(mappedBy = "schoolClass", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val studentAssignments: MutableSet<StudentClassAssignment> = mutableSetOf()
 ) {
-    fun getStudentCount(): Int = students.size
-}
-
-enum class SchoolLevel {
-    NURSERY,
-    PRIMARY,
-    SECONDARY_JUNIOR,
-    SECONDARY_SENIOR
-}
-
-enum class Term {
-    FIRST, SECOND, THIRD
+    fun getStudentCount(): Int = studentAssignments.size
 }

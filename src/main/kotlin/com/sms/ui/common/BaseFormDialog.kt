@@ -88,10 +88,6 @@ abstract class BaseFormDialog<T : Any>(
 
         // Form layout
         val formLayout = FormLayout().apply {
-            responsiveSteps = listOf(
-                FormLayout.ResponsiveStep("0", 1),
-                FormLayout.ResponsiveStep("500px", 2)
-            )
             buildForm(this)
         }
 

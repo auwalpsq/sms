@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mappers.SchoolClassMapper">
+
+    <!-- Result Map -->
+    <resultMap id="SchoolClassResultMap" type="com.sms.entities.SchoolClass">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="section" column="section" javaType="com.sms.enums.Section" />
+        <association property="academicSession" column="session_id" javaType="com.sms.entities.AcademicSession" select="com.sms.mappers.AcademicSessionMapper.findById"/>
+        <association property="classTeacher" column="teacher_id" javaType="com.sms.entities.Staff" select="com.sms.mappers.StaffMapper.findById"/>
+        <!-- Subjects can be loaded separately if needed -->
+    </resultMap>
+
+    <!-- SQL Statements -->
+    <select id="findAll" resultMap="SchoolClassResultMap">
+        SELECT * FROM school_classes
+    </select>
+
+    <select id="findById" resultMap="SchoolClassResultMap">
+        SELECT * FROM school_classes WHERE id = #{id}
+    </select>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO school_classes (name, section, session_id, teacher_id)
+        VALUES (#{name}, #{section}, #{academicSession.id}, #{classTeacher.id})
+    </insert>
+
+    <update id="update">
+        UPDATE school_classes
+        SET name = #{name},
+        section = #{section},
+        session_id = #{academicSession.id},
+        teacher_id = #{classTeacher.id}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM school_classes WHERE id = #{id}
+    </delete>
+
+</mapper>

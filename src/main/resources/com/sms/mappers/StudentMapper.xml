@@ -37,6 +37,17 @@
         </association>
     </resultMap>
 
+    <select id="findById" resultMap="studentResultMap" parameterType="long">
+        SELECT s.*,
+        p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth,
+        sc.id AS class_id,
+        g.id AS guardian_id
+        FROM students s
+        JOIN persons p ON s.id = p.id
+        LEFT JOIN school_classes sc ON s.class_id = sc.id
+        LEFT JOIN guardians g ON s.guardian_id = g.id
+        WHERE s.id = #{id}
+    </select>
 
     <select id="findByGuardianId" resultMap="studentResultMap">
         SELECT s.*, p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth

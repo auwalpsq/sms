@@ -14,7 +14,7 @@ import jakarta.annotation.security.RolesAllowed
 @Route("admin/manage-applications", layout = AdminView::class)
 @RolesAllowed("ADMIN")
 @PageTitle("Manage Applications")
-@Menu(order = 0.0, icon = "vaadin:folder-open", title = "Manage Applications")
+@Menu(order = 1.0, icon = "vaadin:folder-open", title = "Manage Applications")
 class ManageApplicationsView(
     guardianService: GuardianService,
     applicantService: ApplicantService

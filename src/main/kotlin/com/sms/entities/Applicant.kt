@@ -1,5 +1,6 @@
 package com.sms.entities
 
+import com.sms.enums.Section
 import jakarta.persistence.*
 import java.time.*
 
@@ -29,7 +30,10 @@ class Applicant(
     @JoinColumn(name = "guardian_id")
     var guardian: Guardian? = null,
 
-    var applicationLevel: SchoolLevel? = null,
+    var applicationSection: Section = Section.NURSERY,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "intended_class_id")
     var intendedClass: SchoolClass? = null
 
 ) : Person() {

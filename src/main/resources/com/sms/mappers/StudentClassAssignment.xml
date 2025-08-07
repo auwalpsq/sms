@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mappers.StudentClassAssignmentMapper">
+
+    <resultMap id="StudentClassAssignmentResultMap" type="com.sms.entities.StudentClassAssignment">
+        <id property="id" column="id"/>
+        <result property="assignedDate" column="assigned_date"/>
+        <association property="student" column="student_id" javaType="com.sms.entities.Student" select="com.sms.mappers.StudentMapper.findById"/>
+        <association property="schoolClass" column="class_id" javaType="com.sms.entities.SchoolClass" select="com.sms.mappers.SchoolClassMapper.findById"/>
+        <association property="academicSession" column="session_id" javaType="com.sms.entities.AcademicSession" select="com.sms.mappers.AcademicSessionMapper.findById"/>
+    </resultMap>
+
+    <insert id="save" parameterType="com.sms.entities.StudentClassAssignment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO student_class_assignments (student_id, class_id, session_id, assigned_date)
+        VALUES (#{student.id}, #{schoolClass.id}, #{academicSession.id}, #{assignedDate})
+    </insert>
+
+    <select id="findByStudentIdAndSessionId" resultMap="StudentClassAssignmentResultMap">
+        SELECT * FROM student_class_assignments
+        WHERE student_id = #{studentId} AND session_id = #{sessionId}
+    </select>
+
+    <select id="findAllByClassIdAndSessionId" resultMap="StudentClassAssignmentResultMap">
+        SELECT * FROM student_class_assignments
+        WHERE class_id = #{classId} AND session_id = #{sessionId}
+    </select>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM student_class_assignments WHERE id = #{id}
+    </delete>
+
+</mapper>

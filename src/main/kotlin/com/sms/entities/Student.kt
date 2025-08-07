@@ -3,7 +3,8 @@ package com.sms.entities
 import com.sms.entities.Guardian
 import com.sms.entities.Person
 import com.sms.entities.SchoolClass
-import com.sms.entities.SchoolLevel
+import com.sms.enums.Section
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.DiscriminatorValue
 import jakarta.persistence.Entity
@@ -13,6 +14,7 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.Lob
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import java.time.LocalDate
 import java.time.Period
@@ -22,19 +24,18 @@ import java.time.Period
 @DiscriminatorValue("STUDENT")
 class Student(
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     val admissionNumber: String? = null,
 
     @Column(nullable = false)
     val admissionDate: LocalDate = LocalDate.now(),
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id", nullable = true)
-    val currentClass: SchoolClass? = null,
+    @OneToMany(mappedBy = "student", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val classAssignments: MutableSet<StudentClassAssignment> = mutableSetOf(),
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val schoolLevel: SchoolLevel = SchoolLevel.PRIMARY,
+//    @Column(nullable = false)
+    val section: Section = Section.PRIMARY,
 
     val bloodGroup: String? = null,
     val genotype: String? = null,
