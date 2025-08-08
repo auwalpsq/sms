@@ -107,6 +107,8 @@ class GuardianDialogForm(
     }
     init{
         configureDialogAppearance()
+        width = "25%"
+        maxWidth = "600px"
     }
     override fun createNewInstance(): Guardian = Guardian()
     override fun getEntityType(): Class<Guardian> = Guardian::class.java

@@ -5,33 +5,38 @@
 
 <mapper namespace="com.sms.mappers.AcademicSessionMapper">
 
-    <resultMap id="AcademicSessionResultMap" type="com.sms.entities.AcademicSession">
-        <id property="id" column="id" />
-        <result property="year" column="year" />
+    <resultMap id="academicSessionResultMap" type="com.sms.entities.AcademicSession">
+        <id property="id" column="id" javaType="long"/>
+        <result property="startYear" column="start_year" javaType="int"/>
         <result property="term" column="term" javaType="com.sms.enums.Term"/>
-        <result property="isCurrent" column="is_current"/>
+        <result property="isCurrent" column="is_current" javaType="boolean"/>
     </resultMap>
 
-    <select id="findAll" resultMap="AcademicSessionResultMap">
+    <select id="findAll" resultMap="academicSessionResultMap">
         SELECT * FROM academic_sessions
     </select>
 
-    <select id="findById" resultMap="AcademicSessionResultMap">
+    <select id="findById" resultMap="academicSessionResultMap">
         SELECT * FROM academic_sessions WHERE id = #{id}
     </select>
 
-    <select id="findCurrentSession" resultMap="AcademicSessionResultMap">
+    <select id="findCurrentSession" resultMap="academicSessionResultMap">
         SELECT * FROM academic_sessions WHERE is_current = true LIMIT 1
     </select>
 
-    <insert id="save" useGeneratedKeys="true" keyProperty="id" parameterType="com.sms.entities.AcademicSession">
-        INSERT INTO academic_sessions (year, term, is_current)
-        VALUES (#{session.year}, #{session.term}, #{session.isCurrent})
+    <select id="findByYearAndTerm" resultMap="academicSessionResultMap">
+        SELECT * FROM academic_sessions
+        WHERE start_year = #{startYear} AND term = #{term}
+    </select>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="session.id" parameterType="com.sms.entities.AcademicSession">
+        INSERT INTO academic_sessions (start_year, term, is_current)
+        VALUES (#{session.startYear}, #{session.term}, #{session.isCurrent})
     </insert>
 
     <update id="update">
         UPDATE academic_sessions
-        SET year = #{year},
+        SET start_year = #{startYear},
         term = #{term},
         is_current = #{isCurrent}
         WHERE id = #{id}

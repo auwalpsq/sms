@@ -18,12 +18,12 @@ class AcademicSessionFormDialog(
     private val yearField = IntegerField("Year").apply {
         min = 2000
         max = 2100
-        isClearButtonVisible = true
+        //isClearButtonVisible = true
     }
 
     private val termField = ComboBox<Term>("Term").apply {
         setItems(*Term.values())
-        isClearButtonVisible = true
+        //isClearButtonVisible = true
     }
 
     private val currentCheckbox = Checkbox("Current Session")
@@ -36,7 +36,7 @@ class AcademicSessionFormDialog(
     }
 
     override fun configureBinder() {
-        binder.forField(yearField).bind(AcademicSession::year, AcademicSession::year::set)
+        binder.forField(yearField).bind(AcademicSession::startYear, AcademicSession::startYear::set)
         binder.forField(termField).bind(AcademicSession::term, AcademicSession::term::set)
         binder.forField(currentCheckbox).bind(AcademicSession::isCurrent, AcademicSession::isCurrent::set)
     }

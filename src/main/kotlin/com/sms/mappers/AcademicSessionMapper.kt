@@ -1,20 +1,23 @@
 package com.sms.mappers
 
 import com.sms.entities.AcademicSession
+import com.sms.enums.Term
 import org.apache.ibatis.annotations.*
 
 @Mapper
 interface AcademicSessionMapper {
 
-    suspend fun findAll(): List<AcademicSession>
+    fun findAll(): List<AcademicSession>
 
-    suspend fun findById(id: Long): AcademicSession?
+    fun findById(id: Long): AcademicSession
 
-    suspend fun findCurrentSession(): AcademicSession?
+    fun findCurrentSession(): AcademicSession
 
-    suspend fun save(session: AcademicSession)
+    fun findByYearAndTerm(@Param("startYear") startYear: Int, @Param("term") term: Term): AcademicSession?
 
-    suspend fun update(session: AcademicSession)
+    fun save(@Param("session") session: AcademicSession)
 
-    suspend fun deleteById(id: Long)
+    fun update(session: AcademicSession)
+
+    fun deleteById(id: Long)
 }

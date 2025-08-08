@@ -10,8 +10,8 @@ data class AcademicSession(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @Column(nullable = false, unique = true)
-    var year: Int = Year.now().value,
+    @Column(nullable = false)
+    var startYear: Int = Year.now().value,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -19,4 +19,7 @@ data class AcademicSession(
 
     @Column(nullable = false)
     var isCurrent: Boolean = false
-)
+){
+    val displaySession: String
+        get() = "$startYear/${startYear + 1}"
+}

@@ -61,11 +61,15 @@ abstract class BaseFormDialog<T : Any>(
         saveBtn.addClickListener {
             if (binder.writeBeanIfValid(currentEntity)) {
                 launchUiCoroutine {
-                    onSave(currentEntity)
-                    ui?.withUi {
-                        onChange()
-                        close()
-                        showSuccess("Saved successfully")
+                    try {
+                        onSave(currentEntity)
+                        ui?.withUi {
+                            onChange()
+                            close()
+                            showSuccess("Saved successfully")
+                        }
+                    }catch (ex: Exception){
+                        ui?.withUi { showError(ex.message.toString()) }
                     }
                 }
             }
@@ -137,7 +141,7 @@ abstract class BaseFormDialog<T : Any>(
                 CoroutineScope(Dispatchers.IO).launch {
                     onDelete(currentEntity)
                     ui?.withUi {
-                        onChange
+                        onChange()
                         close()
                         showError("Deleted Successfully")
                     }

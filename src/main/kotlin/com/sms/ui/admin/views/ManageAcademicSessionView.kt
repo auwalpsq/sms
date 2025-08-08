@@ -35,10 +35,9 @@ class ManageAcademicSessionsView(
     }
 
     private fun configureGrid() {
-        grid.addColumn { it.year }.setHeader("Year")
+        grid.addColumn { it.displaySession }.setHeader("Session")
         grid.addColumn { it.term }.setHeader("Term")
         grid.addColumn { if (it.isCurrent) "Yes" else "No" }.setHeader("Current?")
-        grid.setSizeFull()
         grid.asSingleSelect().addValueChangeListener {
             it.value?.let { session -> formDialog.open(session) }
         }
@@ -51,6 +50,8 @@ class ManageAcademicSessionsView(
             onChange = { refreshGrid() }
         ).apply {
             configureDialogAppearance()
+            maxWidth = "400px"
+            width = "25%"
         }
     }
 
