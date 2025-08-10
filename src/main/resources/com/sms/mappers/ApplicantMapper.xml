@@ -24,6 +24,8 @@
         <result property="relationshipToGuardian" column="relationship_to_guardian" javaType="com.sms.entities.RelationshipType"/>
         <result property="previousSchoolName" column="previous_school_name" javaType="string"/>
         <result property="previousClass" column="previous_class" javaType="string"/>
+        <result property="applicationSection" column="application_section" javaType="com.sms.enums.Section" />
+        <result property="intendedClass" column="intended_class" javaType="string" />
 
         <association property="guardian" javaType="com.sms.entities.Guardian">
             <id property="id" column="guardian_id" javaType="long"/>
@@ -49,11 +51,11 @@
         INSERT INTO applicants (
         id, application_number, application_status, payment_status,
         submission_date, guardian_id, relationship_to_guardian,
-        previous_school_name, previous_class
+        previous_school_name, previous_class, application_section, intended_class
         ) VALUES (
         #{id}, #{applicationNumber}, #{applicationStatus}, #{paymentStatus},
-        #{submissionDate}, #{guardian.id}, #{relationshipToStudent},
-        #{previousSchoolName}, #{previousClass}
+        #{submissionDate}, #{guardian.id}, #{relationshipToGuardian},
+        #{previousSchoolName}, #{previousClass}, #{applicationSection}, #{intendedClass}
 
         )
     </insert>
@@ -74,7 +76,9 @@
         relationship_to_guardian = #{relationshipToGuardian},
         submission_date = #{submissionDate},
         previous_school_name = #{previousSchoolName},
-        previous_class = #{previousClass}
+        previous_class = #{previousClass},
+        application_section = #{applicationSection},
+        intended_class = #{intendedClass}
         WHERE id = #{id};
     </update>
 

@@ -30,11 +30,12 @@ class Applicant(
     @JoinColumn(name = "guardian_id")
     var guardian: Guardian? = null,
 
-    var applicationSection: Section = Section.NURSERY,
+    @Column(name = "application_section")
+    @Enumerated(EnumType.STRING)
+    var applicationSection: Section =   Section.NURSERY,
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "intended_class_id")
-    var intendedClass: SchoolClass? = null
+    @JoinColumn(name = "intended_class")
+    var intendedClass: String? = ""
 
 ) : Person() {
 

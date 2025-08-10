@@ -1,11 +1,17 @@
 package com.sms.ui.admin.views
 
 import com.sms.entities.User
+import com.sms.services.AcademicSessionService
+import com.sms.util.launchUiCoroutine
+import com.sms.util.withUi
 import com.vaadin.flow.component.Component
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.applayout.AppLayout
 import com.vaadin.flow.component.avatar.Avatar
 import com.vaadin.flow.component.avatar.AvatarVariant
 import com.vaadin.flow.component.html.H1
+import com.vaadin.flow.component.html.H3
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.menubar.MenuBar
 import com.vaadin.flow.component.menubar.MenuBarVariant
@@ -25,18 +31,49 @@ import org.springframework.security.core.context.SecurityContextHolder
 @PageTitle("Admin Dashboard")
 @Route(value = "admin")
 @RolesAllowed("ADMIN")
-class AdminView : AppLayout() {
+class AdminView(
+    private val sessionService: AcademicSessionService
+) : AppLayout() {
 
+    private val ui: UI? = UI.getCurrent()
     init {
         createHeader()
         createDrawer()
     }
 
     private fun createHeader() {
-        val logo = H1("School Management System")
-        val layout = HorizontalLayout(logo)
-        layout.addClassNames(LumoUtility.JustifyContent.CENTER, LumoUtility.Width.FULL)
-        logo.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.MEDIUM)
+        val logo = H3("Admin Portal")
+        val layout = HorizontalLayout()
+        layout.setWidthFull()
+        layout.addClassNames(
+            LumoUtility.JustifyContent.BETWEEN,
+            LumoUtility.AlignItems.CENTER,
+            LumoUtility.Padding.Horizontal.MEDIUM
+        )
+
+        // Add logo on the left
+        layout.add(logo)
+
+        // Fetch and add session info on the right
+        launchUiCoroutine {
+            val session = sessionService.findCurrent()
+            ui?.withUi {
+                val sessionInfo = if (session != null) {
+                    Span("${session.displaySession} - ${session.term} Term")
+                } else {
+                    Span("No active academic session")
+                }
+                sessionInfo.addClassNames(
+                    LumoUtility.FontWeight.BOLD,
+                    LumoUtility.FontSize.MEDIUM
+                )
+
+                // Add session info to the layout (right side)
+                layout.add(sessionInfo)
+            }
+        }
+
+        // Add the layout to the navbar
         addToNavbar(layout)
     }
 

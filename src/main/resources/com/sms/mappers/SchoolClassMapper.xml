@@ -9,10 +9,12 @@
     <resultMap id="SchoolClassResultMap" type="com.sms.entities.SchoolClass">
         <id property="id" column="id" />
         <result property="name" column="name" />
+        <result property="level" column="level" javaType="com.sms.enums.Level" />
+        <result property="grade" column="grade" javaType="com.sms.enums.Grade" />
         <result property="section" column="section" javaType="com.sms.enums.Section" />
-        <association property="academicSession" column="session_id" javaType="com.sms.entities.AcademicSession" select="com.sms.mappers.AcademicSessionMapper.findById"/>
-        <association property="classTeacher" column="teacher_id" javaType="com.sms.entities.Staff" select="com.sms.mappers.StaffMapper.findById"/>
-        <!-- Subjects can be loaded separately if needed -->
+<!--        <association property="classTeacher" column="teacher_id"-->
+<!--                     javaType="com.sms.entities.Staff"-->
+<!--                     select="com.sms.mappers.StaffMapper.findById"/>-->
     </resultMap>
 
     <!-- SQL Statements -->
@@ -25,15 +27,16 @@
     </select>
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO school_classes (name, section, session_id, teacher_id)
-        VALUES (#{name}, #{section}, #{academicSession.id}, #{classTeacher.id})
+        INSERT INTO school_classes (name, level, grade, section, teacher_id)
+        VALUES (#{name}, #{level}, #{grade}, #{section}, #{classTeacher.id})
     </insert>
 
     <update id="update">
         UPDATE school_classes
         SET name = #{name},
+        level = #{level},
+        grade = #{grade},
         section = #{section},
-        session_id = #{academicSession.id},
         teacher_id = #{classTeacher.id}
         WHERE id = #{id}
     </update>
@@ -41,5 +44,18 @@
     <delete id="deleteById">
         DELETE FROM school_classes WHERE id = #{id}
     </delete>
+
+    <select id="existsByUniqueFields" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
+        FROM school_classes
+        WHERE name = #{name}
+        AND level = #{level}
+        AND grade = #{grade}
+        AND section = #{section}
+    </select>
+
+    <select id="findBySection" parameterType="string" resultType="string">
+        SELECT name FROM school_classes WHERE section = #{section}
+    </select>
 
 </mapper>

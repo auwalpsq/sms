@@ -5,6 +5,7 @@ import com.sms.entities.Guardian
 import com.sms.entities.User
 import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
+import com.sms.services.SchoolClassService
 import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.guardian.GuardianLayout
 import com.sms.util.launchUiCoroutine
@@ -18,6 +19,7 @@ import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.ComponentRenderer
+import com.vaadin.flow.router.Menu
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import jakarta.annotation.security.RolesAllowed
@@ -26,9 +28,11 @@ import org.springframework.security.core.context.SecurityContextHolder
 @PageTitle("My Applications")
 @Route(value = "guardian/admissions", layout = GuardianLayout::class)
 @RolesAllowed("GUARDIAN")
+@Menu(order = 2.0, icon = "vaadin:form", title = "Apply for Admission")
 class GuardianApplicationView(
     private val applicantService: ApplicantService,
-    private val guardianService: GuardianService
+    private val guardianService: GuardianService,
+    private val schoolClassService: SchoolClassService
 ) : VerticalLayout() {
     val user = SecurityContextHolder.getContext().authentication.principal as User
     private val grid = Grid(Applicant::class.java, false)
@@ -57,6 +61,7 @@ class GuardianApplicationView(
     private fun createFormDialog() {
         formDialog = ApplicationFormDialog(
             guardian = currentGuardian!!,
+            schoolClassService = schoolClassService,
             onSave = { applicant ->
                 applicantService.save(applicant)
             },

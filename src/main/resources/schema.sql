@@ -1,4 +1,13 @@
-ALTER TABLE students ALTER COLUMN class_id DROP NOT NULL;
+--ALTER TABLE school_classes
+--    DROP CONSTRAINT school_classes_level_check,
+--    ADD CONSTRAINT school_classes_level_check
+--    CHECK (level IN ('ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX'));
+
+--ALTER TABLE school_classes
+--ADD CONSTRAINT uq_class_unique
+--UNIQUE (name, level, grade, section);
+
+--ALTER TABLE students ALTER COLUMN class_id DROP NOT NULL;
 
 --ALTER TABLE users
 --DROP CONSTRAINT IF EXISTS fkmvbq8q4vpi6csivw9wcnq6ho5;

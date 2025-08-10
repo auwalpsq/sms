@@ -1,6 +1,10 @@
 package com.sms.ui.guardian
 
+import com.sms.services.AcademicSessionService
 import com.sms.ui.guardian.views.GuardianApplicationView
+import com.sms.ui.guardian.views.GuardianProfileView
+import com.sms.util.launchUiCoroutine
+import com.sms.util.withUi
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
@@ -8,6 +12,9 @@ import com.vaadin.flow.component.applayout.AppLayout
 import com.vaadin.flow.component.avatar.Avatar
 import com.vaadin.flow.component.avatar.AvatarVariant
 import com.vaadin.flow.component.html.H1
+import com.vaadin.flow.component.html.H3
+import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.menubar.MenuBar
 import com.vaadin.flow.component.menubar.MenuBarVariant
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -18,24 +25,58 @@ import com.vaadin.flow.theme.lumo.LumoUtility.*
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import com.vaadin.flow.server.VaadinServletRequest
+import com.vaadin.flow.server.menu.MenuConfiguration
+import com.vaadin.flow.server.menu.MenuEntry
+import com.vaadin.flow.theme.lumo.LumoUtility
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.security.core.context.SecurityContextHolder
 
 @PageTitle("Guardian Portal")
 @Route(value = "guardian")
 @RolesAllowed("GUARDIAN")
-class GuardianLayout : AppLayout() {
+class GuardianLayout(
+    private val sessionService: AcademicSessionService
+) : AppLayout() {
 
+    private val ui: UI = UI.getCurrent()
     init {
         createHeader()
         createDrawer()
     }
 
     private fun createHeader() {
-        val logo = H1("Guardian Portal")
-        val layout = HorizontalLayout(logo)
-        layout.addClassNames(JustifyContent.CENTER, Width.FULL)
-        logo.addClassNames(FontSize.LARGE, Margin.MEDIUM)
+        val logo = H3("Guardian Portal")
+        val layout = HorizontalLayout()
+        layout.setWidthFull()
+        layout.addClassNames(
+            LumoUtility.JustifyContent.BETWEEN,
+            LumoUtility.AlignItems.CENTER,
+            LumoUtility.Padding.Horizontal.MEDIUM
+        )
+
+        // Add logo on the left
+        layout.add(logo)
+
+        // Fetch and add session info on the right
+        launchUiCoroutine {
+            val session = sessionService.findCurrent()
+            ui?.withUi {
+                val sessionInfo = if (session != null) {
+                    Span("${session.displaySession} - ${session.term} Term")
+                } else {
+                    Span("No active academic session")
+                }
+                sessionInfo.addClassNames(
+                    LumoUtility.FontWeight.BOLD,
+                    LumoUtility.FontSize.MEDIUM
+                )
+
+                // Add session info to the layout (right side)
+                layout.add(sessionInfo)
+            }
+        }
+
+        // Add the layout to the navbar
         addToNavbar(layout)
     }
 
@@ -45,29 +86,17 @@ class GuardianLayout : AppLayout() {
 
     private fun createSideNav(): SideNav {
         val nav = SideNav()
-        nav.addClassNames(Margin.Horizontal.MEDIUM)
-
-        // Add guardian-specific navigation items
-//        nav.addItem(
-//            SideNavItem("Dashboard", GuardianDashboardView::class.java, VaadinIcon.HOME.create())
-//        )
-        nav.addItem(
-            SideNavItem("My Profile", GuardianProfileView::class.java, VaadinIcon.USER.create())
-        )
-//        nav.addItem(
-//            SideNavItem("My Students", GuardianStudentsView::class.java, VaadinIcon.ACADEMY_CAP.create())
-//        )
-        nav.addItem(
-            SideNavItem("Apply for Admission", GuardianApplicationView::class.java, VaadinIcon.PLUS_CIRCLE.create())
-        )
-//        nav.addItem(
-//            SideNavItem("Payments", GuardianPaymentsView::class.java, VaadinIcon.MONEY.create())
-//        )
-//        nav.addItem(
-//            SideNavItem("Messages", GuardianMessagesView::class.java, VaadinIcon.ENVELOPE.create())
-//        )
+        nav.addClassNames(LumoUtility.Margin.Horizontal.MEDIUM)
+        MenuConfiguration.getMenuEntries().forEach { entry -> nav.addItem(createSideNavItem(entry)) }
 
         return nav
+    }
+    private fun createSideNavItem (menuEntry : MenuEntry) : SideNavItem {
+        if(menuEntry.icon != null){
+            return SideNavItem(menuEntry.title, menuEntry.path, Icon(menuEntry.icon))
+        }else{
+            return SideNavItem(menuEntry.title, menuEntry.path)
+        }
     }
 
     private fun createUserMenu(): Component {

@@ -4,7 +4,13 @@ import com.sms.entities.Applicant
 import com.sms.entities.Gender
 import com.sms.entities.Guardian
 import com.sms.entities.RelationshipType
+import com.sms.entities.SchoolClass
+import com.sms.enums.Section
+import com.sms.services.SchoolClassService
 import com.sms.ui.common.BaseFormDialog
+import com.sms.util.launchUiCoroutine
+import com.sms.util.withUi
+import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
@@ -14,11 +20,13 @@ import java.time.LocalDate
 
 class ApplicationFormDialog(
     private val guardian: Guardian,
+    private val schoolClassService: SchoolClassService,
     onSave: suspend (Applicant) -> Unit,
     onDelete: suspend (Applicant) -> Unit,
     onChange: () -> Unit
 ) : BaseFormDialog<Applicant>("Admission Application", onSave, onDelete, onChange) {
 
+    private val uii: UI? = UI.getCurrent()
     private val firstName: TextField = TextField("First Name")
     private val lastName: TextField = TextField("Last Name")
     private val middleName: TextField = TextField("Middle Name")
@@ -36,6 +44,31 @@ class ApplicationFormDialog(
     }
     val previousSchoolName = TextField("Previous School")
     val previousClass = TextField("Previous Class")
+
+    val applicationSection = ComboBox<Section>("Section").apply {
+        setItems(Section.values().toList())
+        isRequiredIndicatorVisible = true
+        setItemLabelGenerator { it.name.lowercase().replaceFirstChar(Char::uppercase) }
+        addValueChangeListener { event ->
+            val selectedSection = event.value
+            intendedClass.clear() // removes previous items & value
+            if (selectedSection != null) {
+                launchUiCoroutine {
+                    val classes = schoolClassService.findBySection(selectedSection)
+                    uii?.withUi {
+                        intendedClass.setItems(classes)
+                        intendedClass.value = classes.firstOrNull() // avoids exception
+                    }
+                }
+            }
+        }
+    }
+
+    val intendedClass = ComboBox<String>("Intended Class").apply {
+        isRequiredIndicatorVisible = true
+        setItems(emptyList())
+        //setItemLabelGenerator{it.toString()}
+    }
     override fun buildForm(formLayout: FormLayout) {
         formLayout.apply{
             responsiveSteps = listOf(
@@ -44,7 +77,7 @@ class ApplicationFormDialog(
             )
         }
         formLayout.add(firstName, lastName, middleName, gender, dateOfBirth,
-            relationship, previousSchoolName, previousClass)
+            relationship, previousSchoolName, previousClass, applicationSection, intendedClass)
     }
 
     override fun configureBinder() {
@@ -79,8 +112,17 @@ class ApplicationFormDialog(
 
         binder.forField(previousSchoolName)
             .bind(Applicant::previousSchoolName, Applicant::previousSchoolName::set)
+
         binder.forField(previousClass)
             .bind(Applicant::previousClass, Applicant::previousClass::set)
+
+        binder.forField(applicationSection)
+            .asRequired("Section is required")
+            .bind(Applicant::applicationSection, Applicant::applicationSection::set)
+
+        binder.forField(intendedClass)
+            .asRequired("Intended class is required")
+            .bind(Applicant::intendedClass, Applicant::intendedClass::set)
     }
     init{
         configureDialogAppearance()
@@ -88,6 +130,18 @@ class ApplicationFormDialog(
     override fun populateForm(entity: Applicant) {
         super.populateForm(entity)
         relationship.value = entity.relationshipToGuardian
+
+        if (entity.applicationSection != null) {
+            launchUiCoroutine {
+                val classes = schoolClassService.findBySection(entity.applicationSection)
+                uii?.withUi {
+                    intendedClass.setItems(classes)
+                    if (classes.contains(entity.intendedClass)) {
+                        intendedClass.value = entity.intendedClass
+                    }
+                }
+            }
+        }
     }
     override fun createNewInstance(): Applicant = Applicant(guardian = guardian)
 

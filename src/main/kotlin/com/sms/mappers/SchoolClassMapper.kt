@@ -1,18 +1,28 @@
 package com.sms.mappers
 
 import com.sms.entities.SchoolClass
-import org.apache.ibatis.annotations.*
+import org.apache.ibatis.annotations.Mapper
+import org.apache.ibatis.annotations.Param
 
 @Mapper
 interface SchoolClassMapper {
 
-    suspend fun findAll(): List<SchoolClass>
+    fun findAll(): List<SchoolClass>
 
-    suspend fun findById(id: Long): SchoolClass?
+    fun findById(@Param("id") id: Long): SchoolClass?
 
-    suspend fun save(schoolClass: SchoolClass)
+    fun save(schoolClass: SchoolClass)
 
-    suspend fun update(schoolClass: SchoolClass)
+    fun update(schoolClass: SchoolClass)
 
-    suspend fun deleteById(id: Long)
+    fun deleteById(@Param("id") id: Long)
+
+    fun existsByUniqueFields(
+        @Param("name") name: String,
+        @Param("level") level: String,  // Enum stored as STRING in DB
+        @Param("grade") grade: String,
+        @Param("section") section: String
+    ): Boolean
+
+    fun findBySection(name: String): List<String>
 }

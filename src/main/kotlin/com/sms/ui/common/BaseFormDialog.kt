@@ -25,7 +25,7 @@ abstract class BaseFormDialog<T : Any>(
     protected val onDelete: suspend (T) -> Unit,
     protected val onChange: () -> Unit
 ) : Dialog() {
-    val ui: UI? = UI.getCurrent()
+    private val ui: UI? = UI.getCurrent()
 
     protected val binder: Binder<T> = Binder(getEntityType())
     protected lateinit var currentEntity: T

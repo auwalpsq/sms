@@ -21,5 +21,5 @@ data class AcademicSession(
     var isCurrent: Boolean = false
 ){
     val displaySession: String
-        get() = "$startYear/${startYear + 1}"
+        get() = "$startYear/${startYear + 1} Academic Session"
 }
