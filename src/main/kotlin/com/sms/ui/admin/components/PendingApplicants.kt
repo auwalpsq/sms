@@ -85,6 +85,7 @@ class PendingApplicants(
                     addFormItem(Span(applicant.getFullName() ?: ""), "Full Name")
                     addFormItem(Span(applicant.gender?.name ?: ""), "Gender")
                     addFormItem(Span(applicant.dateOfBirth?.toString() ?: ""), "Date of Birth")
+                    addFormItem(Span(applicant.currentAge ?: ""), "Age")
                     addFormItem(Span(applicant.createdAt?.toString() ?: ""), "Start Date")
                     addFormItem(Span(applicant.updatedAt?.toString() ?: ""), "Last Updated")
                     addFormItem(Span(applicant.paymentStatus?.toString() ?: ""), "Payment Status")
@@ -92,6 +93,8 @@ class PendingApplicants(
                     addFormItem(Span(applicant.previousSchoolName?.toString() ?: ""), "Previous School")
                     addFormItem(Span(applicant.previousClass?.toString() ?: ""), "Prevoius Class")
                     addFormItem(Span(applicant.applicationStatus.name), "Application Status")
+                    addFormItem(Span(applicant.applicationSection?.toString()), "Application Section")
+                    addFormItem(Span(applicant.intendedClass.toString()), "Application Class")
                 }
 
                 val guardian = applicant.guardian

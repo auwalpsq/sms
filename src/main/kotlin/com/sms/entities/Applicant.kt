@@ -38,6 +38,8 @@ class Applicant(
     var intendedClass: String? = ""
 
 ) : Person() {
+    val currentAge: String
+        get() = "${Period.between(dateOfBirth, LocalDate.now()).years} year(s) ${Period.between(dateOfBirth, LocalDate.now()).months % 12} month(s)"
 
     enum class ApplicationStatus { PENDING, APPROVED, REJECTED }
 
