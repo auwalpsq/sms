@@ -26,6 +26,10 @@
         <result property="previousClass" column="previous_class" javaType="string"/>
         <result property="applicationSection" column="application_section" javaType="com.sms.enums.Section" />
         <result property="intendedClass" column="intended_class" javaType="string" />
+        <result property="bloodGroup" column="blood_group" javaType="string"/>
+        <result property="genotype" column="genotype" javaType="string"/>
+        <result property="knownAllergies" column="known_allergies" javaType="string"/>
+        <result property="photoUrl" column="photo_url" javaType="string"/>
 
         <association property="guardian" javaType="com.sms.entities.Guardian">
             <id property="id" column="guardian_id" javaType="long"/>
@@ -78,7 +82,11 @@
         previous_school_name = #{previousSchoolName},
         previous_class = #{previousClass},
         application_section = #{applicationSection},
-        intended_class = #{intendedClass}
+        intended_class = #{intendedClass},
+        blood_group = #{bloodGroup},
+        genotype = #{genotype},
+        known_allergies = #{knownAllergies},
+        photo_url = #{photoUrl}
         WHERE id = #{id};
     </update>
 

@@ -7,6 +7,7 @@ import com.sms.util.withUi
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.applayout.AppLayout
+import com.vaadin.flow.component.applayout.DrawerToggle
 import com.vaadin.flow.component.avatar.Avatar
 import com.vaadin.flow.component.avatar.AvatarVariant
 import com.vaadin.flow.component.html.H1
@@ -74,7 +75,7 @@ class AdminView(
         }
 
         // Add the layout to the navbar
-        addToNavbar(layout)
+        addToNavbar(DrawerToggle(), layout)
     }
 
     private fun createDrawer() {

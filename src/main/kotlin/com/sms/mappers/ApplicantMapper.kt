@@ -20,6 +20,9 @@ interface ApplicantMapper {
 
     fun delete(id: Long)
 
+    @Update("UPDATE applicants SET photo_url = #{photoUrl} WHERE id = #{id}")
+    fun updatePhoto(@Param("id") id: Long, @Param("photoUrl") photoUrl: String)
+
     suspend fun findLatestApplicationNumberForToday(@Param("datePrefix") datePrefix: String = LocalDate.now().format(
         DateTimeFormatter.ofPattern("yyyyMMdd"))): String?
 }

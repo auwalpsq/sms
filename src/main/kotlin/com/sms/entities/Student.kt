@@ -34,7 +34,7 @@ class Student(
     val classAssignments: MutableSet<StudentClassAssignment> = mutableSetOf(),
 
     @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
+    @Column(nullable = false)
     val section: Section = Section.PRIMARY,
 
     val bloodGroup: String? = null,

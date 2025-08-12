@@ -35,7 +35,13 @@ class Applicant(
     var applicationSection: Section =   Section.NURSERY,
 
     @JoinColumn(name = "intended_class")
-    var intendedClass: String? = ""
+    var intendedClass: String? = "",
+
+    var bloodGroup: String? = null,
+    var genotype: String? = null,
+    var knownAllergies: String? = null,
+
+    var photoUrl: String? = null
 
 ) : Person() {
     val currentAge: String
