@@ -174,7 +174,10 @@ class ApplicationFormDialog(
     }
 
     override fun populateForm(entity: Applicant) {
-        super.populateForm(entity)
+        formLayout.removeAll()
+        buildForm(formLayout)
+        //binder.readBean(entity)
+
         relationship.value = entity.relationshipToGuardian
 
         if (entity.applicationSection != null) {
@@ -188,18 +191,20 @@ class ApplicationFormDialog(
                 }
             }
         }
+
         if (entity.applicationStatus == Applicant.ApplicationStatus.APPROVED) {
-            // Create reusable upload field only when needed
             if (photoUpload == null) {
                 photoUpload = PhotoUploadField(Paths.get("uploads/applicants"))
-                formLayout.add(photoUpload, bloodGroup, genotype, knownAllergies)
             }
+            formLayout.add(photoUpload, bloodGroup, genotype, knownAllergies)
+
             bloodGroup.value = entity.bloodGroup ?: ""
             genotype.value = entity.genotype ?: ""
             knownAllergies.value = entity.knownAllergies ?: ""
             photoUpload?.setPhotoUrl(entity.photoUrl)
         }
     }
+
     override fun createNewInstance(): Applicant = Applicant(guardian = guardian)
 
     override fun getEntityType(): Class<Applicant> = Applicant::class.java

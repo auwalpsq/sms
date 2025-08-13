@@ -130,6 +130,7 @@ abstract class BaseFormDialog<T : Any>(
         currentEntity = entity ?: createNewInstance()
         deleteBtn.isVisible = entity != null
         binder.readBean(currentEntity)
+        //if(entity != null){populateForm(entity)}
         open()
     }
     protected open fun showDeleteConfirmation() {
