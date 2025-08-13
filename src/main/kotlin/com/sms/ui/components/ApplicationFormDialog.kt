@@ -4,7 +4,6 @@ import com.sms.entities.Applicant
 import com.sms.entities.Gender
 import com.sms.entities.Guardian
 import com.sms.entities.RelationshipType
-import com.sms.entities.SchoolClass
 import com.sms.enums.Section
 import com.sms.services.SchoolClassService
 import com.sms.ui.common.BaseFormDialog
@@ -14,8 +13,20 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
+import com.vaadin.flow.component.html.Image
+import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.data.validator.StringLengthValidator
+import com.vaadin.flow.function.SerializableBiConsumer
+import com.vaadin.flow.server.streams.UploadHandler
+import com.vaadin.flow.server.streams.UploadMetadata
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.time.LocalDate
 
 class ApplicationFormDialog(
@@ -25,6 +36,10 @@ class ApplicationFormDialog(
     onDelete: suspend (Applicant) -> Unit,
     onChange: () -> Unit
 ) : BaseFormDialog<Applicant>("Admission Application", onSave, onDelete, onChange) {
+
+    private var photoUpload: PhotoUploadField? = null
+    private val uploadedPhotoPath: String?
+        get() = photoUpload?.getPhotoUrl()
 
     private val uii: UI? = UI.getCurrent()
     private val firstName: TextField = TextField("First Name")
@@ -69,6 +84,10 @@ class ApplicationFormDialog(
         setItems(emptyList())
         //setItemLabelGenerator{it.toString()}
     }
+    private val bloodGroup = TextField("Blood Group")
+    private val genotype = TextField("Genotype")
+    private val knownAllergies = TextField("Known Allergies")
+
     override fun buildForm(formLayout: FormLayout) {
         formLayout.apply{
             responsiveSteps = listOf(
@@ -123,10 +142,37 @@ class ApplicationFormDialog(
         binder.forField(intendedClass)
             .asRequired("Intended class is required")
             .bind(Applicant::intendedClass, Applicant::intendedClass::set)
+
+        binder.forField(bloodGroup).bind(Applicant::bloodGroup, Applicant::bloodGroup::set)
+        binder.forField(genotype).bind(Applicant::genotype, Applicant::genotype::set)
+        binder.forField(knownAllergies).bind(Applicant::knownAllergies, Applicant::knownAllergies::set)
     }
     init{
         configureDialogAppearance()
+
+        saveBtn.addClickListener {
+            if (binder.writeBeanIfValid(currentEntity)) {
+
+                currentEntity.photoUrl = uploadedPhotoPath
+
+                launchUiCoroutine {
+                    try {
+                        onSave(currentEntity)
+                        uii?.withUi {
+                            onChange()
+                            close()
+                            Notification.show("Saved successfully")
+                        }
+                    } catch (ex: Exception) {
+                        uii?.withUi {
+                            Notification.show("Error: ${ex.message}")
+                        }
+                    }
+                }
+            }
+        }
     }
+
     override fun populateForm(entity: Applicant) {
         super.populateForm(entity)
         relationship.value = entity.relationshipToGuardian
@@ -141,6 +187,17 @@ class ApplicationFormDialog(
                     }
                 }
             }
+        }
+        if (entity.applicationStatus == Applicant.ApplicationStatus.APPROVED) {
+            // Create reusable upload field only when needed
+            if (photoUpload == null) {
+                photoUpload = PhotoUploadField(Paths.get("uploads/applicants"))
+                formLayout.add(photoUpload, bloodGroup, genotype, knownAllergies)
+            }
+            bloodGroup.value = entity.bloodGroup ?: ""
+            genotype.value = entity.genotype ?: ""
+            knownAllergies.value = entity.knownAllergies ?: ""
+            photoUpload?.setPhotoUrl(entity.photoUrl)
         }
     }
     override fun createNewInstance(): Applicant = Applicant(guardian = guardian)

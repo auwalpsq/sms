@@ -30,6 +30,8 @@ abstract class BaseFormDialog<T : Any>(
     protected val binder: Binder<T> = Binder(getEntityType())
     protected lateinit var currentEntity: T
 
+    protected lateinit var formLayout: FormLayout
+
     protected val saveBtn = Button("Save").apply {
         addThemeVariants(ButtonVariant.LUMO_PRIMARY)
         isEnabled = false
@@ -91,7 +93,7 @@ abstract class BaseFormDialog<T : Any>(
         }
 
         // Form layout
-        val formLayout = FormLayout().apply {
+        formLayout = FormLayout().apply {
             buildForm(this)
         }
 

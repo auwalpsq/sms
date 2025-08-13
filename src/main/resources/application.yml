@@ -16,9 +16,6 @@ spring:
       init:
         mode: always
         continue-on-error: true
-  web:
-    resources:
-      static-locations: file:uploads/photos/
 
 vaadin:
   production-mode: false
@@ -34,5 +31,3 @@ server:
   servlet:
     session:
       timeout: 15m
-file:
-  upload-dir: uploads/photos/

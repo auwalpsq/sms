@@ -33,6 +33,7 @@ class ApplicantController(
             // Update applicant in DB
             val applicant = Applicant(photoUrl = "/photos/$fileName")
             //applicant.id = id
+            //applicantMapper.updatePhoto(id, "/photos/$fileName")
             applicantMapper.update(applicant)
 
             return ResponseEntity.ok("Photo uploaded successfully")

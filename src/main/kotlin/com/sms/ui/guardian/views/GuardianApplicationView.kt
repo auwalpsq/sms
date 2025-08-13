@@ -103,12 +103,18 @@ class GuardianApplicationView(
 
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
-                Button("Edit").apply {
-                    isEnabled = applicant.applicationStatus == Applicant.ApplicationStatus.PENDING
-                    addClickListener { formDialog?.open(applicant) }
+                Button(if (applicant.applicationStatus == Applicant.ApplicationStatus.APPROVED)
+                    "Complete"
+                else
+                    "Edit").apply {
+                    //isEnabled = applicant.applicationStatus == Applicant.ApplicationStatus.PENDING
+                    addClickListener {
+                        formDialog?.open(applicant)
+                    }
                 }
             }
         ).setHeader("Actions")
+
         //grid.setWidthFull()
         grid.columns.forEach { column -> column.isAutoWidth = true }
     }
