@@ -14,8 +14,6 @@ import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.notification.Notification
-import com.vaadin.flow.component.orderedlayout.FlexComponent
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.validator.StringLengthValidator
 import java.nio.file.Paths
@@ -161,7 +159,7 @@ class ApplicationFormDialog(
         saveBtn.addClickListener {
             if (binder.writeBeanIfValid(currentEntity)) {
                 currentEntity.photoUrl = photoUpload.getPhotoUrl()
-                
+
                 launchUiCoroutine {
                     try {
                         onSave(currentEntity)

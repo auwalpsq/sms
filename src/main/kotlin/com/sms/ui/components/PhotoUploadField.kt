@@ -80,11 +80,13 @@ class PhotoUploadField(
 
     fun setPhotoUrl(url: String?) {
         uploadedFileUrl = url
-        if (url != null && url.startsWith("http")) {
+        if (!url.isNullOrBlank()) {
+            // Use the same public URL pattern your upload handler generates
             imagePreview.src = url
             imagePreview.isVisible = true
         } else {
-            imagePreview.src = url ?: placeholderImage
+            // Show placeholder
+            imagePreview.src = placeholderImage
             imagePreview.isVisible = false
         }
     }
