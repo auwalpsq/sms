@@ -3,6 +3,7 @@ package com.sms.ui.components
 import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Image
+import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.server.streams.UploadHandler
@@ -19,18 +20,26 @@ class PhotoUploadField(
         width = "150px"
         height = "150px"
         style["object-fit"] = "cover"
+        isVisible = false
     }
 
     private var uploadedFileUrl: String? = null
 
     init {
+        // Center everything inside the root VerticalLayout
+        content.setSizeFull()
+        content.defaultHorizontalComponentAlignment = FlexComponent.Alignment.CENTER
+        content.justifyContentMode = FlexComponent.JustifyContentMode.CENTER
+        content.isPadding = false
+        content.isSpacing = true
+
         val inMemoryHandler = UploadHandler.inMemory { metadata, data ->
             val fileName = UUID.randomUUID().toString() + "_" + metadata.fileName
             val filePath = uploadDirectory.resolve(fileName)
 
             // Save file locally
-            //Files.createDirectories(uploadDirectory) // Ensure folder exists
-            //Files.write(filePath, data)
+            Files.createDirectories(uploadDirectory) // Ensure folder exists
+            Files.write(filePath, data)
 
             // Store file URL for saving to entity
             uploadedFileUrl = "/uploads/$fileName"
@@ -38,13 +47,14 @@ class PhotoUploadField(
             // Set preview using base64 data URI
             val base64Data = Base64.getEncoder().encodeToString(data)
             imagePreview.src = "data:${metadata.contentType};base64,$base64Data"
+            imagePreview.isVisible = true
         }
 
         val upload = Upload(inMemoryHandler).apply {
             maxFiles = 1
             isDropAllowed = true
             addFileRejectedListener { e -> println("Rejected: ${e.errorMessage}") }
-            style["display"] = "none" // Hide actual upload button
+            // style["display"] = "none"
         }
 
         val replaceButton = Button("Replace Photo") {
