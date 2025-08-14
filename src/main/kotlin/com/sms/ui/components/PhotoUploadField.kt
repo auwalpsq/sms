@@ -42,17 +42,21 @@ class PhotoUploadField(
             isVisible = false
         }
         val inMemoryHandler = UploadHandler.inMemory { metadata, data ->
-            val fileName = UUID.randomUUID().toString() + "_" + metadata.fileName
-            val filePath = uploadDirectory.resolve(fileName)
+            val filePath: Path
 
-            // Save file locally
-            Files.createDirectories(uploadDirectory) // Ensure folder exists
+            if (uploadedFileUrl != null && uploadedFileUrl!!.startsWith("/uploads/")) {
+                // Overwrite existing file
+                filePath = uploadDirectory.resolve(uploadedFileUrl!!.removePrefix("/uploads/"))
+            } else {
+                // New file
+                val fileName = UUID.randomUUID().toString() + "_" + metadata.fileName
+                filePath = uploadDirectory.resolve(fileName)
+                uploadedFileUrl = "/uploads/$fileName"
+            }
+
+            Files.createDirectories(uploadDirectory)
             Files.write(filePath, data)
 
-            // Store file URL for saving to entity
-            uploadedFileUrl = "/uploads/$fileName"
-
-            // Set preview using base64 data URI
             val base64Data = Base64.getEncoder().encodeToString(data)
             imagePreview.src = "data:${metadata.contentType};base64,$base64Data"
             imagePreview.isVisible = true

@@ -160,7 +160,8 @@ class ApplicationFormDialog(
 
         saveBtn.addClickListener {
             if (binder.writeBeanIfValid(currentEntity)) {
-
+                currentEntity.photoUrl = photoUpload.getPhotoUrl()
+                
                 launchUiCoroutine {
                     try {
                         onSave(currentEntity)
@@ -197,6 +198,8 @@ class ApplicationFormDialog(
 
         val approved = entity.applicationStatus == Applicant.ApplicationStatus.APPROVED
         showApprovedOnlyFields(approved)
+
+        photoUpload.setPhotoUrl(entity.photoUrl)
 
         // If approved, set read-only for initial fields
         if (approved) {
