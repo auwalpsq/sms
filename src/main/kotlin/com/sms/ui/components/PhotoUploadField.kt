@@ -33,6 +33,14 @@ class PhotoUploadField(
         content.isPadding = false
         content.isSpacing = true
 
+        val upload = Upload().apply {
+            maxFiles = 1
+            isDropAllowed = true
+            addFileRejectedListener { e -> println("Rejected: ${e.errorMessage}") }
+        }
+        val replaceButton = Button("Replace Photo").apply {
+            isVisible = false
+        }
         val inMemoryHandler = UploadHandler.inMemory { metadata, data ->
             val fileName = UUID.randomUUID().toString() + "_" + metadata.fileName
             val filePath = uploadDirectory.resolve(fileName)
@@ -48,17 +56,17 @@ class PhotoUploadField(
             val base64Data = Base64.getEncoder().encodeToString(data)
             imagePreview.src = "data:${metadata.contentType};base64,$base64Data"
             imagePreview.isVisible = true
+            replaceButton.isVisible = true
+            upload.isVisible = false
         }
 
-        val upload = Upload(inMemoryHandler).apply {
-            maxFiles = 1
-            isDropAllowed = true
-            addFileRejectedListener { e -> println("Rejected: ${e.errorMessage}") }
-            // style["display"] = "none"
-        }
+        upload.setUploadHandler(inMemoryHandler)
 
-        val replaceButton = Button("Replace Photo") {
-            upload.element.callJsFunction("click")
+        replaceButton.addClickListener {
+            imagePreview.isVisible = false
+            replaceButton.isVisible = false
+            upload.isVisible = true
+            upload.clearFileList()
         }
 
         content.add(imagePreview, upload, replaceButton)
@@ -70,8 +78,10 @@ class PhotoUploadField(
         uploadedFileUrl = url
         if (url != null && url.startsWith("http")) {
             imagePreview.src = url
+            imagePreview.isVisible = true
         } else {
             imagePreview.src = url ?: placeholderImage
+            imagePreview.isVisible = false
         }
     }
 }
