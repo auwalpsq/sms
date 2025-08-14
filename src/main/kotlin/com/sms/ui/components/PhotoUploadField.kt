@@ -7,6 +7,8 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.server.streams.UploadHandler
+import java.io.File
+import java.io.FileInputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
@@ -81,11 +83,34 @@ class PhotoUploadField(
     fun setPhotoUrl(url: String?) {
         uploadedFileUrl = url
         if (!url.isNullOrBlank()) {
-            // Use the same public URL pattern your upload handler generates
-            imagePreview.src = url
-            imagePreview.isVisible = true
+            try {
+                // Resolve the actual file path
+                val filePath = uploadDirectory.resolve(
+                    uploadedFileUrl?.removePrefix("/uploads/") ?: ""
+                ).toFile()
+
+                if (filePath.exists()) {
+                    val bytes = filePath.readBytes()
+                    val base64 = Base64.getEncoder().encodeToString(bytes)
+
+                    // Guess MIME type (default to image/png if unknown)
+                    val mimeType = Files.probeContentType(filePath.toPath()) ?: "image/png"
+
+                    // Set as base64 data URI
+                    imagePreview.src = "data:$mimeType;base64,$base64"
+                    imagePreview.isVisible = true
+                } else {
+                    // File missing — show placeholder
+                    imagePreview.src = placeholderImage
+                    imagePreview.isVisible = false
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                imagePreview.src = placeholderImage
+                imagePreview.isVisible = false
+            }
         } else {
-            // Show placeholder
+            // Show placeholder if no URL
             imagePreview.src = placeholderImage
             imagePreview.isVisible = false
         }
