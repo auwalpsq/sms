@@ -1,0 +1,102 @@
+/* General Layout */
+.application-form {
+  width: 800px;
+  margin: 0 auto;
+  padding: 20px 40px;
+  background: white;
+  color: #000;
+  font-family: "Times New Roman", serif;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.applicant-info td:first-child {
+  font-weight: bold;
+  background: #f9f9f9;
+}
+/* Letterhead */
+.application-letterhead {
+  text-align: center;
+  border-bottom: 2px solid #000;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.application-letterhead img {
+  height: 80px;
+  margin-bottom: 10px;
+}
+
+.application-letterhead h1 {
+  font-size: 22px;
+  margin: 0;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.application-letterhead p {
+  margin: 2px 0;
+  font-size: 14px;
+}
+
+/* Section Headings */
+.application-section {
+  margin-top: 5px;
+  font-family: "Times New Roman", serif;
+}
+
+.application-section h2 {
+  font-size: 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #000;
+  padding-bottom: 3px;
+  text-transform: uppercase;
+}
+
+/* Applicant Info Table */
+.applicant-info {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.applicant-info td {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  /*border: 1px solid #999;*/
+  font-size: 14px;
+  vertical-align: top;
+}
+
+/* Signature Area */
+.signature-block {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.signature-line {
+  width: 45%;
+  text-align: center;
+  border-top: 1px solid #000;
+  padding-top: 5px;
+  font-size: 14px;
+  flex: 0 0 40%;
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+  }
+  .application-form {
+    box-shadow: none;
+    border: none;
+    width: 100%;
+    padding: 0;
+  }
+  button {
+      display: none !important;
+    }
+}

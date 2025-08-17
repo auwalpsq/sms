@@ -103,14 +103,21 @@ class GuardianApplicationView(
 
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
-                Button(if (applicant.applicationStatus == Applicant.ApplicationStatus.APPROVED)
-                    "Complete"
-                else
-                    "Edit").apply {
-                    //isEnabled = applicant.applicationStatus == Applicant.ApplicationStatus.PENDING
-                    addClickListener {
-                        formDialog?.open(applicant)
-                    }
+                HorizontalLayout().apply {
+                    add(
+                        Button(
+                            if (applicant.applicationStatus == Applicant.ApplicationStatus.APPROVED)
+                                "Complete" else "Edit"
+                        ).apply {
+                            addClickListener { formDialog?.open(applicant) }
+                        },
+                        Button("View Form").apply {
+                            addThemeVariants(ButtonVariant.LUMO_TERTIARY)
+                            addClickListener {
+                                ui?.get()?.page?.open("/guardian/application-form/${applicant.id}", "_blank")
+                            }
+                        }
+                    )
                 }
             }
         ).setHeader("Actions")

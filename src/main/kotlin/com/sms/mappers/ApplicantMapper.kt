@@ -29,4 +29,6 @@ interface ApplicantMapper {
     fun findAll(): List<Applicant>
 
     fun findByOptionalStatus(status: Applicant.ApplicationStatus?): List<Applicant>
+
+    fun findById(@Param("id") id: Long): Applicant?
 }

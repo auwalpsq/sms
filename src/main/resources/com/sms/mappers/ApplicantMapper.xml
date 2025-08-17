@@ -134,4 +134,10 @@
         ORDER BY p.created_at DESC
     </select>
 
+    <select id="findById" parameterType="long" resultMap="applicantResultMap">
+        SELECT *
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        WHERE a.id = #{id}
+    </select>
 </mapper>

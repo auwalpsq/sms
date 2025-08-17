@@ -61,4 +61,7 @@ class ApplicantService(
         Dispatchers.IO){
         applicantMapper.findByOptionalStatus(status)
     }
+    open suspend fun findById(id: Long): Applicant? = withContext(Dispatchers.IO){
+        applicantMapper.findById(id)
+    }
 }

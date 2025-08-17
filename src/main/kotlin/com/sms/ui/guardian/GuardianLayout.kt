@@ -1,18 +1,15 @@
 package com.sms.ui.guardian
 
 import com.sms.services.AcademicSessionService
-import com.sms.ui.guardian.views.GuardianApplicationView
 import com.sms.ui.guardian.views.GuardianProfileView
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
-import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.applayout.AppLayout
 import com.vaadin.flow.component.applayout.DrawerToggle
 import com.vaadin.flow.component.avatar.Avatar
 import com.vaadin.flow.component.avatar.AvatarVariant
-import com.vaadin.flow.component.html.H1
 import com.vaadin.flow.component.html.H3
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
