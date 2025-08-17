@@ -25,4 +25,8 @@ interface ApplicantMapper {
 
     suspend fun findLatestApplicationNumberForToday(@Param("datePrefix") datePrefix: String = LocalDate.now().format(
         DateTimeFormatter.ofPattern("yyyyMMdd"))): String?
+
+    fun findAll(): List<Applicant>
+
+    fun findByOptionalStatus(status: Applicant.ApplicationStatus?): List<Applicant>
 }

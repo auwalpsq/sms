@@ -1,17 +1,18 @@
-package com.sms.ui.admin.components
+package com.sms.ui.admin.views
 
 import com.sms.entities.Applicant
 import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
-import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
+import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.dialog.Dialog
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.H3
 import com.vaadin.flow.component.html.Span
@@ -20,23 +21,34 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.ComponentRenderer
 
-class PendingApplicants(
+class ApplicantsView(
     private val applicantService: ApplicantService,
     private val guardianService: GuardianService
 ) : VerticalLayout() {
 
     private val ui: UI? = UI.getCurrent()
     private val grid = Grid(Applicant::class.java, false)
+    private val statusFilter = ComboBox<Applicant.ApplicationStatus>().apply {
+        setItems(Applicant.ApplicationStatus.values().toList())
+        isClearButtonVisible = true
+        placeholder = "All"
+        addValueChangeListener { event ->
+            val selected = event.value
+            refresh(selected)
+        }
+    }
 
     init {
-        add(H2("Pending Applicants"))
+        add(H2("Applicants"))
         configureGrid()
-        add(grid)
-        loadPendingApplicants()
+        add(statusFilter, grid)
+        refresh(null)
+        //loadPendingApplicants()
     }
 
     private fun configureGrid() {
         grid.addColumn { it.applicationNumber }.setHeader("Application No.")
+            .setAutoWidth(true).setFlexGrow(0)
         grid.addColumn { it.getFullName() ?: "N/A" }.setHeader("Applicant Name")
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
@@ -49,6 +61,17 @@ class PendingApplicants(
                 }
             }
         ).setHeader("Status")
+        grid.addColumn(
+            ComponentRenderer { applicant: Applicant ->
+                Span(applicant.paymentStatus.name).apply {
+                    element.setAttribute("theme", when (applicant.paymentStatus) {
+                        Applicant.PaymentStatus.UNPAID -> "badge error"
+                        Applicant.PaymentStatus.PAID -> "badge success"
+                        Applicant.PaymentStatus.PARTIALLY_PAID -> "badge contrast" // or "badge warning"
+                    })
+                }
+            }
+        ).setHeader("Payment")
 
         grid.addComponentColumn { applicant ->
             Button("Open").apply {
@@ -58,12 +81,21 @@ class PendingApplicants(
                 }
             }
         }
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
     }
 
     private fun loadPendingApplicants() {
         launchUiCoroutine {
             val pending = applicantService.findByStatus(Applicant.ApplicationStatus.PENDING)
             ui?.withUi { grid.setItems(pending) }
+        }
+    }
+    private fun refresh(status: Applicant.ApplicationStatus?) {
+        launchUiCoroutine {
+            val applicants = applicantService.findByOptionalStatus(status)
+            ui?.withUi {
+                grid.setItems(applicants)
+            }
         }
     }
 

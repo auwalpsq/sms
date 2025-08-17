@@ -1,4 +1,4 @@
-package com.sms.ui.admin.components
+package com.sms.ui.admin.views
 
 import com.sms.entities.Guardian
 import com.sms.services.GuardianService
@@ -8,16 +8,18 @@ import com.sms.util.withUi
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
+import com.vaadin.flow.theme.lumo.LumoUtility
 
 
-class Guardians(
+class GuardiansView(
     private val guardianService: GuardianService
 ) : VerticalLayout() {
 
     private val ui = UI.getCurrent()
-    private val grid = Grid(Guardian::class.java)
+    private val grid = Grid(Guardian::class.java, false)
     private lateinit var dialog: GuardianDialogForm
 
     init {
@@ -49,11 +51,14 @@ class Guardians(
     }
 
     private fun configureGrid() {
-        grid.setSizeFull()
-        grid.setColumns("firstName", "middleName", "lastName", "email", "phoneNumber")
+        grid.addColumn { it.getFullName() }.setHeader("Full Name")
+        grid.addColumn { it.email }.setHeader("Email")
+        grid.addColumn { it.phoneNumber }.setHeader("Phone Number")
+        //grid.setColumns("email", "phoneNumber")
         grid.addItemDoubleClickListener { event ->
             dialog.open(event.item)
         }
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
     }
 
     private fun addToolbar() {

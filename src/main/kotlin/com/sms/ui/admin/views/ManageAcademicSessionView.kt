@@ -8,6 +8,7 @@ import com.sms.util.withUi
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.Menu
@@ -41,6 +42,8 @@ class ManageAcademicSessionsView(
         grid.asSingleSelect().addValueChangeListener {
             it.value?.let { session -> formDialog.open(session) }
         }
+
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
     }
 
     private fun configureDialog() {

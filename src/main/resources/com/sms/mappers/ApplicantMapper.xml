@@ -108,4 +108,30 @@
         JOIN persons p ON a.id = p.id
         WHERE a.application_status = #{status}
     </select>
+
+    <!-- Find all applicants -->
+    <select id="findAll" resultMap="applicantResultMap">
+        SELECT a.*,
+        p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth,
+        p.created_at, p.updated_at
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        ORDER BY p.created_at DESC
+    </select>
+
+    <!-- Find all applicants with optional status filter -->
+    <select id="findByOptionalStatus" resultMap="applicantResultMap">
+        SELECT a.*,
+        p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth,
+        p.created_at, p.updated_at
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        <where>
+            <if test="status != null">
+                a.application_status = #{status}
+            </if>
+        </where>
+        ORDER BY p.created_at DESC
+    </select>
+
 </mapper>

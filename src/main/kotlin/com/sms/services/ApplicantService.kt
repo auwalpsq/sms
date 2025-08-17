@@ -52,4 +52,13 @@ class ApplicantService(
     suspend fun findByStatus(status: Applicant.ApplicationStatus): List<Applicant> {
         return applicantMapper.findByStatus(status.name)
     }
+
+    suspend fun findAll(): List<Applicant> = withContext(Dispatchers.IO) {
+        applicantMapper.findAll()
+    }
+
+    open suspend fun findByOptionalStatus(status: Applicant.ApplicationStatus?): List<Applicant> = withContext(
+        Dispatchers.IO){
+        applicantMapper.findByOptionalStatus(status)
+    }
 }

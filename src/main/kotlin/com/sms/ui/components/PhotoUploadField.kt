@@ -26,7 +26,14 @@ class PhotoUploadField(
     }
 
     private var uploadedFileUrl: String? = null
-
+    val upload = Upload().apply {
+        maxFiles = 1
+        isDropAllowed = true
+        addFileRejectedListener { e -> println("Rejected: ${e.errorMessage}") }
+    }
+    val replaceButton = Button("Replace Photo").apply {
+        isVisible = false
+    }
     init {
         // Center everything inside the root VerticalLayout
         content.setSizeFull()
@@ -35,14 +42,6 @@ class PhotoUploadField(
         content.isPadding = false
         content.isSpacing = true
 
-        val upload = Upload().apply {
-            maxFiles = 1
-            isDropAllowed = true
-            addFileRejectedListener { e -> println("Rejected: ${e.errorMessage}") }
-        }
-        val replaceButton = Button("Replace Photo").apply {
-            isVisible = false
-        }
         val inMemoryHandler = UploadHandler.inMemory { metadata, data ->
             val filePath: Path
 
@@ -99,20 +98,28 @@ class PhotoUploadField(
                     // Set as base64 data URI
                     imagePreview.src = "data:$mimeType;base64,$base64"
                     imagePreview.isVisible = true
+                    upload.isVisible = false
+                    replaceButton.isVisible = true
                 } else {
                     // File missing — show placeholder
                     imagePreview.src = placeholderImage
                     imagePreview.isVisible = false
+                    replaceButton.isVisible = false
+                    upload.isVisible = true
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 imagePreview.src = placeholderImage
                 imagePreview.isVisible = false
+                replaceButton.isVisible = false
+                upload.isVisible = true
             }
         } else {
             // Show placeholder if no URL
             imagePreview.src = placeholderImage
             imagePreview.isVisible = false
+            replaceButton.isVisible = false
+            upload.isVisible = true
         }
     }
 }

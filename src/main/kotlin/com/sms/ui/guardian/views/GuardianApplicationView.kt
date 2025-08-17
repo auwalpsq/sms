@@ -14,6 +14,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -85,8 +86,7 @@ class GuardianApplicationView(
 
     private fun configureGrid() {
         grid.addColumn { it.applicationNumber }.setHeader("Application Number")
-        grid.addColumn { it.firstName }.setHeader("First Name")
-        grid.addColumn { it.lastName }.setHeader("Last Name")
+        grid.addColumn { it.getFullName() }.setHeader("Full Name")
         grid.addColumn { it.gender }.setHeader("Gender")
         grid.addColumn { it.dateOfBirth }.setHeader("Date of Birth")
         grid.addColumn(
@@ -117,6 +117,7 @@ class GuardianApplicationView(
 
         //grid.setWidthFull()
         grid.columns.forEach { column -> column.isAutoWidth = true }
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
     }
 
     private fun refreshGrid() {
