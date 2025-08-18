@@ -80,6 +80,9 @@ class ApplicationFormView(
             addRow("Guardian", applicant.guardian?.getFullName() ?: "")
             addRow("Application Status", applicant.applicationStatus.name)
             addRow("Submission Date", applicant.submissionDate?.toString() ?: "")
+            addRow("Application Number", applicant.applicationNumber ?: "")
+            addRow("Intended Class", applicant.intendedClass ?: "")
+            addRow("Payment Status", applicant.paymentStatus.name)
         }
 
         content.add(
