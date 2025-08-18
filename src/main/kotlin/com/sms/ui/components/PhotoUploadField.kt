@@ -7,8 +7,6 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.upload.Upload
 import com.vaadin.flow.server.streams.UploadHandler
-import java.io.File
-import java.io.FileInputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*

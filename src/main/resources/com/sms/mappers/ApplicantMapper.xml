@@ -31,9 +31,10 @@
         <result property="knownAllergies" column="known_allergies" javaType="string"/>
         <result property="photoUrl" column="photo_url" javaType="string"/>
 
-        <association property="guardian" javaType="com.sms.entities.Guardian">
-            <id property="id" column="guardian_id" javaType="long"/>
-        </association>
+        <association property="guardian"
+                     javaType="com.sms.entities.Guardian"
+                     column="guardian_id"
+                     select="com.sms.mappers.GuardianMapper.findById"/>
     </resultMap>
 
     <select id="findByGuardianId" resultMap="applicantResultMap">
