@@ -20,6 +20,7 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.menubar.MenuBar
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -109,39 +110,26 @@ class GuardianApplicationView(
 
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
-                HorizontalLayout().apply {
-                    add(
-                        Button(
-                            if (applicant.applicationStatus == Applicant.ApplicationStatus.APPROVED)
-                                "Complete" else "Edit"
-                        ).apply {
-                            addClickListener { formDialog?.open(applicant) }
-                        },
-                        Button("View Form").apply {
-                            addThemeVariants(ButtonVariant.LUMO_TERTIARY)
-                            addClickListener {
-                                ui?.get()?.page?.open("/guardian/application-form/${applicant.id}", "_blank")
-                            }
-                        },
-                        Button("Make Payment", { e ->
-                            UI.getCurrent().getPage().executeJs(
-                                "const paystack = new PaystackPop();" +
-                                        "paystack.newTransaction({" +
-                                        "   key: 'pk_test_1c957236071be45d53fe766576b4f60aaaa0534c'," +  // your public key
-                                        "   email: '${applicant.guardian?.email}'," +
-                                        "   amount: 5000 * 100," +  // amount in kobo
-                                        "   currency: 'NGN'," +
-                                        "   onSuccess: (transaction) => { $0.\$server.paymentSuccess(transaction.reference); }," +
-                                        "   onClose: () => { alert('Payment window closed'); }" +
-                                        "});",
-                                getElement()
-                            )
-                        })
-                    )
+                MenuBar().apply {
+                    addItem("Actions")
+                        .subMenu.addItem("Edit", { formDialog?.open(applicant)})
+                        .subMenu.addItem("View Form", { ui?.get()?.page?.open("/guardian/application-form/${applicant.id}", "_blank") })
+                        .subMenu.addItem("Pay", { UI.getCurrent().getPage().executeJs(
+                            "const paystack = new PaystackPop();" +
+                                    "paystack.newTransaction({" +
+                                    "   key: 'pk_test_1c957236071be45d53fe766576b4f60aaaa0534c'," +  // your public key
+                                    "   email: '${applicant.guardian?.email}'," +
+                                    "   amount: 5000 * 100," +  // amount in kobo
+                                    "   currency: 'NGN'," +
+                                    "   onSuccess: (transaction) => { $0.\$server.paymentSuccess(transaction.reference); }," +
+                                    "   onClose: () => { alert('Payment window closed'); }" +
+                                    "});",
+                            getElement()
+                        ) })
                 }
             }
         ).setHeader("Actions")
-            .isAutoWidth = true
+
 
         grid.setWidthFull()
         //grid.columns.forEach { column -> column.isAutoWidth = true }
