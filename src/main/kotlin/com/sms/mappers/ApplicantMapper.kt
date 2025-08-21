@@ -2,6 +2,7 @@ package com.sms.mappers
 
 import com.sms.entities.Applicant
 import org.apache.ibatis.annotations.*
+import org.springframework.expression.spel.ast.BeanReference
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -31,4 +32,6 @@ interface ApplicantMapper {
     fun findByOptionalStatus(status: Applicant.ApplicationStatus?): List<Applicant>
 
     fun findById(@Param("id") id: Long): Applicant?
+
+    fun updatePaymentStatus(reference: String, status: String)
 }

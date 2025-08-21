@@ -5,7 +5,9 @@ import com.sms.entities.Guardian
 import com.sms.entities.User
 import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
+import com.sms.services.PaystackService
 import com.sms.services.SchoolClassService
+import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
 import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.guardian.GuardianLayout
@@ -21,7 +23,6 @@ import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.menubar.MenuBar
-import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -39,7 +40,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 class GuardianApplicationView(
     private val applicantService: ApplicantService,
     private val guardianService: GuardianService,
-    private val schoolClassService: SchoolClassService
+    private val schoolClassService: SchoolClassService,
+    private val paystackService: PaystackService
 ) : VerticalLayout() {
     val user = SecurityContextHolder.getContext().authentication.principal as User
     private val grid = Grid(Applicant::class.java, false)
@@ -107,29 +109,42 @@ class GuardianApplicationView(
                 }
             }
         ).setHeader("Status")
-
+        grid.addColumn(
+            ComponentRenderer { applicant: Applicant ->
+                Span(applicant.paymentStatus.name).apply {
+                    element.setAttribute("theme", when (applicant.paymentStatus) {
+                        Applicant.PaymentStatus.UNPAID -> "badge error"
+                        Applicant.PaymentStatus.PAID -> "badge success"
+                        Applicant.PaymentStatus.PARTIALLY_PAID -> "badge contrast" // or "badge warning"
+                    })
+                }
+            }
+        ).setHeader("Payment")
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
                 MenuBar().apply {
-                    addItem("Actions")
-                        .subMenu.addItem("Edit", { formDialog?.open(applicant)})
-                        .subMenu.addItem("View Form", { ui?.get()?.page?.open("/guardian/application-form/${applicant.id}", "_blank") })
-                        .subMenu.addItem("Pay", { UI.getCurrent().getPage().executeJs(
-                            "const paystack = new PaystackPop();" +
-                                    "paystack.newTransaction({" +
-                                    "   key: 'pk_test_1c957236071be45d53fe766576b4f60aaaa0534c'," +  // your public key
-                                    "   email: '${applicant.guardian?.email}'," +
-                                    "   amount: 5000 * 100," +  // amount in kobo
-                                    "   currency: 'NGN'," +
-                                    "   onSuccess: (transaction) => { $0.\$server.paymentSuccess(transaction.reference); }," +
-                                    "   onClose: () => { alert('Payment window closed'); }" +
-                                    "});",
-                            getElement()
-                        ) })
+                    val menu = addItem("Actions")
+                        menu.subMenu.addItem("Edit", { formDialog?.open(applicant)})
+                        menu.subMenu.addItem("View Form", { ui?.get()?.page?.open("/guardian/application-form/${applicant.id}", "_blank") })
+                        menu.subMenu.addItem("Pay", { UI.getCurrent().page.executeJs(
+                            """
+                                        const paystack = new PaystackPop();
+                                        paystack.newTransaction({
+                                           key: 'pk_test_1c957236071be45d53fe766576b4f60aaaa0534c',
+                                           email: '${applicant.guardian?.email}',
+                                           amount: 5000 * 100,
+                                           currency: 'NGN',
+                                           onSuccess: (transaction) => { 
+                                               $0.${'$'}server.paymentSuccess(transaction.reference); 
+                                           },
+                                           onClose: () => { alert('Payment window closed'); }
+                                        });
+                                        """.trimIndent(),
+                            this@GuardianApplicationView)
+            })
                 }
             }
-        ).setHeader("Actions")
-
+        ).setHeader("More Actions")
 
         grid.setWidthFull()
         //grid.columns.forEach { column -> column.isAutoWidth = true }
@@ -148,8 +163,17 @@ class GuardianApplicationView(
         }
     }
     @ClientCallable
-    private fun paymentSuccess(reference: String?) {
-        // Call your backend to verify payment via Paystack REST API
-        Notification.show("Payment successful! Ref: " + reference)
+    fun paymentSuccess(reference: String) {
+        launchUiCoroutine {
+            val verified = paystackService.verify(reference)
+            if(verified){applicantService.updatePaymentStatus(reference, "PAID")}
+            ui?.withUi {
+                if (verified) {
+                    showSuccess("✅ Payment verified and recorded. Ref: $reference")
+                } else {
+                    showError("❌ Payment verification failed. Please try again.")
+                }
+            }
+        }
     }
 }

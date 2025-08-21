@@ -1,0 +1,28 @@
+<mapper namespace="com.sms.mappers.PaymentMapper">
+
+    <resultMap id="PaymentResultMap" type="com.sms.entities.Payment">
+        <id property="id" column="id"/>
+        <result property="reference" column="reference"/>
+        <result property="amount" column="amount"/>
+        <result property="status" column="status" javaType="com.sms.entities.Payment.PaymentStatus"/>
+        <result property="paymentDate" column="payment_date"/>
+        <association property="applicant" column="applicant_id"
+                     javaType="com.sms.entities.Applicant" select="com.sms.mappers.ApplicantMapper.findById"/>
+    </resultMap>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO payments (reference, amount, status, payment_date, applicant_id)
+        VALUES (#{reference}, #{amount}, #{status}, #{paymentDate}, #{applicant.id})
+    </insert>
+
+    <select id="findByReference" parameterType="string" resultMap="PaymentResultMap">
+        SELECT * FROM payments WHERE reference = #{reference}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE payments
+        SET status = #{status}
+        WHERE reference = #{reference}
+    </update>
+
+</mapper>

@@ -37,6 +37,7 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
 }
 
 dependencyManagement {

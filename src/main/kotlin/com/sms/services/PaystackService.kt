@@ -1,25 +1,29 @@
 package com.sms.services
 
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.reactive.function.client.WebClient
 
 @Service
-class PaystackService(private val restTemplate: RestTemplate) {
+class PaystackService(
+    @Value("\${sk_test_e7fd3716c1beec1ca1c788208040db93d472ec93}") private val secretKey: String
+) {
+    private val client = WebClient.builder()
+        .baseUrl("https://api.paystack.co")
+        .defaultHeader("Authorization", "Bearer $secretKey")
+        .build()
 
-    private val secretKey = "sk_test_e7fd3716c1beec1ca1c788208040db93d472ec93" // From Paystack dashboard
+    suspend fun verify(reference: String): Boolean = withContext(Dispatchers.IO) {
+        val response = client.get()
+            .uri("/transaction/verify/{reference}", reference)
+            .retrieve()
+            .bodyToMono(Map::class.java)
+            .block()
 
-    fun verifyPayment(reference: String): Boolean {
-        val url = "https://api.paystack.co/transaction/verify/$reference"
-        val headers = HttpHeaders().apply {
-            set("Authorization", "Bearer $secretKey")
-        }
-        val entity = HttpEntity<String>(headers)
-        val response = restTemplate.exchange(url, HttpMethod.GET, entity, String::class.java)
-
-        return response.statusCode.is2xxSuccessful &&
-                response.body?.contains("\"status\":true") == true
+        val data = response?.get("data") as? Map<*, *>
+        val status = data?.get("status") as? String
+        status == "success"
     }
 }

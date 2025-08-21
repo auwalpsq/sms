@@ -64,4 +64,7 @@ class ApplicantService(
     open suspend fun findById(id: Long): Applicant? = withContext(Dispatchers.IO){
         applicantMapper.findById(id)
     }
+    suspend fun updatePaymentStatus(reference: String, status: String) {
+        applicantMapper.updatePaymentStatus(reference, status)
+    }
 }

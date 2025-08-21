@@ -141,4 +141,5 @@
         JOIN persons p ON a.id = p.id
         WHERE a.id = #{id}
     </select>
+
 </mapper>

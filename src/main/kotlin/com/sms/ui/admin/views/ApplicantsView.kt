@@ -84,10 +84,11 @@ class ApplicantsView(
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
     }
 
-    private fun loadPendingApplicants() {
+    private fun loadApplicants() {
         launchUiCoroutine {
-            val pending = applicantService.findByStatus(Applicant.ApplicationStatus.PENDING)
-            ui?.withUi { grid.setItems(pending) }
+            val applicants = applicantService.findByOptionalStatus(null)
+            //val pending = applicantService.findByStatus(Applicant.ApplicationStatus.PENDING)
+            ui?.withUi { grid.setItems(applicants) }
         }
     }
     private fun refresh(status: Applicant.ApplicationStatus?) {
@@ -183,7 +184,7 @@ class ApplicantsView(
             ui?.withUi {
                 Notification.show("Applicant approved")
                 dialog.close()
-                loadPendingApplicants()
+                loadApplicants()
             }
         }
     }
@@ -195,7 +196,7 @@ class ApplicantsView(
             ui?.withUi {
                 Notification.show("Applicant rejected")
                 dialog.close()
-                loadPendingApplicants()
+                loadApplicants()
             }
         }
     }
