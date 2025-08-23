@@ -1,6 +1,8 @@
 package com.sms.services
 
 import com.sms.entities.Payment
+import com.sms.enums.PaymentStatus
+import com.sms.enums.Term
 import com.sms.mappers.PaymentMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,7 +19,22 @@ class PaymentService(private val paymentMapper: PaymentMapper) {
         paymentMapper.findByReference(reference)
     }
 
-    suspend fun updateStatus(reference: String, status: Payment.PaymentStatus) = withContext(Dispatchers.IO) {
+    suspend fun updateStatus(reference: String, status: PaymentStatus) = withContext(Dispatchers.IO) {
         paymentMapper.updateStatus(reference, status)
+    }
+    suspend fun findAll(): List<Payment> = withContext(Dispatchers.IO) {
+        paymentMapper.findAll()
+    }
+    suspend fun findByApplicantAndTypeAndSessionAndTerm(
+        applicantId: Long,
+        paymentTypeId: Long,
+        sessionId: Long,
+        term: Term
+    ): Payment? = withContext(Dispatchers.IO) {
+        paymentMapper.findByApplicantAndTypeAndSessionAndTerm(applicantId, paymentTypeId, sessionId, term)
+    }
+
+    suspend fun findByStatus(status: PaymentStatus): List<Payment> = withContext(Dispatchers.IO) {
+        paymentMapper.findByStatus(status)
     }
 }

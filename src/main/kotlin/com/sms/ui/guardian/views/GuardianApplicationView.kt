@@ -2,9 +2,16 @@ package com.sms.ui.guardian.views
 
 import com.sms.entities.Applicant
 import com.sms.entities.Guardian
+import com.sms.entities.Payment
 import com.sms.entities.User
+import com.sms.enums.PaymentCategory
+import com.sms.enums.PaymentStatus
+import com.sms.services.AcademicSessionService
 import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
+import com.sms.services.PaymentService
+import com.sms.services.PaymentTypeService
+import com.sms.services.PaymentVerificationService
 import com.sms.services.PaystackService
 import com.sms.services.SchoolClassService
 import com.sms.ui.common.showError
@@ -31,6 +38,7 @@ import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.security.core.context.SecurityContextHolder
+import java.util.UUID
 
 @JavaScript("https://js.paystack.co/v2/inline.js")
 @PageTitle("My Applications")
@@ -38,16 +46,20 @@ import org.springframework.security.core.context.SecurityContextHolder
 @RolesAllowed("GUARDIAN")
 @Menu(order = 2.0, icon = "vaadin:form", title = "Apply for Admission")
 class GuardianApplicationView(
+    private val paymentVerificationService: PaymentVerificationService,
     private val applicantService: ApplicantService,
     private val guardianService: GuardianService,
     private val schoolClassService: SchoolClassService,
-    private val paystackService: PaystackService
+    private val paystackService: PaystackService,
+    private val paymentTypeService: PaymentTypeService,
+    private val academicSessionService: AcademicSessionService,
+    private val paymentService: PaymentService
 ) : VerticalLayout() {
     val user = SecurityContextHolder.getContext().authentication.principal as User
     private val grid = Grid(Applicant::class.java, false)
     private var formDialog: ApplicationFormDialog? = null
     private var currentGuardian: Guardian? = null
-    val ui: UI? = UI.getCurrent()
+    private val ui: UI? = UI.getCurrent()
 
     init {
         add(H2("Admission Applications"))
@@ -141,7 +153,63 @@ class GuardianApplicationView(
                                         });
                                         """.trimIndent(),
                             this@GuardianApplicationView)
-            })
+                        })
+                    menu.subMenu.addItem("Test Payment", {
+                        launchUiCoroutine {
+                            val paymentType = paymentTypeService.findByCategory(PaymentCategory.APPLICATION)
+                            val session = academicSessionService.findCurrent()
+
+                            // Check if payment already exists
+                            var payment = paymentService.findByApplicantAndTypeAndSessionAndTerm(
+                                applicant.id!!, paymentType?.id!!, session?.id!!, session.term
+                            )
+
+                            if (payment != null) {
+                                if (payment.status == PaymentStatus.SUCCESS) {
+                                    UI.getCurrent().withUi { showSuccess("✅ You have already paid for this application.") }
+                                    return@launchUiCoroutine
+                                }
+                                // Reuse existing reference if pending
+                            } else {
+                                // Create new payment
+                                val reference = UUID.randomUUID().toString()
+                                payment = Payment(
+                                    applicant = applicant,
+                                    guardian = applicant.guardian,
+                                    paymentType = paymentType,
+                                    academicSession = session,
+                                    term = session.term,
+                                    reference = reference,
+                                    status = PaymentStatus.PENDING
+                                )
+
+                                paymentService.save(payment)
+                            }
+
+                            // Launch Paystack with existing/new reference
+                            val reference = payment.reference
+                            ui?.get()?.withUi {
+                                ui?.get()?.page?.executeJs(
+                                    """
+                                const paystack = new PaystackPop();
+                                paystack.newTransaction({
+                                   key: 'pk_test_1c957236071be45d53fe766576b4f60aaaa0534c',
+                                   email: '${applicant.guardian?.email}',
+                                   amount: ${paymentType.amount} * 100,
+                                   currency: 'NGN',
+                                   reference: '$reference',
+                                   onSuccess: (transaction) => { 
+                                       $0.${'$'}server.paymentSuccess(transaction.reference);
+                                   },
+                                   onClose: () => { alert('Payment window closed'); }
+                                });
+                                """.trimIndent(),
+                                    this@GuardianApplicationView
+                                )
+                            }
+                        }
+
+                    })
                 }
             }
         ).setHeader("More Actions")
@@ -166,13 +234,16 @@ class GuardianApplicationView(
     fun paymentSuccess(reference: String) {
         launchUiCoroutine {
             val verified = paystackService.verify(reference)
-            if(verified){applicantService.updatePaymentStatus(reference, "PAID")}
+            if(verified){
+                paymentVerificationService.verifyAndUpdateApplicant(reference)
+            }
             ui?.withUi {
                 if (verified) {
                     showSuccess("✅ Payment verified and recorded. Ref: $reference")
                 } else {
                     showError("❌ Payment verification failed. Please try again.")
                 }
+                refreshGrid()
             }
         }
     }

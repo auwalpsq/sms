@@ -1,0 +1,18 @@
+{
+  "frontendFolder": "C:/Users/pc/Documents/GitHub/sms/./src/main/frontend",
+  "themeFolder": "themes",
+  "themeResourceFolder": "C:/Users/pc/Documents/GitHub/sms/./src/main/frontend/generated/jar-resources",
+  "staticOutput": "C:/Users/pc/Documents/GitHub/sms/target/classes/META-INF/VAADIN/webapp/VAADIN/static",
+  "generatedFolder": "generated",
+  "statsOutput": "C:\\Users\\pc\\Documents\\GitHub\\sms\\target\\classes\\META-INF\\VAADIN\\config",
+  "frontendBundleOutput": "C:\\Users\\pc\\Documents\\GitHub\\sms\\target\\classes\\META-INF\\VAADIN\\webapp",
+  "devBundleOutput": "C:/Users/pc/Documents/GitHub/sms/target/dev-bundle/webapp",
+  "devBundleStatsOutput": "C:/Users/pc/Documents/GitHub/sms/target/dev-bundle/config",
+  "i18nOutput": "target/classes/vaadin-i18n",
+  "jarResourcesFolder": "C:/Users/pc/Documents/GitHub/sms/./src/main/frontend/generated/jar-resources",
+  "themeName": "",
+  "clientServiceWorkerSource": "C:\\Users\\pc\\Documents\\GitHub\\sms\\target\\sw.ts",
+  "pwaEnabled": false,
+  "offlineEnabled": false,
+  "offlinePath": "'offline.html'"
+}

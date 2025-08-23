@@ -1,28 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.sms.mappers.PaymentMapper">
 
     <resultMap id="PaymentResultMap" type="com.sms.entities.Payment">
         <id property="id" column="id"/>
         <result property="reference" column="reference"/>
-        <result property="amount" column="amount"/>
-        <result property="status" column="status" javaType="com.sms.entities.Payment.PaymentStatus"/>
-        <result property="paymentDate" column="payment_date"/>
-        <association property="applicant" column="applicant_id"
-                     javaType="com.sms.entities.Applicant" select="com.sms.mappers.ApplicantMapper.findById"/>
+        <result property="status" column="status" javaType="com.sms.enums.PaymentStatus"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="term" column="term" javaType="com.sms.enums.Term"/>
+        <association property="applicant" javaType="com.sms.entities.Applicant" column="applicant_id" select="com.sms.mappers.ApplicantMapper.findById"/>
+        <association property="guardian" javaType="com.sms.entities.Guardian" column="guardian_id" select="com.sms.mappers.GuardianMapper.findById"/>
+        <association property="paymentType" javaType="com.sms.entities.PaymentType" column="payment_type_id" select="com.sms.mappers.PaymentTypeMapper.findById"/>
+        <association property="academicSession" javaType="com.sms.entities.AcademicSession" column="academic_session_id" select="com.sms.mappers.AcademicSessionMapper.findById"/>
     </resultMap>
 
-    <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO payments (reference, amount, status, payment_date, applicant_id)
-        VALUES (#{reference}, #{amount}, #{status}, #{paymentDate}, #{applicant.id})
-    </insert>
-
-    <select id="findByReference" parameterType="string" resultMap="PaymentResultMap">
+    <select id="findByReference" parameterType="java.lang.String" resultMap="PaymentResultMap">
         SELECT * FROM payments WHERE reference = #{reference}
     </select>
 
+    <insert id="save" parameterType="com.sms.entities.Payment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO payments(applicant_id, guardian_id, payment_type_id, academic_session_id, term, reference, status, created_at)
+        VALUES (#{applicant.id}, #{guardian.id}, #{paymentType.id}, #{academicSession.id}, #{term}, #{reference}, #{status}, #{createdAt})
+    </insert>
+
     <update id="updateStatus">
-        UPDATE payments
-        SET status = #{status}
-        WHERE reference = #{reference}
+        UPDATE payments SET status = #{status} WHERE reference = #{reference}
     </update>
 
+    <select id="findAll" resultMap="PaymentResultMap">
+        SELECT * FROM payments
+    </select>
+
+    <select id="findByStatus" parameterType="com.sms.enums.PaymentStatus" resultMap="PaymentResultMap">
+        SELECT * FROM payments WHERE status = #{status}
+    </select>
+    <select id="findByApplicantAndTypeAndSessionAndTerm"
+            resultMap="PaymentResultMap">
+        SELECT * FROM payments
+        WHERE applicant_id = #{applicantId}
+        AND payment_type_id = #{paymentTypeId}
+        AND academic_session_id = #{sessionId}
+        AND term = #{term}
+        LIMIT 1
+    </select>
 </mapper>

@@ -31,3 +31,6 @@ server:
   servlet:
     session:
       timeout: 15m
+
+paystack:
+  secret-key: sk_test_e7fd3716c1beec1ca1c788208040db93d472ec93

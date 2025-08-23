@@ -31,7 +31,7 @@ fun showError(message: String) {
         add(layout)
         addThemeVariants(NotificationVariant.LUMO_ERROR)
         position = Notification.Position.TOP_STRETCH
-        duration = 30000
+        duration = 3000
         open()
     }
 }

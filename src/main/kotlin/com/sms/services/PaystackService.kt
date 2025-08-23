@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Service
 class PaystackService(
-    @Value("\${sk_test_e7fd3716c1beec1ca1c788208040db93d472ec93}") private val secretKey: String
+    @Value("\${paystack.secret-key}") private val secretKey: String
 ) {
     private val client = WebClient.builder()
         .baseUrl("https://api.paystack.co")

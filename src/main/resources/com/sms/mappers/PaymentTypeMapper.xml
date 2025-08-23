@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mappers.PaymentTypeMapper">
+
+    <resultMap id="PaymentTypeResultMap" type="com.sms.entities.PaymentType">
+        <id property="id" column="id"/>
+        <result property="category" column="category" javaType="com.sms.enums.PaymentCategory"/>
+        <result property="amount" column="amount"/>
+        <result property="description" column="description"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="PaymentTypeResultMap">
+        SELECT * FROM payment_types
+    </select>
+
+    <select id="findById" resultMap="PaymentTypeResultMap" parameterType="long">
+        SELECT * FROM payment_types WHERE id = #{id}
+    </select>
+
+    <insert id="save" parameterType="com.sms.entities.PaymentType" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO payment_types (category, amount, description)
+        VALUES (#{category}, #{amount}, #{description})
+    </insert>
+
+    <update id="update" parameterType="com.sms.entities.PaymentType">
+        UPDATE payment_types
+        SET category = #{category}, amount = #{amount}, description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM payment_types WHERE id = #{id}
+    </delete>
+    <select id="findByCategory" resultMap="PaymentTypeResultMap" parameterType="com.sms.enums.PaymentCategory">
+        SELECT * FROM payment_types WHERE category = #{category}
+    </select>
+
+</mapper>
