@@ -138,78 +138,62 @@ class GuardianApplicationView(
                     val menu = addItem("Actions")
                         menu.subMenu.addItem("Edit", { formDialog?.open(applicant)})
                         menu.subMenu.addItem("View Form", { ui?.get()?.page?.open("/guardian/application-form/${applicant.id}", "_blank") })
-                        menu.subMenu.addItem("Pay", { UI.getCurrent().page.executeJs(
-                            """
-                                        const paystack = new PaystackPop();
-                                        paystack.newTransaction({
-                                           key: 'pk_test_1c957236071be45d53fe766576b4f60aaaa0534c',
-                                           email: '${applicant.guardian?.email}',
-                                           amount: 5000 * 100,
-                                           currency: 'NGN',
-                                           onSuccess: (transaction) => { 
-                                               $0.${'$'}server.paymentSuccess(transaction.reference); 
-                                           },
-                                           onClose: () => { alert('Payment window closed'); }
-                                        });
-                                        """.trimIndent(),
-                            this@GuardianApplicationView)
-                        })
-                    menu.subMenu.addItem("Test Payment", {
-                        launchUiCoroutine {
-                            val paymentType = paymentTypeService.findByCategory(PaymentCategory.APPLICATION)
-                            val session = academicSessionService.findCurrent()
+                        menu.subMenu.addItem("Make Payment", {
+                            launchUiCoroutine {
+                                val paymentType = paymentTypeService.findByCategory(PaymentCategory.APPLICATION)
+                                val session = academicSessionService.findCurrent()
 
-                            // Check if payment already exists
-                            var payment = paymentService.findByApplicantAndTypeAndSessionAndTerm(
-                                applicant.id!!, paymentType?.id!!, session?.id!!, session.term
-                            )
+                                // Check if payment already exists
+                                var payment = paymentService.findByApplicantAndTypeAndSessionAndTerm(
+                                    applicant.id!!, paymentType?.id!!, session?.id!!, session.term
+                                )
 
-                            if (payment != null) {
-                                if (payment.status == PaymentStatus.SUCCESS) {
-                                    ui?.get()?.withUi { showSuccess("✅ You have already paid for this application.") }
-                                    return@launchUiCoroutine
+                                if (payment != null) {
+                                    if (payment.status == PaymentStatus.SUCCESS) {
+                                        ui?.get()?.withUi { showSuccess("✅ You have already paid for this application.") }
+                                        return@launchUiCoroutine
+                                    }
+                                    // Reuse existing reference if pending
+                                } else {
+                                    // Create new payment
+                                    val reference = UUID.randomUUID().toString()
+                                    payment = Payment(
+                                        applicant = applicant,
+                                        guardian = applicant.guardian,
+                                        paymentType = paymentType,
+                                        academicSession = session,
+                                        term = session.term,
+                                        reference = reference,
+                                        status = PaymentStatus.PENDING
+                                    )
+
+                                    paymentService.save(payment)
                                 }
-                                // Reuse existing reference if pending
-                            } else {
-                                // Create new payment
-                                val reference = UUID.randomUUID().toString()
-                                payment = Payment(
-                                    applicant = applicant,
-                                    guardian = applicant.guardian,
-                                    paymentType = paymentType,
-                                    academicSession = session,
-                                    term = session.term,
-                                    reference = reference,
-                                    status = PaymentStatus.PENDING
-                                )
 
-                                paymentService.save(payment)
+                                // Launch Paystack with existing/new reference
+                                val reference = payment.reference
+                                ui?.get()?.withUi {
+                                    ui?.get()?.page?.executeJs(
+                                        """
+                                    const paystack = new PaystackPop();
+                                    paystack.newTransaction({
+                                       key: 'pk_test_1c957236071be45d53fe766576b4f60aaaa0534c',
+                                       email: '${applicant.guardian?.email}',
+                                       amount: ${paymentType.amount} * 100,
+                                       currency: 'NGN',
+                                       reference: '$reference',
+                                       onSuccess: (transaction) => { 
+                                           $0.${'$'}server.paymentSuccess(transaction.reference);
+                                       },
+                                       onClose: () => { alert('Payment window closed'); }
+                                    });
+                                    """.trimIndent(),
+                                        this@GuardianApplicationView
+                                    )
+                                }
                             }
 
-                            // Launch Paystack with existing/new reference
-                            val reference = payment.reference
-                            ui?.get()?.withUi {
-                                ui?.get()?.page?.executeJs(
-                                    """
-                                const paystack = new PaystackPop();
-                                paystack.newTransaction({
-                                   key: 'pk_test_1c957236071be45d53fe766576b4f60aaaa0534c',
-                                   email: '${applicant.guardian?.email}',
-                                   amount: ${paymentType.amount} * 100,
-                                   currency: 'NGN',
-                                   reference: '$reference',
-                                   onSuccess: (transaction) => { 
-                                       $0.${'$'}server.paymentSuccess(transaction.reference);
-                                   },
-                                   onClose: () => { alert('Payment window closed'); }
-                                });
-                                """.trimIndent(),
-                                    this@GuardianApplicationView
-                                )
-                            }
-                        }
-
-                    })
+                        })
                 }
             }
         ).setHeader("More Actions")

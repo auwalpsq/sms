@@ -14,4 +14,5 @@ interface GuardianMapper {
     fun findById(@Param("id") id: Long?): Guardian?
     fun findAll(): List<Guardian>
     fun existsByEmail(@Param("email") email: String): Boolean
+    fun findByEmail(email: String): Guardian?
 }

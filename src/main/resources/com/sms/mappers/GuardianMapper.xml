@@ -142,4 +142,33 @@
         SELECT COUNT(*) > 0 FROM contact_details WHERE lower(email) = lower(#{email})
     </select>
 
+    <!-- Find by Email -->
+    <select id="findByEmail" parameterType="string" resultMap="GuardianResultMap">
+        SELECT
+        p.id,
+        p.first_name,
+        p.middle_name,
+        p.last_name,
+        p.gender,
+        p.date_of_birth,
+        p.created_at,
+        p.updated_at,
+
+        c.email,
+        c.phone_number,
+        c.address,
+        c.city,
+        c.state,
+
+        g.guardian_id,
+        g.occupation,
+        g.employer,
+        g.alternate_phone
+        FROM persons p
+        JOIN contact_details c ON p.id = c.id
+        JOIN guardians g ON c.id = g.id
+        WHERE lower(c.email) = lower(#{email})
+    </select>
+
+
 </mapper>

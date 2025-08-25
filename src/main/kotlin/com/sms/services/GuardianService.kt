@@ -57,4 +57,7 @@ class GuardianService(
         val year = LocalDate.now().year
         return "GDN-$year-${String.format("%04d", latestId)}"
     }
+    suspend fun findByEmail(email: String): Guardian? = withContext(Dispatchers.IO) {
+        guardianMapper.findByEmail(email)
+    }
 }
