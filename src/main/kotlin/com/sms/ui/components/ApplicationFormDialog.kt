@@ -7,13 +7,14 @@ import com.sms.entities.RelationshipType
 import com.sms.enums.Section
 import com.sms.services.SchoolClassService
 import com.sms.ui.common.BaseFormDialog
+import com.sms.ui.common.showError
+import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
-import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.validator.StringLengthValidator
 import java.nio.file.Paths
@@ -27,7 +28,6 @@ class ApplicationFormDialog(
     onChange: () -> Unit
 ) : BaseFormDialog<Applicant>("Admission Application", onSave, onDelete, onChange) {
 
-    private val uii: UI? = UI.getCurrent()
     private val firstName: TextField = TextField("First Name")
     private val lastName: TextField = TextField("Last Name")
     private val middleName: TextField = TextField("Middle Name")
@@ -56,7 +56,7 @@ class ApplicationFormDialog(
             if (selectedSection != null) {
                 launchUiCoroutine {
                     val classes = schoolClassService.findBySection(selectedSection)
-                    uii?.withUi {
+                    UI.getCurrent().withUi{
                         intendedClass.setItems(classes)
                         intendedClass.value = classes.firstOrNull() // avoids exception
                     }
@@ -155,37 +155,32 @@ class ApplicationFormDialog(
     }
     init{
         configureDialogAppearance()
-
-        saveBtn.addClickListener {
-            if (binder.writeBeanIfValid(currentEntity)) {
-                currentEntity.photoUrl = photoUpload.getPhotoUrl()
-
-                launchUiCoroutine {
-                    try {
-                        onSave(currentEntity)
-                        uii?.withUi {
-                            onChange()
-                            close()
-                            Notification.show("Saved successfully")
-                        }
-                    } catch (ex: Exception) {
-                        uii?.withUi {
-                            Notification.show("Error: ${ex.message}")
-                        }
+    }
+    override fun onSaveClick() {
+        if (binder.writeBeanIfValid(currentEntity)) {
+            currentEntity.photoUrl = photoUpload.getPhotoUrl()
+            launchUiCoroutine {
+                try {
+                    onSave(currentEntity)
+                    ui?.withUi {
+                        onChange()
+                        close()
+                        showSuccess("Saved successfully")
                     }
+                } catch (ex: Exception) {
+                    ui?.withUi { showError("Error: ${ex.message}") }
                 }
             }
         }
     }
-
-    override fun populateForm(entity: Applicant) {
+    override fun populateForm(entity: Applicant?) {
         super.populateForm(entity)
-        relationship.value = entity.relationshipToGuardian
+        relationship.value = entity?.relationshipToGuardian
 
-        if (entity.applicationSection != null) {
+        if (entity?.applicationSection != null) {
             launchUiCoroutine {
                 val classes = schoolClassService.findBySection(entity.applicationSection)
-                uii?.withUi {
+                ui?.withUi {
                     intendedClass.setItems(classes)
                     if (classes.contains(entity.intendedClass)) {
                         intendedClass.value = entity.intendedClass
@@ -194,10 +189,10 @@ class ApplicationFormDialog(
             }
         }
 
-        val approved = entity.applicationStatus == Applicant.ApplicationStatus.APPROVED
+        val approved = entity?.applicationStatus == Applicant.ApplicationStatus.APPROVED
         showApprovedOnlyFields(approved)
 
-        photoUpload.setPhotoUrl(entity.photoUrl)
+        photoUpload.setPhotoUrl(entity?.photoUrl)
 
         // If approved, set read-only for initial fields
         if (approved) {
@@ -206,10 +201,21 @@ class ApplicationFormDialog(
             lastName.isReadOnly = true
             dateOfBirth.isReadOnly = true
             gender.isReadOnly = true
+        }else {
+            // ✅ if not approved, ensure fields are editable
+            firstName.isReadOnly = false
+            middleName.isReadOnly = false
+            lastName.isReadOnly = false
+            dateOfBirth.isReadOnly = false
+            gender.isReadOnly = false
         }
     }
 
-    override fun createNewInstance(): Applicant = Applicant(guardian = guardian)
+    override fun createNewInstance(): Applicant {
+        val applicant = Applicant(guardian = guardian)
+        showApprovedOnlyFields(false) // ✅ hide extras for new applicant.
+        return applicant
+    }
 
     override fun getEntityType(): Class<Applicant> = Applicant::class.java
 }

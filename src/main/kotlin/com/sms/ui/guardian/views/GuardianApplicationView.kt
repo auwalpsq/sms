@@ -166,7 +166,7 @@ class GuardianApplicationView(
 
                             if (payment != null) {
                                 if (payment.status == PaymentStatus.SUCCESS) {
-                                    UI.getCurrent().withUi { showSuccess("✅ You have already paid for this application.") }
+                                    ui?.get()?.withUi { showSuccess("✅ You have already paid for this application.") }
                                     return@launchUiCoroutine
                                 }
                                 // Reuse existing reference if pending

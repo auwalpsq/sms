@@ -14,9 +14,13 @@ fun launchUiCoroutine(block: suspend CoroutineScope.() -> Unit) {
     }
 }
 
-// Suspend coroutine, then run block on Vaadin UI thread
-suspend fun <T> UI.withUi(block: () -> T): T = suspendCancellableCoroutine { cont ->
-    access {
+// Suspend coroutine, then run block on Vaadin UI thread safely
+suspend fun <T> UI?.withUi(block: () -> T): T? = suspendCancellableCoroutine { cont ->
+    if (this == null || !this.isAttached) {
+        cont.cancel()
+        return@suspendCancellableCoroutine
+    }
+    this.access {
         try {
             val result = block()
             cont.resume(result)

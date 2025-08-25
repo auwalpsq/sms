@@ -3,6 +3,7 @@ package com.sms.ui.admin.views
 import com.sms.entities.Payment
 import com.sms.enums.PaymentStatus
 import com.sms.services.PaymentService
+import com.sms.util.FormatUtil
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -66,7 +67,7 @@ class PaymentsView(
         grid.addColumn { it.paymentType?.category ?: "" }.setHeader("Payment Type")
         grid.addColumn { it.academicSession?.displaySession ?: "" }.setHeader("Session")
         grid.addColumn { it.term?.name ?: "" }.setHeader("Term")
-        grid.addColumn { it.paymentType?.amount ?: 0.0 }.setHeader("Amount")
+        grid.addColumn { FormatUtil.formatCurrency(it.paymentType?.amount ?: 0.0)}.setHeader("Amount")
         grid.addColumn { it.reference ?: "" }.setHeader("Reference")
         grid.addComponentColumn { statusBadge(it.status) }.setHeader("Status")
         grid.addColumn { it.createdAt?.format(formatter) ?: "" }.setHeader("Date")

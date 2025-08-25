@@ -25,7 +25,7 @@ abstract class BaseFormDialog<T : Any>(
     protected val onDelete: suspend (T) -> Unit,
     protected val onChange: () -> Unit
 ) : Dialog() {
-    private val ui: UI? = UI.getCurrent()
+    protected open val ui: UI? = UI.getCurrent()
 
     protected val binder: Binder<T> = Binder(getEntityType())
     protected lateinit var currentEntity: T
@@ -59,32 +59,27 @@ abstract class BaseFormDialog<T : Any>(
         setResizable(true)
         configureButtonActions()
     }
-    private fun configureButtonActions() {
-        saveBtn.addClickListener {
-            if (binder.writeBeanIfValid(currentEntity)) {
-                launchUiCoroutine {
-                    try {
-                        onSave(currentEntity)
-                        ui?.withUi {
-                            onChange()
-                            close()
-                            showSuccess("Saved successfully")
-                        }
-                    }catch (ex: Exception){
-                        ui?.withUi { showError(ex.message.toString()) }
+    protected open fun onSaveClick() {
+        if (binder.writeBeanIfValid(currentEntity)) {
+            launchUiCoroutine {
+                try {
+                    onSave(currentEntity)
+                    ui?.withUi {
+                        onChange()
+                        close()
+                        showSuccess("Saved successfully")
                     }
+                } catch (ex: Exception) {
+                    ui?.withUi { showError(ex.message.toString()) }
                 }
             }
         }
+    }
 
-        deleteBtn.addClickListener {
-            showDeleteConfirmation()
-            close()
-        }
-
-        cancelBtn.addClickListener {
-            close()
-        }
+    private fun configureButtonActions() {
+        saveBtn.addClickListener { onSaveClick() }
+        deleteBtn.addClickListener { showDeleteConfirmation(); close() }
+        cancelBtn.addClickListener { close() }
     }
     fun configureDialogAppearance() {
         // Header
@@ -130,7 +125,7 @@ abstract class BaseFormDialog<T : Any>(
         currentEntity = entity ?: createNewInstance()
         deleteBtn.isVisible = entity != null
         binder.readBean(currentEntity)
-        if(entity != null){populateForm(entity)}
+        populateForm(entity)
         open()
     }
     protected open fun showDeleteConfirmation() {
@@ -153,7 +148,7 @@ abstract class BaseFormDialog<T : Any>(
         }
         dialog.open()
     }
-    open fun populateForm(entity: T) {
+    open fun populateForm(entity: T?) {
         binder.readBean(entity)
     }
     protected abstract fun buildForm(formLayout: FormLayout)
