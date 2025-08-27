@@ -1,6 +1,7 @@
 package com.sms.security
 
-import com.sms.services.UserService
+import com.sms.services.MyUserDetailsManager
+import com.vaadin.flow.server.auth.AnonymousAllowed
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
@@ -8,12 +9,12 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(
-    private val userService: UserService,
+    private val userDetailsManager: MyUserDetailsManager,
     private val passwordEncoder: PasswordEncoder
 ) {
     @PostMapping("/login")
-    suspend fun login(@RequestBody request: LoginRequest): ResponseEntity<LoginResponse> {
-        val user = userService.findByUsername(request.username)
+    fun login(@RequestBody request: LoginRequest): ResponseEntity<LoginResponse> {
+        val user = userDetailsManager.findByUsername(request.username)
             ?: return ResponseEntity.badRequest().build()
 
         return if (passwordEncoder.matches(request.password, user.password)) {

@@ -140,4 +140,10 @@ class MyUserDetailsManager(
             user.copy(roles = roles.toSet())
         }
     }
+    fun findByUsername(username: String): User? {
+        return userMapper.findByUsername(username)?.copy(
+            roles = userMapper.findRolesByUsername(username).toSet()
+        )
+    }
+
 }

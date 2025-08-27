@@ -1,5 +1,6 @@
 package com.sms.security
 
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
@@ -23,16 +24,31 @@ object JwtUtil {
             .compact()
     }
 
-    fun validateToken(token: String): String? {
+    fun getClaims(token: String): Claims? {
         return try {
-            val claims = Jwts.parserBuilder()
+            Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .body
-            claims.subject
         } catch (ex: Exception) {
             null
         }
+    }
+
+    fun extractUsername(token: String): String? {
+        return getClaims(token)?.subject
+    }
+
+    fun extractRoles(token: String): List<String> {
+        return getClaims(token)
+            ?.get("roles", List::class.java)
+            ?.map { it.toString() }
+            ?: emptyList()
+    }
+
+    fun validateToken(token: String): Boolean {
+        val claims = getClaims(token) ?: return false
+        return claims.expiration.after(Date())
     }
 }
