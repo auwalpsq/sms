@@ -16,6 +16,7 @@ import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.validator.StringLengthValidator
+import kotlinx.coroutines.runBlocking
 import java.nio.file.Paths
 import java.time.LocalDate
 
@@ -53,15 +54,17 @@ class ApplicationFormDialog(
             val selectedSection = event.value
             println("$selectedSection app section")
             intendedClass.clear() // removes previous items & value
-//            if (selectedSection != null) {
-//                launchUiCoroutine {
-//                    val classes = schoolClassService.findBySection(selectedSection)
-//                    ui?.get()?.withUi{
-//                        intendedClass.setItems(classes)
-//                        intendedClass.value = classes.firstOrNull() // avoids exception
-//                    }
-//                }
-//            }
+            if (selectedSection != null)
+            runBlocking {
+                val classes = schoolClassService.findBySection(selectedSection)
+                ui?.get()?.withUi {
+                    intendedClass.setItems(classes)
+                    intendedClass.value = classes.firstOrNull() // avoids exception
+                }
+            }
+
+
+
         }
     }
 
