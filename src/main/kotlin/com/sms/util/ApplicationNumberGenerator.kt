@@ -3,7 +3,7 @@ package com.sms.util
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-object ApplicationNumberGenerator {
+object  ApplicationNumberGenerator {
     suspend fun generate(latestNumberForToday: String?): String {
         val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
         val prefix = "APP-$today-"

@@ -5,7 +5,7 @@ import com.sms.services.GuardianService
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.web.bind.annotation.*
 
-@RolesAllowed("GUARDIAN", "ADMIN")
+@RolesAllowed("GUARDIAN")
 @RestController
 @RequestMapping("/api/guardians")
 class GuardianController(
