@@ -11,7 +11,6 @@ import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
-import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
@@ -52,16 +51,17 @@ class ApplicationFormDialog(
         setItemLabelGenerator { it.name.lowercase().replaceFirstChar(Char::uppercase) }
         addValueChangeListener { event ->
             val selectedSection = event.value
+            println("$selectedSection app section")
             intendedClass.clear() // removes previous items & value
-            if (selectedSection != null) {
-                launchUiCoroutine {
-                    val classes = schoolClassService.findBySection(selectedSection)
-                    UI.getCurrent().withUi{
-                        intendedClass.setItems(classes)
-                        intendedClass.value = classes.firstOrNull() // avoids exception
-                    }
-                }
-            }
+//            if (selectedSection != null) {
+//                launchUiCoroutine {
+//                    val classes = schoolClassService.findBySection(selectedSection)
+//                    ui?.get()?.withUi{
+//                        intendedClass.setItems(classes)
+//                        intendedClass.value = classes.firstOrNull() // avoids exception
+//                    }
+//                }
+//            }
         }
     }
 
@@ -180,6 +180,7 @@ class ApplicationFormDialog(
         if (entity?.applicationSection != null) {
             launchUiCoroutine {
                 val classes = schoolClassService.findBySection(entity.applicationSection)
+                println(classes + "populate form")
                 ui?.withUi {
                     intendedClass.setItems(classes)
                     if (classes.contains(entity.intendedClass)) {

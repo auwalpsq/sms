@@ -25,7 +25,6 @@ class JwtFilter(
         if (header != null && header.startsWith("Bearer ")) {
             val token = header.substring(7)
             val username = JwtUtil.extractUsername(token)
-
             if (username != null && SecurityContextHolder.getContext().authentication == null) {
                 val userDetails = userDetailsManager.findByUsername(username)
                 if (userDetails != null && JwtUtil.validateToken(token)) {

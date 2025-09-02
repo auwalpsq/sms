@@ -1,7 +1,7 @@
 package com.sms.api
 
 import com.sms.entities.Guardian
-import com.sms.services.GuardianService
+import com.sms.mappers.GuardianMapper
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.web.bind.annotation.*
 
@@ -9,35 +9,40 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/guardians")
 class GuardianController(
-    private val guardianService: GuardianService
+    private val guardianMapper: GuardianMapper
 ) {
+
     @GetMapping
-    suspend fun getAllGuardians(): List<Guardian> {
-        return guardianService.findAll()
+    fun getAllGuardians(): List<Guardian> {
+        return guardianMapper.findAll()
     }
 
     @GetMapping("/{id}")
-    suspend fun getGuardianById(@PathVariable id: Long): Guardian? {
-        return guardianService.findById(id)
+    fun getGuardianById(@PathVariable id: Long): Guardian? {
+        return guardianMapper.findById(id)
     }
 
     @GetMapping("/search")
-    suspend fun getGuardianByEmail(@RequestParam email: String): Guardian? {
-        return guardianService.findByEmail(email)
+    fun getGuardianByEmail(@RequestParam email: String): Guardian? {
+        return guardianMapper.findByEmail(email)
     }
 
     @PostMapping
-    suspend fun createGuardian(@RequestBody guardian: Guardian): Guardian {
-        return guardianService.save(guardian)
+    fun createGuardian(@RequestBody guardian: Guardian): Guardian {
+        guardianMapper.insertIntoPersons(guardian)
+        guardianMapper.insertIntoContactDetails(guardian)
+        guardianMapper.insertIntoGuardians(guardian)
+        return guardian
     }
 
     @PutMapping("/{id}")
-    suspend fun updateGuardian(@RequestBody guardian: Guardian): Guardian {
-        return guardianService.save(guardian)
+    fun updateGuardian(@RequestBody guardian: Guardian): Guardian {
+        guardianMapper.update(guardian)
+        return guardian
     }
 
     @DeleteMapping("/{id}")
-    suspend fun deleteGuardian(@RequestBody guardian: Guardian) {
-        guardianService.delete(guardian)
+    fun deleteGuardian(@PathVariable id: Long) {
+        guardianMapper.delete(id)
     }
 }
