@@ -1,6 +1,7 @@
 package com.sms.mappers
 
 import com.sms.entities.SchoolClass
+import com.sms.enums.Section
 import org.apache.ibatis.annotations.Mapper
 import org.apache.ibatis.annotations.Param
 
@@ -24,5 +25,5 @@ interface SchoolClassMapper {
         @Param("section") section: String
     ): Boolean
 
-    fun findBySection(name: String): List<String>
+    fun findBySection(name: Section): List<String>
 }

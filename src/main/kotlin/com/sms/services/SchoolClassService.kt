@@ -58,7 +58,7 @@ class SchoolClassService(
     suspend fun deleteById(id: Long) = withContext(Dispatchers.IO) {
         schoolClassMapper.deleteById(id)
     }
-    suspend fun findBySection(section: Section): List<String> {
-        return schoolClassMapper.findBySection(section.name)
+    suspend fun findBySection(section: Section): List<String>? {
+        return schoolClassMapper.findBySection(section)
     }
 }

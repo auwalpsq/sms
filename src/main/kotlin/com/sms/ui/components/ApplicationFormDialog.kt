@@ -51,20 +51,16 @@ class ApplicationFormDialog(
         isRequiredIndicatorVisible = true
         setItemLabelGenerator { it.name.lowercase().replaceFirstChar(Char::uppercase) }
         addValueChangeListener { event ->
+            if (!event.isFromClient) return@addValueChangeListener
             val selectedSection = event.value
-            println("$selectedSection app section")
-            intendedClass.clear() // removes previous items & value
             if (selectedSection != null)
-            runBlocking {
-                val classes = schoolClassService.findBySection(selectedSection)
-                ui?.get()?.withUi {
-                    intendedClass.setItems(classes)
-                    intendedClass.value = classes.firstOrNull() // avoids exception
+                launchUiCoroutine {
+                    val classes = schoolClassService.findBySection(selectedSection)
+                    ui?.get()?.withUi {
+                        intendedClass.setItems(classes)
+                        intendedClass.value = classes?.firstOrNull() // avoids exception
+                    }
                 }
-            }
-
-
-
         }
     }
 
@@ -183,10 +179,10 @@ class ApplicationFormDialog(
         if (entity?.applicationSection != null) {
             launchUiCoroutine {
                 val classes = schoolClassService.findBySection(entity.applicationSection)
-                println(classes + "populate form")
+                println("$classes populate form")
                 ui?.withUi {
                     intendedClass.setItems(classes)
-                    if (classes.contains(entity.intendedClass)) {
+                    if (classes?.contains(entity.intendedClass)!!) {
                         intendedClass.value = entity.intendedClass
                     }
                 }

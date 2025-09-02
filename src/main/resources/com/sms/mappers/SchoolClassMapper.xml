@@ -54,7 +54,7 @@
         AND section = #{section}
     </select>
 
-    <select id="findBySection" parameterType="string" resultType="string">
+    <select id="findBySection" parameterType="com.sms.enums.Section" resultType="string">
         SELECT name FROM school_classes WHERE section = #{section}
     </select>
 
