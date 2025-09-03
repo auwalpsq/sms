@@ -42,7 +42,7 @@ import java.util.UUID
 
 @JavaScript("https://js.paystack.co/v2/inline.js")
 @PageTitle("My Applications")
-@Route(value = "guardian/admissions", layout = GuardianLayout::class)
+@Route(value = "guardian/applications", layout = GuardianLayout::class)
 @RolesAllowed("GUARDIAN")
 @Menu(order = 2.0, icon = "vaadin:form", title = "Apply for Admission")
 class GuardianApplicationView(
@@ -197,6 +197,16 @@ class GuardianApplicationView(
                 }
             }
         ).setHeader("More Actions")
+        grid.addColumn(
+            ComponentRenderer { applicant: Applicant ->
+                Button("Open Profile").apply {
+                    addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE)
+                    addClickListener {
+                        ui?.get()?.navigate("guardian/applicant/${applicant.id}")
+                    }
+                }
+            }
+        ).setHeader("Actions")
 
         grid.setWidthFull()
         //grid.columns.forEach { column -> column.isAutoWidth = true }

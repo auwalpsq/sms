@@ -1,6 +1,7 @@
 package com.sms.mappers
 
 import com.sms.entities.Payment
+import com.sms.entities.PaymentType
 import com.sms.enums.PaymentStatus
 import com.sms.enums.Term
 import org.apache.ibatis.annotations.Mapper
@@ -27,5 +28,12 @@ interface PaymentMapper {
         @Param("paymentTypeId") paymentTypeId: Long,
         @Param("sessionId") sessionId: Long,
         @Param("term") term: Term
+    ): Payment?
+
+    fun findByApplicantId(@Param("applicantId") applicantId: Long): List<Payment>
+
+    fun findByApplicantIdAndPaymentType(
+        @Param("applicantId") applicantId: Long,
+        @Param("paymentType") paymentType: PaymentType
     ): Payment?
 }

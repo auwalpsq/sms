@@ -16,7 +16,7 @@ class PhotoUploadField(
     private val placeholderImage: String = "/images/placeholder.png"
 ) : Composite<VerticalLayout>() {
 
-    private var imagePreview = Image(placeholderImage, "Photo preview").apply {
+    var imagePreview = Image(placeholderImage, "Photo preview").apply {
         width = "150px"
         height = "150px"
         style["object-fit"] = "cover"

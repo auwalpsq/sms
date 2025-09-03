@@ -37,13 +37,18 @@
     <select id="findByStatus" parameterType="com.sms.enums.PaymentStatus" resultMap="PaymentResultMap">
         SELECT * FROM payments WHERE status = #{status}
     </select>
-    <select id="findByApplicantAndTypeAndSessionAndTerm"
-            resultMap="PaymentResultMap">
+    <select id="findByApplicantAndTypeAndSessionAndTerm" resultMap="PaymentResultMap">
         SELECT * FROM payments
         WHERE applicant_id = #{applicantId}
         AND payment_type_id = #{paymentTypeId}
         AND academic_session_id = #{sessionId}
         AND term = #{term}
         LIMIT 1
+    </select>
+    <select id="findByApplicantId" parameterType="long" resultMap="PaymentResultMap">
+        SELECT * FROM payments WHERE applicant_id = #{applicantId}
+    </select>
+    <select id="findByApplicantIdAndPaymentType" resultMap="PaymentResultMap">
+        SELECT * FROM payments WHERE applicant_id = #{applicantId} AND payment_type = #{PaymentType}
     </select>
 </mapper>

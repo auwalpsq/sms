@@ -179,7 +179,6 @@ class ApplicationFormDialog(
         if (entity?.applicationSection != null) {
             launchUiCoroutine {
                 val classes = schoolClassService.findBySection(entity.applicationSection)
-                println("$classes populate form")
                 ui?.withUi {
                     intendedClass.setItems(classes)
                     if (classes?.contains(entity.intendedClass)!!) {
