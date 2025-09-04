@@ -2,6 +2,7 @@ package com.sms.services
 
 import com.sms.entities.Payment
 import com.sms.entities.PaymentType
+import com.sms.enums.PaymentCategory
 import com.sms.enums.PaymentStatus
 import com.sms.enums.Term
 import com.sms.mappers.PaymentMapper
@@ -43,9 +44,9 @@ class PaymentService(private val paymentMapper: PaymentMapper) {
     }
     suspend fun findByApplicantIdAndPaymentType(
         applicantId: Long,
-        paymentType: PaymentType
+        paymentTypeId: Long
     ): Payment? = withContext(Dispatchers.IO) {
-        paymentMapper.findByApplicantIdAndPaymentCategory(applicantId, paymentCategory)
+        paymentMapper.findByApplicantIdAndPaymentType(applicantId, paymentTypeId)
     }
 
 }

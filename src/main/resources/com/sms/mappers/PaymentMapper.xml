@@ -49,6 +49,10 @@
         SELECT * FROM payments WHERE applicant_id = #{applicantId}
     </select>
     <select id="findByApplicantIdAndPaymentType" resultMap="PaymentResultMap">
-        SELECT * FROM payments WHERE applicant_id = #{applicantId} AND payment_type = #{PaymentType}
+        SELECT *
+        FROM payments
+        WHERE applicant_id = #{applicantId}
+        AND payment_type_id = #{paymentTypeId}
     </select>
+
 </mapper>

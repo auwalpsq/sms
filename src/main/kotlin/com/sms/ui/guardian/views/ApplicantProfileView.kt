@@ -7,6 +7,7 @@ import com.sms.entities.PaymentType
 import com.sms.enums.PaymentCategory
 import com.sms.services.ApplicantService
 import com.sms.services.PaymentService
+import com.sms.services.PaymentTypeService
 import com.sms.services.SchoolClassService
 import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
@@ -38,7 +39,8 @@ import java.nio.file.Path
 class ApplicantProfileView(
     private val applicantService: ApplicantService,
     private val paymentService: PaymentService,
-    private val schoolClassService: SchoolClassService
+    private val schoolClassService: SchoolClassService,
+    private val paymentTypeService: PaymentTypeService
 ) : VerticalLayout(), BeforeEnterObserver {
 
     private val ui: UI? = UI.getCurrent()
@@ -165,39 +167,64 @@ class ApplicantProfileView(
 
     private fun showPayment() {
         launchUiCoroutine {
-            val payment = applicant?.id?.let {
-                paymentService.findByApplicantIdAndPaymentType(it, PaymentCategory.APPLICATION)
-            }
+            val applicationPaymentType = paymentTypeService.findByCategory(PaymentCategory.APPLICATION)
+
+            val payment = if (applicationPaymentType != null) {
+                paymentService.findByApplicantIdAndPaymentType(
+                    applicantId = applicant!!.id!!,
+                    paymentTypeId = applicationPaymentType.id!!
+                )
+            } else null
 
             ui?.withUi {
-                content.removeAll()
-
                 if (payment == null) {
-                    content.add(Paragraph("No payment record found."))
+                    // No record at all
+                    content.add(Paragraph("No application payment has been made."))
+                    content.add(Button("Make Application Payment", VaadinIcon.CREDIT_CARD.create()).apply {
+                        addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+                        addClickListener {
+                            showSuccess("TODO: integrate Paystack for Application Fee")
+                        }
+                    })
+                } else {
+                    // Show record, regardless of status
+                    val infoLayout = com.vaadin.flow.component.formlayout.FormLayout().apply {
+                        setResponsiveSteps(
+                            com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep("0", 1)
+                        )
+                        addFormItem(Paragraph(payment.reference ?: "-"), "Reference")
+                        addFormItem(Paragraph(payment.createdAt.toString()), "Date Created")
+                        addFormItem(Paragraph(payment.status?.name ?: "-"), "Status")
+                        addFormItem(Paragraph(payment.term?.name ?: "-"), "Term")
+                        addFormItem(
+                            Paragraph(FormatUtil.formatCurrency(payment.paymentType?.amount)),
+                            "Amount"
+                        )
+                        addFormItem(
+                            Paragraph(payment.academicSession?.displaySession ?: "-"),
+                            "Academic Session"
+                        )
+                    }
 
-                    // Show button if application is unpaid
-                    if (applicant?.paymentStatus == PaymentStatus.UNPAID) {
-                        val payButton = Button("Make Payment", VaadinIcon.CREDIT_CARD.create()).apply {
+                    content.add(infoLayout)
+
+                    if (payment.status == com.sms.enums.PaymentStatus.SUCCESS) {
+                        // Only allow receipt download if successful
+                        content.add(Button("Download Receipt", VaadinIcon.FILE_TEXT.create()).apply {
+                            addThemeVariants(ButtonVariant.LUMO_TERTIARY)
+                            addClickListener {
+                                showSuccess("TODO: implement receipt download/print")
+                            }
+                        })
+                    } else {
+                        // Show retry option if not successful
+                        content.add(Button("Retry Application Payment", VaadinIcon.CREDIT_CARD.create()).apply {
                             addThemeVariants(ButtonVariant.LUMO_PRIMARY)
                             addClickListener {
-                                // TODO: integrate Paystack/Flutterwave
-                                showSuccess("Redirecting to Paystack (integration coming soon)...")
+                                showSuccess("TODO: integrate Paystack retry for Application Fee")
                             }
-                        }
-                        content.add(payButton)
+                        })
                     }
-                } else {
-                    val details = VerticalLayout().apply {
-                        isPadding = false
-                        isSpacing = true
-
-                        add(Paragraph("Reference: ${payment.reference}"))
-                        add(Paragraph("Type: ${payment.paymentType ?: "-"}"))
-                        add(Paragraph("Amount: ${FormatUtil.formatCurrency(payment.paymentType?.amount)}"))
-                        add(Paragraph("Date: ${payment.createdAt ?: "-"}"))
-                        add(Paragraph("Status: ${payment.status.name}"))
-                    }
-                    content.add(details)
                 }
             }
         }
