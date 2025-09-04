@@ -55,6 +55,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1")
 
+	implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
+	implementation("org.xhtmlrenderer:flying-saucer-pdf-openpdf:9.1.22")
+
 }
 
 dependencyManagement {
