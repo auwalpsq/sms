@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Application Form</title>
+    <style>
+        body {
+            font-family: "Times New Roman", serif;
+            font-size: 14px;
+            color: #000;
+            margin: 20px;
+        }
+        .letterhead {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+        .letterhead img {
+            height: 80px;
+        }
+        h1 {
+            margin: 5px 0;
+            font-size: 22px;
+            text-transform: uppercase;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        td {
+            border: 1px solid #ccc;
+            padding: 6px 10px;
+            vertical-align: top;
+        }
+        td:first-child {
+            font-weight: bold;
+            background: #f9f9f9;
+        }
+        .signature-block {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-line {
+            width: 40%;
+            border-top: 1px solid #000;
+            text-align: center;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="letterhead">
+    <img src="images/placeholder.png" alt="School Logo"/>
+    <h1>SCHOOL NAME PLACEHOLDER</h1>
+    <p>Address Line 1, City, State</p>
+    <p>Phone: +234 XXX XXX XXXX | Email: info@school.com</p>
+</div>
+
+<h2>Personal Information</h2>
+<table>
+    <tr><td>Full Name</td><td th:text="${applicant.fullName}"></td></tr>
+    <tr><td>Gender</td><td th:text="${applicant.gender}"></td></tr>
+    <tr><td>Date of Birth</td><td th:text="${applicant.dateOfBirth}"></td></tr>
+    <tr><td>Age</td><td th:text="${applicant.currentAge}"></td></tr>
+</table>
+
+<h2>Application Information</h2>
+<table>
+    <tr><td>Application Number</td><td th:text="${applicant.applicationNumber}"></td></tr>
+    <tr><td>Intended Class</td><td th:text="${applicant.intendedClass}"></td></tr>
+    <tr><td>Status</td><td th:text="${applicant.applicationStatus}"></td></tr>
+    <tr><td>Payment Status</td><td th:text="${applicant.paymentStatus}"></td></tr>
+</table>
+
+<h2>Guardian Information</h2>
+<table>
+    <tr><td>Full Name</td><td th:text="${guardian.getFullName}"></td></tr>
+    <tr><td>Email</td><td th:text="${guardian.email}"></td></tr>
+    <tr><td>Phone</td><td th:text="${guardian.phoneNumber}"></td></tr>
+    <tr><td>Address</td><td th:text="${guardian.address}"></td></tr>
+</table>
+
+<div class="signature-block">
+    <div class="signature-line">Guardian's Signature</div>
+    <div class="signature-line">School Official</div>
+</div>
+</body>
+</html>

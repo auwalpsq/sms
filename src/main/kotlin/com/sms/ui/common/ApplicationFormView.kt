@@ -10,6 +10,7 @@ import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.*
 import com.sms.services.ApplicantService
+import com.sms.services.PdfExportService
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -29,7 +30,8 @@ import java.io.ByteArrayOutputStream
 @RolesAllowed("GUARDIAN")
 @PageTitle("Application Form")
 class ApplicationFormView(
-    private val applicantService: ApplicantService
+    private val applicantService: ApplicantService,
+    private val pdfExportService: PdfExportService
 ) : VerticalLayout(), BeforeEnterObserver {
 
     private var applicant: Applicant? = null
@@ -64,168 +66,27 @@ class ApplicationFormView(
         val printBtn = Button("Print").apply {
             addClickListener { ui?.get()?.page?.executeJs("window.print();") }
         }
-        val appFormFileName = "application-form-${applicant?.applicationNumber ?: applicant?.id}.pdf"
+        val downloadBtn = Anchor(
+            DownloadHandler.fromInputStream { _ ->
+                val model = mapOf("applicant" to applicant!!, "guardian" to applicant!!.guardian!!)
+                val pdfBytes = pdfExportService.renderPdf("application-form", model)
 
-        val appFormHandler = DownloadHandler.fromInputStream({ _ ->
-            try {
-                val html = """
-            <!DOCTYPE html>
-            <html xmlns="http://www.w3.org/1999/xhtml">
-              <head>
-                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-                <title>Application Form</title>
-                <style>
-                    /* General Layout */
-                    .application-form {
-                      width: 800px;
-                      margin: 0 auto;
-                      padding: 20px 40px;
-                      background: white;
-                      color: #000;
-                      font-family: "Times New Roman", serif;
-                      border: 1px solid #ccc;
-                      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-                      font-size: 15px;
-                      line-height: 1.5;
-                    }
-                    .applicant-info td:first-child, .guardian-info td:first-child, .personal-info td:first-child {
-                      font-weight: bold;
-                      background: #f9f9f9;
-                    }
-                    /* Letterhead */
-                    .application-letterhead {
-                      text-align: center;
-                      border-bottom: 2px solid #000;
-                      padding-bottom: 15px;
-                      margin-bottom: 20px;
-                    }
-
-                    .application-letterhead img {
-                      height: 80px;
-                      margin-bottom: 10px;
-                    }
-
-                    .application-letterhead h1 {
-                      font-size: 22px;
-                      margin: 0;
-                      font-weight: bold;
-                      text-transform: uppercase;
-                    }
-                    .info-row {
-                      display: flex;
-                      gap: 20px;
-                      margin-bottom: 20px;
-                    }
-
-                    .info-row .application-section {
-                      flex: 1;
-                    }
-                    .application-letterhead p {
-                      margin: 2px 0;
-                      font-size: 14px;
-                    }
-
-                    /* Section Headings */
-                    .application-section {
-                      margin-top: 5px;
-                      font-family: "Times New Roman", serif;
-                    }
-
-                    .application-section h2 {
-                      font-size: 16px;
-                      margin-bottom: 8px;
-                      border-bottom: 1px solid #000;
-                      padding-bottom: 3px;
-                      text-transform: uppercase;
-                    }
-
-                    /* Applicant Info Table */
-                    .applicant-info, .guardian-info, .personal-info {
-                      width: 100%;
-                      border-collapse: collapse;
-                      margin-top: 10px;
-                    }
-
-                    .applicant-info td, .guardian-info td, .personal-info td {
-                      padding: 6px 10px;
-                      border: 1px solid #ccc;
-                      /*border: 1px solid #999;*/
-                      font-size: 14px;
-                      vertical-align: top;
-                    }
-
-                    /* Signature Area */
-                    .signature-block {
-                      margin-top: 40px;
-                      display: flex;
-                      justify-content: space-around;
-                    }
-
-                    .signature-line {
-                      width: 45%;
-                      text-align: center;
-                      border-top: 1px solid #000;
-                      padding-top: 5px;
-                      font-size: 14px;
-                      flex: 0 0 40%;
-                    }
-
-                    /* Print Styles */
-                    @media print {
-                      body {
-                        background: white;
-                      }
-                      .application-form {
-                        box-shadow: none;
-                        border: none;
-                        width: 100%;
-                        padding: 0;
-                      }
-                      button {
-                          display: none !important;
-                        }
-                    }
-                </style>
-              </head>
-              <body>
-                ${this.element.outerHTML}
-              </body>
-            </html>
-        """.trimIndent()
-
-                // Clean & force XHTML
-                val document = org.jsoup.Jsoup.parse(html)
-                document.outputSettings().syntax(org.jsoup.nodes.Document.OutputSettings.Syntax.xml)
-                val xhtml = document.outerHtml()
-
-                // Render PDF
-                val baos = ByteArrayOutputStream()
-                val renderer = org.xhtmlrenderer.pdf.ITextRenderer()
-                renderer.setDocumentFromString(xhtml)
-                renderer.layout()
-                renderer.createPDF(baos)
-
-                val pdfBytes = baos.toByteArray()
+                // Using the new DownloadResponse constructor
                 DownloadResponse(
                     ByteArrayInputStream(pdfBytes),
-                    appFormFileName,
+                    "application-form-${applicant!!.id}.pdf",
                     "application/pdf",
                     pdfBytes.size.toLong()
                 )
-            } catch (e: Exception) {
-                e.printStackTrace()
-                DownloadResponse.error(500)
-            }
-        })
-
-        val downloadForm = Anchor(appFormHandler, "").apply {
-            element.setAttribute("download", true) // force as file download
-            add(VaadinIcon.FILE.create(), Span(" Download Application Form (PDF)"))
-            style.set("display", "inline-flex")
-            style.set("gap", "0.4rem")
+            },
+            "Download PDF"
+        ).apply {
+            element.setAttribute("download", true) // ensures browser downloads file
+            VaadinIcon.DOWNLOAD.create()
         }
 
-        add(header, content, downloadForm)
+
+        add(header, content, printBtn, downloadBtn)
     }
 
     override fun beforeEnter(event: BeforeEnterEvent) {

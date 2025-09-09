@@ -15,8 +15,6 @@ import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.components.PhotoUploadField
 import com.sms.ui.guardian.GuardianLayout
 import com.sms.util.FormatUtil
-import com.sms.util.buildPdfHtml
-import com.sms.util.htmlToPdfBytes
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -241,34 +239,34 @@ class ApplicantProfileView(
     private fun showDocuments() {
         content.removeAll()
 
-        // --- Application Form PDF (always available) ---
-        val app = applicant ?: return
-        val appFormFileName = "application-form-${app.applicationNumber ?: app.id}.pdf"
-
-        val appFormHandler = DownloadHandler.fromInputStream({ event ->
-            try {
-                val html = buildPdfHtml(app)
-                val pdf = htmlToPdfBytes(html)
-                DownloadResponse(
-                    ByteArrayInputStream(pdf),
-                    appFormFileName,
-                    "application/pdf",
-                    pdf.size.toLong()
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-                DownloadResponse.error(500)
-            }
-        })
-
-        val downloadForm = Anchor(appFormHandler, "").apply {
-            element.setAttribute("download", true) // force as file download
-            add(VaadinIcon.FILE_TEXT.create(), Span(" Download Application Form (PDF)"))
-            style.set("display", "inline-flex")
-            style.set("gap", "0.4rem")
-        }
-
-        content.add(downloadForm)
+//        // --- Application Form PDF (always available) ---
+//        val app = applicant ?: return
+//        val appFormFileName = "application-form-${app.applicationNumber ?: app.id}.pdf"
+//
+//        val appFormHandler = DownloadHandler.fromInputStream({ event ->
+//            try {
+//                val html = buildPdfHtml(app)
+//                val pdf = htmlToPdfBytes(html)
+//                DownloadResponse(
+//                    ByteArrayInputStream(pdf),
+//                    appFormFileName,
+//                    "application/pdf",
+//                    pdf.size.toLong()
+//                )
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                DownloadResponse.error(500)
+//            }
+//        })
+//
+//        val downloadForm = Anchor(appFormHandler, "").apply {
+//            element.setAttribute("download", true) // force as file download
+//            add(VaadinIcon.FILE_TEXT.create(), Span(" Download Application Form (PDF)"))
+//            style.set("display", "inline-flex")
+//            style.set("gap", "0.4rem")
+//        }
+//
+//        content.add(downloadForm)
 
         // --- Admission Letter PDF (only when approved & paid) ---
 //        if (app.applicationStatus == Applicant.ApplicationStatus.APPROVED &&

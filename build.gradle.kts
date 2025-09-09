@@ -32,6 +32,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
+	// Thymeleaf (for HTML templates, used for PDF export)
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
 	// Jackson Kotlin module
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
@@ -47,17 +50,21 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
+	// PDF generation (OpenPDF is recommended, actively maintained)
+	implementation("com.github.librepdf:openpdf:1.3.39")
+
+	// WebClient (from Spring WebFlux) - needed for PaystackService
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+	// OpenHTMLtoPDF core + PDFBox renderer
+	implementation("com.openhtmltopdf:openhtmltopdf-core:1.0.10")
+	implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
+
+
 	// Testing
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.springframework.security:spring-security-test")
-
-	implementation("org.springframework.boot:spring-boot-starter-webflux")
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.1")
-
-	implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
-	implementation("org.xhtmlrenderer:flying-saucer-pdf-openpdf:9.1.22")
-
 }
 
 dependencyManagement {
