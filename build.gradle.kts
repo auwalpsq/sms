@@ -60,6 +60,8 @@ dependencies {
 	implementation("com.openhtmltopdf:openhtmltopdf-core:1.0.10")
 	implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
 
+	implementation("com.princexml:prince-java-wrapper:1.5.0")
+
 
 	// Testing
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

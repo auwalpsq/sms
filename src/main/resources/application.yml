@@ -34,3 +34,8 @@ server:
 
 paystack:
   secret-key: sk_test_e7fd3716c1beec1ca1c788208040db93d472ec93
+
+prince:
+  executable: C:\Program Files\Prince\engine\bin\prince # set to where prince is installed on your machine
+  log: C:\Users\pc\Documents\GitHub\sms\prince\prince.txt       # optional
+  enableJs: false               # optional (if you use JS in templates)

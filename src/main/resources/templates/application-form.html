@@ -9,37 +9,60 @@
             font-size: 14px;
             color: #000;
             margin: 20px;
+            line-height: 1.6;
         }
+
         .letterhead {
             text-align: center;
             border-bottom: 2px solid #000;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             padding-bottom: 10px;
         }
-        .letterhead img {
-            height: 80px;
-        }
-        h1 {
+        .letterhead img { height: 80px; }
+        .letterhead h1 {
             margin: 5px 0;
             font-size: 22px;
             text-transform: uppercase;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+
+        h2 {
+            font-size: 16px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #000;
+            padding-bottom: 3px;
+            margin: 20px 0 10px;
         }
-        td {
-            border: 1px solid #ccc;
-            padding: 6px 10px;
-            vertical-align: top;
+
+        .field-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 6px 0;
         }
-        td:first-child {
+        .field-group {
+            flex: 1 1 45%;
+            margin-right: 20px;
+            margin-bottom: 8px;
+        }
+        .field-full {
+            flex: 1 1 100%;
+            margin-bottom: 8px;
+        }
+
+        .field-label {
             font-weight: bold;
-            background: #f9f9f9;
+            font-family: "Times New Roman", serif;
+            margin-right: 5px;
         }
+        .field-value {
+            font-family: "Courier New", monospace;
+            border-bottom: 1px solid #000;
+            padding: 0 5px;
+            display: inline-block;
+            min-width: 150px;
+        }
+
         .signature-block {
-            margin-top: 40px;
+            margin-top: 50px;
             display: flex;
             justify-content: space-between;
         }
@@ -53,35 +76,99 @@
 </head>
 <body>
 <div class="letterhead">
-    <img src="images/placeholder.png" alt="School Logo"/>
+    <img th:src="${schoolLogo}" alt="School Logo"/>
     <h1>SCHOOL NAME PLACEHOLDER</h1>
     <p>Address Line 1, City, State</p>
     <p>Phone: +234 XXX XXX XXXX | Email: info@school.com</p>
 </div>
 
 <h2>Personal Information</h2>
-<table>
-    <tr><td>Full Name</td><td th:text="${applicant.fullName}"></td></tr>
-    <tr><td>Gender</td><td th:text="${applicant.gender}"></td></tr>
-    <tr><td>Date of Birth</td><td th:text="${applicant.dateOfBirth}"></td></tr>
-    <tr><td>Age</td><td th:text="${applicant.currentAge}"></td></tr>
-</table>
+<div class="field-row">
+    <div class="field-full">
+        <span class="field-label">Full Name:</span>
+        <span class="field-value" th:text="${applicant.fullName}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Gender:</span>
+        <span class="field-value" th:text="${applicant.gender}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Date of Birth:</span>
+        <span class="field-value" th:text="${applicant.dateOfBirth}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Age:</span>
+        <span class="field-value" th:text="${applicant.currentAge}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Relationship to Guardian:</span>
+        <span class="field-value" th:text="${applicant.relationshipToGuardian}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Blood Group:</span>
+        <span class="field-value" th:text="${applicant.bloodGroup}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Genotype:</span>
+        <span class="field-value" th:text="${applicant.genotype}"></span>
+    </div>
+    <div class="field-full">
+        <span class="field-label">Known Allergies:</span>
+        <span class="field-value" th:text="${applicant.knownAllergies} ?: 'None'"></span>
+    </div>
+</div>
 
 <h2>Application Information</h2>
-<table>
-    <tr><td>Application Number</td><td th:text="${applicant.applicationNumber}"></td></tr>
-    <tr><td>Intended Class</td><td th:text="${applicant.intendedClass}"></td></tr>
-    <tr><td>Status</td><td th:text="${applicant.applicationStatus}"></td></tr>
-    <tr><td>Payment Status</td><td th:text="${applicant.paymentStatus}"></td></tr>
-</table>
+<div class="field-row">
+    <div class="field-group">
+        <span class="field-label">Application Number:</span>
+        <span class="field-value" th:text="${applicant.applicationNumber}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Intended Class:</span>
+        <span class="field-value" th:text="${applicant.intendedClass}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Application Status:</span>
+        <span class="field-value" th:text="${applicant.applicationStatus}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Payment Status:</span>
+        <span class="field-value" th:text="${applicant.paymentStatus}"></span>
+    </div>
+    <div class="field-full">
+        <span class="field-label">Submission Date:</span>
+        <span class="field-value" th:text="${applicant.submissionDate}"></span>
+    </div>
+    <div class="field-full">
+        <span class="field-label">Previous School:</span>
+        <span class="field-value" th:text="${applicant.previousSchoolName} ?: 'Not Specified'"></span>
+    </div>
+    <div class="field-full">
+        <span class="field-label">Previous Class:</span>
+        <span class="field-value" th:text="${applicant.previousClass} ?: 'Not Specified'"></span>
+    </div>
+</div>
 
 <h2>Guardian Information</h2>
-<table>
-    <tr><td>Full Name</td><td th:text="${guardian.getFullName}"></td></tr>
-    <tr><td>Email</td><td th:text="${guardian.email}"></td></tr>
-    <tr><td>Phone</td><td th:text="${guardian.phoneNumber}"></td></tr>
-    <tr><td>Address</td><td th:text="${guardian.address}"></td></tr>
-</table>
+<div class="field-row">
+    <div class="field-full">
+        <span class="field-label">Full Name:</span>
+        <span class="field-value" th:text="${guardian.fullName}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Email:</span>
+        <span class="field-value" th:text="${guardian.email}"></span>
+    </div>
+    <div class="field-group">
+        <span class="field-label">Phone:</span>
+        <span class="field-value" th:text="${guardian.phoneNumber}"></span>
+    </div>
+    <div class="field-full">
+        <span class="field-label">Address:</span>
+        <span class="field-value" th:text="${guardian.address}"></span>
+    </div>
+</div>
 
 <div class="signature-block">
     <div class="signature-line">Guardian's Signature</div>
