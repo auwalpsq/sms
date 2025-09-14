@@ -10,15 +10,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.*
 import com.sms.services.ApplicantService
 import com.sms.services.ApplicationFormPdfService
-import com.sms.services.PdfExportService
+import com.sms.ui.components.SchoolHeader
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.html.Anchor
 import com.vaadin.flow.component.html.H2
-import com.vaadin.flow.component.html.NativeTable
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.orderedlayout.FlexComponent
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.server.streams.DownloadHandler
 import com.vaadin.flow.server.streams.DownloadResponse
 import jakarta.annotation.security.RolesAllowed
@@ -29,7 +29,6 @@ import java.io.ByteArrayInputStream
 @PageTitle("Application Form")
 class ApplicationFormView(
     private val applicantService: ApplicantService,
-    private val pdfExportService: PdfExportService,
     private val applicationFormPdfService: ApplicationFormPdfService
 ) : VerticalLayout(), BeforeEnterObserver {
 
@@ -45,78 +44,53 @@ class ApplicationFormView(
         defaultHorizontalComponentAlignment = FlexComponent.Alignment.CENTER
         justifyContentMode = FlexComponent.JustifyContentMode.START
 
-        // Header (Letterhead placeholder)
-        val header = Div().apply {
-            addClassName("application-letterhead")
-            style["text-align"] = "center"
-
-            val logo = Image("images/placeholder.png", "School Logo").apply {
-                addClassName("logo")
-                style["max-height"] = "80px"
-                style["margin-bottom"] = "0.5rem"
-            }
-            add(
-                logo,
-                H1("SCHOOL NAME PLACEHOLDER"),
-                Paragraph("Address Line 1, City, State"),
-                Paragraph("Phone: +234 XXX XXX XXXX | Email: info@school.com")
-            )
-        }
+        val header = SchoolHeader()
 
         // Section container
         content.addClassName("application-section")
 
-        // Print button (can be hidden in print view via CSS)
-        val printBtn = Button("Print").apply {
-            addClickListener { ui?.get()?.page?.executeJs("window.print();") }
-        }
-        val downloadBtn = Anchor(
-            DownloadHandler.fromInputStream { _ ->
-                val model = mapOf("applicant" to applicant!!, "guardian" to applicant!!.guardian!!)
-                val pdfBytes = pdfExportService.renderPdf("application-form", model)
-
-                // Using the new DownloadResponse constructor
-                DownloadResponse(
-                    ByteArrayInputStream(pdfBytes),
-                    "application-form-${applicant!!.id}.pdf",
-                    "application/pdf",
-                    pdfBytes.size.toLong()
-                )
-            },
-            "Download PDF"
-        ).apply {
-            element.setAttribute("download", true) // ensures browser downloads file
-            VaadinIcon.DOWNLOAD.create()
-        }
         val imageUrl = this::class.java.getResource("/static/images/placeholder.png")?.toExternalForm()
             ?: throw IllegalStateException("Image not found in resources")
+
+        // Print button
+        val printBtn = Button("Print", VaadinIcon.PRINT.create()).apply {
+            addClassName("action-button")
+            addClickListener { ui?.get()?.page?.executeJs("window.print();") }
+        }
+
+// Download button (PrinceXML PDF)
         val princeDownloadBtn = Anchor(
             DownloadHandler.fromInputStream { _ ->
-                val model = mapOf(  "applicant" to applicant!!,
-                                    "guardian" to applicant!!.guardian!!,
-                                    "schoolLogo" to imageUrl
-                                )
+                val model = mapOf(
+                    "applicant" to applicant!!,
+                    "guardian" to applicant!!.guardian!!,
+                    "schoolLogo" to imageUrl
+                )
                 val pdfBytes = applicationFormPdfService.renderPdf("application-form", model)
 
                 DownloadResponse(
                     ByteArrayInputStream(pdfBytes),
-                    "application-form-${
-                                                    applicant!!.applicationNumber
-                                                    }-${applicant!!.lastName!!.replace(" ", "_")}-${
-                                                    applicant!!.firstName!!.replace(" ", "_")
-                                                    }.pdf".lowercase()
-                                                    ,
+                    "application-form-${applicant!!.applicationNumber}-${applicant!!.lastName!!.replace(" ", "_")}-${applicant!!.firstName!!.replace(" ", "_")}.pdf".lowercase(),
                     "application/pdf",
                     pdfBytes.size.toLong()
                 )
             },
-            "Download (PrinceXML)"
+            ""
         ).apply {
             element.setAttribute("download", true)
-            VaadinIcon.FILE_PRESENTATION.create()
+            add(Button("Download PDF", VaadinIcon.DOWNLOAD.create()).apply {
+                addClassName("action-button")
+            })
         }
 
-        add(header, content, printBtn, downloadBtn, princeDownloadBtn)
+// Button Layout
+        val btnLayout = HorizontalLayout(printBtn, princeDownloadBtn).apply {
+            isSpacing = true
+            defaultVerticalComponentAlignment = FlexComponent.Alignment.CENTER
+            addClassName("button-bar")
+        }
+
+        add(header, content, btnLayout)
     }
 
     override fun beforeEnter(event: BeforeEnterEvent) {

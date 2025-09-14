@@ -3,176 +3,138 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Application Form</title>
-    <style>
-        body {
-            font-family: "Times New Roman", serif;
-            font-size: 14px;
-            color: #000;
-            margin: 20px;
-            line-height: 1.6;
-        }
 
-        .letterhead {
-            text-align: center;
-            border-bottom: 2px solid #000;
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-        }
-        .letterhead img { height: 80px; }
-        .letterhead h1 {
-            margin: 5px 0;
-            font-size: 22px;
-            text-transform: uppercase;
-        }
-
-        h2 {
-            font-size: 16px;
-            text-transform: uppercase;
-            border-bottom: 1px solid #000;
-            padding-bottom: 3px;
-            margin: 20px 0 10px;
-        }
-
-        .field-row {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 6px 0;
-        }
-        .field-group {
-            flex: 1 1 45%;
-            margin-right: 20px;
-            margin-bottom: 8px;
-        }
-        .field-full {
-            flex: 1 1 100%;
-            margin-bottom: 8px;
-        }
-
-        .field-label {
-            font-weight: bold;
-            font-family: "Times New Roman", serif;
-            margin-right: 5px;
-        }
-        .field-value {
-            font-family: "Courier New", monospace;
-            border-bottom: 1px solid #000;
-            padding: 0 5px;
-            display: inline-block;
-            min-width: 150px;
-        }
-
-        .signature-block {
-            margin-top: 50px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .signature-line {
-            width: 40%;
-            border-top: 1px solid #000;
-            text-align: center;
-            padding-top: 5px;
-        }
-    </style>
 </head>
 <body>
-<div class="letterhead">
-    <img th:src="${schoolLogo}" alt="School Logo"/>
-    <h1>SCHOOL NAME PLACEHOLDER</h1>
-    <p>Address Line 1, City, State</p>
-    <p>Phone: +234 XXX XXX XXXX | Email: info@school.com</p>
-</div>
+<div class="application-form">
 
-<h2>Personal Information</h2>
-<div class="field-row">
-    <div class="field-full">
-        <span class="field-label">Full Name:</span>
-        <span class="field-value" th:text="${applicant.fullName}"></span>
+    <!-- Letterhead -->
+    <div class="application-letterhead">
+        <img th:src="${schoolLogo}" alt="School Logo"/>
+        <h1>SCHOOL NAME PLACEHOLDER</h1>
+        <p>Address Line 1, City, State</p>
+        <p>Phone: +234 XXX XXX XXXX | Email: info@school.com</p>
     </div>
-    <div class="field-group">
-        <span class="field-label">Gender:</span>
-        <span class="field-value" th:text="${applicant.gender}"></span>
-    </div>
-    <div class="field-group">
-        <span class="field-label">Date of Birth:</span>
-        <span class="field-value" th:text="${applicant.dateOfBirth}"></span>
-    </div>
-    <div class="field-group">
-        <span class="field-label">Age:</span>
-        <span class="field-value" th:text="${applicant.currentAge}"></span>
-    </div>
-    <div class="field-group">
-        <span class="field-label">Relationship to Guardian:</span>
-        <span class="field-value" th:text="${applicant.relationshipToGuardian}"></span>
-    </div>
-    <div class="field-group">
-        <span class="field-label">Blood Group:</span>
-        <span class="field-value" th:text="${applicant.bloodGroup}"></span>
-    </div>
-    <div class="field-group">
-        <span class="field-label">Genotype:</span>
-        <span class="field-value" th:text="${applicant.genotype}"></span>
-    </div>
-    <div class="field-full">
-        <span class="field-label">Known Allergies:</span>
-        <span class="field-value" th:text="${applicant.knownAllergies} ?: 'None'"></span>
-    </div>
-</div>
 
-<h2>Application Information</h2>
-<div class="field-row">
-    <div class="field-group">
-        <span class="field-label">Application Number:</span>
-        <span class="field-value" th:text="${applicant.applicationNumber}"></span>
-    </div>
-    <div class="field-group">
-        <span class="field-label">Intended Class:</span>
-        <span class="field-value" th:text="${applicant.intendedClass}"></span>
-    </div>
-    <div class="field-group">
-        <span class="field-label">Application Status:</span>
-        <span class="field-value" th:text="${applicant.applicationStatus}"></span>
-    </div>
-    <div class="field-group">
-        <span class="field-label">Payment Status:</span>
-        <span class="field-value" th:text="${applicant.paymentStatus}"></span>
-    </div>
-    <div class="field-full">
-        <span class="field-label">Submission Date:</span>
-        <span class="field-value" th:text="${applicant.submissionDate}"></span>
-    </div>
-    <div class="field-full">
-        <span class="field-label">Previous School:</span>
-        <span class="field-value" th:text="${applicant.previousSchoolName} ?: 'Not Specified'"></span>
-    </div>
-    <div class="field-full">
-        <span class="field-label">Previous Class:</span>
-        <span class="field-value" th:text="${applicant.previousClass} ?: 'Not Specified'"></span>
-    </div>
-</div>
+    <!-- Personal Information -->
+    <div class="application-section">
+        <h2>Personal Information</h2>
 
-<h2>Guardian Information</h2>
-<div class="field-row">
-    <div class="field-full">
-        <span class="field-label">Full Name:</span>
-        <span class="field-value" th:text="${guardian.fullName}"></span>
-    </div>
-    <div class="field-group">
-        <span class="field-label">Email:</span>
-        <span class="field-value" th:text="${guardian.email}"></span>
-    </div>
-    <div class="field-group">
-        <span class="field-label">Phone:</span>
-        <span class="field-value" th:text="${guardian.phoneNumber}"></span>
-    </div>
-    <div class="field-full">
-        <span class="field-label">Address:</span>
-        <span class="field-value" th:text="${guardian.address}"></span>
-    </div>
-</div>
+        <div class="field-single full-line">
+            <span class="field-label">Full Name:</span>
+            <span class="field-value" th:text="${applicant.fullName}"></span>
+        </div>
 
-<div class="signature-block">
-    <div class="signature-line">Guardian's Signature</div>
-    <div class="signature-line">School Official</div>
+        <div class="field-row">
+            <div class="field-group">
+                <span class="field-label">Gender:</span>
+                <span class="field-value" th:text="${applicant.gender}"></span>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Date of Birth:</span>
+                <span class="field-value" th:text="${applicant.dateOfBirth}"></span>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Age:</span>
+                <span class="field-value" th:text="${applicant.currentAge}"></span>
+            </div>
+        </div>
+
+        <div class="field-row">
+            <div class="field-group">
+                <span class="field-label">Relationship to Guardian:</span>
+                <span class="field-value" th:text="${applicant.relationshipToGuardian}"></span>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Blood Group:</span>
+                <span class="field-value" th:text="${applicant.bloodGroup}"></span>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Genotype:</span>
+                <span class="field-value" th:text="${applicant.genotype}"></span>
+            </div>
+        </div>
+
+        <div class="field-single full-line">
+            <span class="field-label">Known Allergies:</span>
+            <span class="field-value" th:text="${applicant.knownAllergies} ?: 'None'"></span>
+        </div>
+    </div>
+
+    <!-- Application Information -->
+    <div class="application-section">
+        <h2>Application Information</h2>
+
+        <div class="field-row">
+            <div class="field-group">
+                <span class="field-label">Application Number:</span>
+                <span class="field-value" th:text="${applicant.applicationNumber}"></span>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Intended Class:</span>
+                <span class="field-value" th:text="${applicant.intendedClass}"></span>
+            </div>
+        </div>
+
+        <div class="field-row">
+            <div class="field-group">
+                <span class="field-label">Application Status:</span>
+                <span class="field-value" th:text="${applicant.applicationStatus}"></span>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Payment Status:</span>
+                <span class="field-value" th:text="${applicant.paymentStatus}"></span>
+            </div>
+        </div>
+
+        <div class="field-single">
+            <span class="field-label">Submission Date:</span>
+            <span class="field-value" th:text="${applicant.submissionDate}"></span>
+        </div>
+
+        <div class="field-single full-line">
+            <span class="field-label">Previous School:</span>
+            <span class="field-value" th:text="${applicant.previousSchoolName} ?: 'Not Specified'"></span>
+        </div>
+
+        <div class="field-single full-line">
+            <span class="field-label">Previous Class:</span>
+            <span class="field-value" th:text="${applicant.previousClass} ?: 'Not Specified'"></span>
+        </div>
+    </div>
+
+    <!-- Guardian Information -->
+    <div class="application-section">
+        <h2>Guardian Information</h2>
+
+        <div class="field-single full-line">
+            <span class="field-label">Full Name:</span>
+            <span class="field-value" th:text="${guardian.fullName}"></span>
+        </div>
+
+        <div class="field-row">
+            <div class="field-group">
+                <span class="field-label">Email:</span>
+                <span class="field-value" th:text="${guardian.email}"></span>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Phone:</span>
+                <span class="field-value" th:text="${guardian.phoneNumber}"></span>
+            </div>
+        </div>
+
+        <div class="field-single full-line">
+            <span class="field-label">Address:</span>
+            <span class="field-value" th:text="${guardian.address}"></span>
+        </div>
+    </div>
+
+    <!-- Signatures -->
+    <div class="signature-block">
+        <div class="signature-line">Guardian's Signature</div>
+        <div class="signature-line">School Official</div>
+    </div>
+
 </div>
 </body>
 </html>

@@ -7,17 +7,32 @@ import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.nio.charset.StandardCharsets
 
 @Service
 class ApplicationFormPdfService(
     private val templateEngine: TemplateEngine,
     private val prince: Prince
 ) {
+    private val css: String by lazy {
+        val cssStream = this::class.java.getResourceAsStream("/static/css/application-form.css")
+        cssStream?.readBytes()?.toString(StandardCharsets.UTF_8)
+            ?: throw IOException("Could not load application-form.css from /static/css")
+    }
+
 
     fun renderHtml(templateName: String, model: Map<String, Any>): String {
         val ctx = Context()
         ctx.setVariables(model)
-        return templateEngine.process(templateName, ctx)
+
+        // Render template HTML
+        val html = templateEngine.process(templateName, ctx)
+
+        // Inject CSS before </head>
+        return html.replaceFirst(
+            "</head>",
+            "<style>$css</style></head>"
+        )
     }
 
     fun renderPdf(templateName: String, model: Map<String, Any>): ByteArray{

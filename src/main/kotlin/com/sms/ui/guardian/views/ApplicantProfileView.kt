@@ -9,6 +9,7 @@ import com.sms.services.ApplicantService
 import com.sms.services.PaymentService
 import com.sms.services.PaymentTypeService
 import com.sms.services.SchoolClassService
+import com.sms.ui.common.ApplicationFormView
 import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
 import com.sms.ui.components.ApplicationFormDialog
@@ -21,6 +22,7 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.html.Anchor
+import com.vaadin.flow.component.html.AnchorTargetValue
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.html.Span
@@ -238,71 +240,53 @@ class ApplicantProfileView(
 
     private fun showDocuments() {
         content.removeAll()
+        val app = applicant ?: return
 
-//        // --- Application Form PDF (always available) ---
-//        val app = applicant ?: return
-//        val appFormFileName = "application-form-${app.applicationNumber ?: app.id}.pdf"
-//
-//        val appFormHandler = DownloadHandler.fromInputStream({ event ->
-//            try {
-//                val html = buildPdfHtml(app)
-//                val pdf = htmlToPdfBytes(html)
-//                DownloadResponse(
-//                    ByteArrayInputStream(pdf),
-//                    appFormFileName,
-//                    "application/pdf",
-//                    pdf.size.toLong()
-//                )
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                DownloadResponse.error(500)
-//            }
-//        })
-//
-//        val downloadForm = Anchor(appFormHandler, "").apply {
-//            element.setAttribute("download", true) // force as file download
-//            add(VaadinIcon.FILE_TEXT.create(), Span(" Download Application Form (PDF)"))
-//            style.set("display", "inline-flex")
-//            style.set("gap", "0.4rem")
-//        }
-//
-//        content.add(downloadForm)
+        val layout = VerticalLayout().apply {
+            isSpacing = true
+            isPadding = true
+            defaultHorizontalComponentAlignment = FlexComponent.Alignment.START
+        }
 
-        // --- Admission Letter PDF (only when approved & paid) ---
+        // Application Form button
+        val appFormLink = Anchor(
+            RouteConfiguration.forApplicationScope().getUrl(
+                ApplicationFormView::class.java,
+                RouteParameters("applicantId", app.id.toString())
+            ),
+            ""
+        ).apply {
+            setTarget("_blank")
+            element.appendChild(Button("View Application Form", VaadinIcon.FILE_TEXT.create()).apply {
+                addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+            }.element)
+        }
+
+        layout.add(appFormLink)
+
+//        // Admission Letter button (only if approved + paid)
 //        if (app.applicationStatus == Applicant.ApplicationStatus.APPROVED &&
-//            app.paymentStatus == PaymentStatus.PAID) {
-//
-//            val letterFileName = "admission-letter-${app.applicationNumber ?: app.id}.pdf"
-//
-//            val letterHandler = DownloadHandler.fromInputStream({ event ->
-//                try {
-//                    val letterHtml = buildAdmissionLetterHtml(app) // create similar to form HTML
-//                    val pdf = htmlToPdfBytes(letterHtml)
-//                    DownloadResponse(
-//                        ByteArrayInputStream(pdf),
-//                        letterFileName,
-//                        "application/pdf",
-//                        pdf.size.toLong()
-//                    )
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                    DownloadResponse.error(500)
-//                }
-//            }, letterFileName)
-//
-//            val downloadLetter = Anchor(letterHandler, "").apply {
-//                element.setAttribute("download", true)
-//                add(VaadinIcon.FILE.create(), Span(" Download Admission Letter (PDF)"))
-//                style.set("display", "inline-flex")
-//                style.set("gap", "0.4rem")
+//            app.paymentStatus == PaymentStatus.PAID
+//        ) {
+//            val letterLink = Anchor(
+//                RouteConfiguration.forApplicationScope().getUrl(
+//                    AdmissionLetterView::class.java,
+//                    RouteParameters("applicantId", app.id.toString())
+//                ),
+//                ""
+//            ).apply {
+//                target = "_blank"
+//                element.appendChild(Button("View Admission Letter", VaadinIcon.FILE_PRESENTATION.create()).apply {
+//                    addThemeVariants(ButtonVariant.LUMO_SUCCESS)
+//                }.element)
 //            }
-//
-//            content.add(HorizontalLayout(downloadLetter))
+//            layout.add(letterLink)
 //        } else {
-//            content.add(Paragraph("Admission Letter not available yet"))
+//            layout.add(Paragraph("Admission Letter not available yet"))
 //        }
-    }
 
+        content.add(layout)
+    }
 
     private fun reloadApplicant() {
         launchUiCoroutine {

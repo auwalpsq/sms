@@ -90,3 +90,11 @@ allOpen {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+tasks.register<Copy>("copyThemeCss") {
+	from("src/main/frontend/themes/sms-styles/application-form.css")
+	into("src/main/resources/static/css")
+}
+
+tasks.named("processResources") {
+	dependsOn("copyThemeCss")
+}

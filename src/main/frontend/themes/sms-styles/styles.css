@@ -20,3 +20,20 @@ html, :host() {
   background-color: #c62828; /* dark red */
   border-radius: var(--lumo-border-radius-m);
 }
+.application-form .button-bar {
+    margin-top: 1rem;
+}
+
+.application-form .action-button {
+    background-color: #007BFF; /* Bootstrap blue */
+    color: white;
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.application-form .action-button:hover {
+    background-color: #0056b3;
+    cursor: pointer;
+}
