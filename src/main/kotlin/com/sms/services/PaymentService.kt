@@ -48,5 +48,7 @@ class PaymentService(private val paymentMapper: PaymentMapper) {
     ): Payment? = withContext(Dispatchers.IO) {
         paymentMapper.findByApplicantIdAndPaymentType(applicantId, paymentTypeId)
     }
-
+    suspend fun findLatestByApplicant(applicantId: Long): Payment? = withContext(Dispatchers.IO) {
+        paymentMapper.findLatestByApplicant(applicantId)
+    }
 }

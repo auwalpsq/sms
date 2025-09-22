@@ -32,8 +32,10 @@ interface PaymentMapper {
 
     fun findByApplicantId(@Param("applicantId") applicantId: Long): List<Payment>
 
-    suspend fun findByApplicantIdAndPaymentType(
+    fun findByApplicantIdAndPaymentType(
         @Param("applicantId") applicantId: Long,
         @Param("paymentTypeId") paymentTypeId: Long
     ): Payment?
+
+    fun findLatestByApplicant(applicantId: Long): Payment?
 }

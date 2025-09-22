@@ -213,17 +213,31 @@ class GuardianApplicationView(
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
     }
 
+
     private fun refreshGrid() {
         currentGuardian?.id?.let { guardianId ->
             launchUiCoroutine {
                 val applications = applicantService.findByGuardianId(guardianId)
                     .sortedByDescending { it.submissionDate }
+
+                // Check for any pending payments and re-verify them
+                applications.forEach { applicant ->
+                    val payment = paymentService.findLatestByApplicant(applicant.id!!)
+                    if (payment != null && payment.status == PaymentStatus.PENDING) {
+                        val verified = paystackService.verify(payment.reference)
+                        if (verified) {
+                            paymentVerificationService.verifyAndUpdateApplicant(payment.reference!!)
+                        }
+                    }
+                }
+
                 ui?.withUi { grid.setItems(applications) }
             }
         } ?: run {
             ui?.access { grid.setItems(emptyList()) }
         }
     }
+
     @ClientCallable
     fun paymentSuccess(reference: String) {
         launchUiCoroutine {
