@@ -4,10 +4,14 @@ package com.sms.ui.guardian.views
 import com.sms.entities.Applicant
 import com.sms.entities.User
 import com.sms.entities.Applicant.PaymentStatus
+import com.sms.entities.Payment
 import com.sms.enums.PaymentCategory
+import com.sms.services.AcademicSessionService
 import com.sms.services.ApplicantService
 import com.sms.services.PaymentService
 import com.sms.services.PaymentTypeService
+import com.sms.services.PaymentVerificationService
+import com.sms.services.PaystackService
 import com.sms.services.SchoolClassService
 import com.sms.ui.common.ApplicationFormView
 import com.sms.ui.common.showError
@@ -16,8 +20,10 @@ import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.components.PhotoUploadField
 import com.sms.ui.guardian.GuardianLayout
 import com.sms.util.FormatUtil
+import com.sms.util.PaymentUiUtil
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
+import com.vaadin.flow.component.ClientCallable
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
@@ -39,6 +45,7 @@ import jakarta.annotation.security.RolesAllowed
 import org.springframework.security.core.context.SecurityContextHolder
 import java.io.ByteArrayInputStream
 import java.nio.file.Path
+import java.util.UUID
 
 @Route(value = "guardian/applicant/:id", layout = GuardianLayout::class)
 @PageTitle("Applicant Profile")
@@ -47,7 +54,10 @@ class ApplicantProfileView(
     private val applicantService: ApplicantService,
     private val paymentService: PaymentService,
     private val schoolClassService: SchoolClassService,
-    private val paymentTypeService: PaymentTypeService
+    private val paymentTypeService: PaymentTypeService,
+    private val paystackService: PaystackService,
+    private val academicSessionService: AcademicSessionService,
+    private val paymentVerificationService: PaymentVerificationService
 ) : VerticalLayout(), BeforeEnterObserver {
 
     private val ui: UI? = UI.getCurrent()
@@ -184,7 +194,7 @@ class ApplicantProfileView(
         launchUiCoroutine {
             val applicationPaymentType = paymentTypeService.findByCategory(PaymentCategory.APPLICATION)
 
-            val payment = if (applicationPaymentType != null) {
+            var payment = if (applicationPaymentType != null) {
                 paymentService.findByApplicantIdAndPaymentType(
                     applicantId = applicant!!.id!!,
                     paymentTypeId = applicationPaymentType.id!!
@@ -196,7 +206,53 @@ class ApplicantProfileView(
                     content.add(Paragraph("No application payment has been made."))
                     content.add(Button("Make Application Payment", VaadinIcon.CREDIT_CARD.create()).apply {
                         addThemeVariants(ButtonVariant.LUMO_PRIMARY)
-                        addClickListener { showSuccess("TODO: integrate Paystack for Application Fee") }
+                        addClickListener {
+                            launchUiCoroutine {
+                                val paymentType = paymentTypeService.findByCategory(PaymentCategory.APPLICATION)
+                                val session = academicSessionService.findCurrent()
+
+                                // Check if payment already exists
+                                var payment = paymentService.findByApplicantAndTypeAndSessionAndTerm(
+                                    applicant?.id!!, paymentType?.id!!, session?.id!!, session.term
+                                )
+
+                                if (payment != null) {
+                                    if (payment.status == com.sms.enums.PaymentStatus.SUCCESS) {
+                                        ui?.get()?.withUi { showSuccess("✅ You have already paid for this application.") }
+                                        return@launchUiCoroutine
+                                    }
+                                    // Reuse existing reference if pending
+                                } else {
+                                    // Create new payment
+                                    val reference = UUID.randomUUID().toString()
+                                    payment = Payment(
+                                        applicant = applicant,
+                                        guardian = applicant?.guardian,
+                                        paymentType = paymentType,
+                                        academicSession = session,
+                                        term = session.term,
+                                        reference = reference,
+                                        status = com.sms.enums.PaymentStatus.PENDING
+                                    )
+
+                                    paymentService.save(payment)
+                                }
+
+                                // Launch Paystack with existing/new reference
+                                val reference = payment.reference
+                                ui?.get()?.access {
+                                    PaymentUiUtil.startPaystackTransaction(
+                                        ui = ui.get(),
+                                        applicant = applicant!!,
+                                        reference = reference,
+                                        amount = paymentType.amount,
+                                        serverCallbackTarget = this@ApplicantProfileView
+                                    )
+                                }
+
+
+                            }
+                        }
                     })
                 } else {
                     val paymentStatusBadge = Span(payment.status?.name ?: "-").apply {
@@ -230,8 +286,45 @@ class ApplicantProfileView(
                     } else {
                         content.add(Button("Retry Application Payment", VaadinIcon.CREDIT_CARD.create()).apply {
                             addThemeVariants(ButtonVariant.LUMO_PRIMARY)
-                            addClickListener { showSuccess("TODO: integrate Paystack retry for Application Fee") }
+                            addClickListener {
+                                launchUiCoroutine {
+                                    val paymentType = paymentTypeService.findByCategory(PaymentCategory.APPLICATION)
+                                    val session = academicSessionService.findCurrent()
+
+                                    // Ensure we have a valid payment record
+                                    var existingPayment = paymentService.findByApplicantAndTypeAndSessionAndTerm(
+                                        applicant?.id!!, paymentType?.id!!, session?.id!!, session.term
+                                    )
+
+                                    if (existingPayment == null) {
+                                        // Safety: recreate if somehow missing
+                                        val reference = UUID.randomUUID().toString()
+                                        existingPayment = Payment(
+                                            applicant = applicant,
+                                            guardian = applicant?.guardian,
+                                            paymentType = paymentType,
+                                            academicSession = session,
+                                            term = session.term,
+                                            reference = reference,
+                                            status = com.sms.enums.PaymentStatus.PENDING
+                                        )
+                                        paymentService.save(existingPayment)
+                                    }
+
+                                    val reference = existingPayment.reference
+                                    ui?.get()?.access {
+                                        PaymentUiUtil.startPaystackTransaction(
+                                            ui = ui.get(),
+                                            applicant = applicant!!,
+                                            reference = reference,
+                                            amount = paymentType!!.amount,
+                                            serverCallbackTarget = this@ApplicantProfileView
+                                        )
+                                    }
+                                }
+                            }
                         })
+
                     }
                 }
             }
@@ -292,6 +385,37 @@ class ApplicantProfileView(
         launchUiCoroutine {
             applicant = applicantService.findById(applicant!!.id!!)
             ui?.withUi { updateContent(tabs.selectedTab) }
+        }
+    }
+    @ClientCallable
+    fun paymentSuccess(reference: String) {
+        launchUiCoroutine {
+            PaymentUiUtil.handlePaymentSuccess(
+                reference,
+                paystackService,
+                paymentVerificationService,
+                ui!!
+            )
+            reloadApplicant()
+        }
+    }
+
+    @ClientCallable
+    fun paymentFailed(reference: String) {
+        launchUiCoroutine {
+            PaymentUiUtil.handlePaymentFailed(reference, ui!!)
+            try {
+                paymentService.updateStatus(reference, com.sms.enums.PaymentStatus.FAILED)
+            } catch (_: Exception) {}
+            reloadApplicant()
+        }
+    }
+
+    @ClientCallable
+    fun paymentCancelled(reference: String) {
+        launchUiCoroutine {
+            PaymentUiUtil.handlePaymentCancelled(reference, ui!!)
+            reloadApplicant()
         }
     }
 }

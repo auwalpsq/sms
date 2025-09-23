@@ -18,6 +18,7 @@ import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
 import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.guardian.GuardianLayout
+import com.sms.util.PaymentUiUtil
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.ClientCallable
@@ -51,8 +52,6 @@ class GuardianApplicationView(
     private val guardianService: GuardianService,
     private val schoolClassService: SchoolClassService,
     private val paystackService: PaystackService,
-    private val paymentTypeService: PaymentTypeService,
-    private val academicSessionService: AcademicSessionService,
     private val paymentService: PaymentService
 ) : VerticalLayout() {
     val user = SecurityContextHolder.getContext().authentication.principal as User
@@ -132,71 +131,7 @@ class GuardianApplicationView(
                 }
             }
         ).setHeader("Payment")
-        grid.addColumn(
-            ComponentRenderer { applicant: Applicant ->
-                MenuBar().apply {
-                    val menu = addItem("Actions")
-                        menu.subMenu.addItem("Edit", { formDialog?.open(applicant)})
-                        menu.subMenu.addItem("View Form", { ui?.get()?.page?.open("/guardian/application-form/${applicant.id}", "_blank") })
-                        menu.subMenu.addItem("Make Payment", {
-                            launchUiCoroutine {
-                                val paymentType = paymentTypeService.findByCategory(PaymentCategory.APPLICATION)
-                                val session = academicSessionService.findCurrent()
 
-                                // Check if payment already exists
-                                var payment = paymentService.findByApplicantAndTypeAndSessionAndTerm(
-                                    applicant.id!!, paymentType?.id!!, session?.id!!, session.term
-                                )
-
-                                if (payment != null) {
-                                    if (payment.status == PaymentStatus.SUCCESS) {
-                                        ui?.get()?.withUi { showSuccess("✅ You have already paid for this application.") }
-                                        return@launchUiCoroutine
-                                    }
-                                    // Reuse existing reference if pending
-                                } else {
-                                    // Create new payment
-                                    val reference = UUID.randomUUID().toString()
-                                    payment = Payment(
-                                        applicant = applicant,
-                                        guardian = applicant.guardian,
-                                        paymentType = paymentType,
-                                        academicSession = session,
-                                        term = session.term,
-                                        reference = reference,
-                                        status = PaymentStatus.PENDING
-                                    )
-
-                                    paymentService.save(payment)
-                                }
-
-                                // Launch Paystack with existing/new reference
-                                val reference = payment.reference
-                                ui?.get()?.withUi {
-                                    ui?.get()?.page?.executeJs(
-                                        """
-                                    const paystack = new PaystackPop();
-                                    paystack.newTransaction({
-                                       key: 'pk_test_1c957236071be45d53fe766576b4f60aaaa0534c',
-                                       email: '${applicant.guardian?.email}',
-                                       amount: ${paymentType.amount} * 100,
-                                       currency: 'NGN',
-                                       reference: '$reference',
-                                       onSuccess: (transaction) => { 
-                                           $0.${'$'}server.paymentSuccess(transaction.reference);
-                                       },
-                                       onClose: () => { alert('Payment window closed'); }
-                                    });
-                                    """.trimIndent(),
-                                        this@GuardianApplicationView
-                                    )
-                                }
-                            }
-
-                        })
-                }
-            }
-        ).setHeader("More Actions")
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
                 Button("Open Profile").apply {
@@ -220,17 +155,6 @@ class GuardianApplicationView(
                 val applications = applicantService.findByGuardianId(guardianId)
                     .sortedByDescending { it.submissionDate }
 
-                // Check for any pending payments and re-verify them
-                applications.forEach { applicant ->
-                    val payment = paymentService.findLatestByApplicant(applicant.id!!)
-                    if (payment != null && payment.status == PaymentStatus.PENDING) {
-                        val verified = paystackService.verify(payment.reference)
-                        if (verified) {
-                            paymentVerificationService.verifyAndUpdateApplicant(payment.reference!!)
-                        }
-                    }
-                }
-
                 ui?.withUi { grid.setItems(applications) }
             }
         } ?: run {
@@ -238,21 +162,4 @@ class GuardianApplicationView(
         }
     }
 
-    @ClientCallable
-    fun paymentSuccess(reference: String) {
-        launchUiCoroutine {
-            val verified = paystackService.verify(reference)
-            if(verified){
-                paymentVerificationService.verifyAndUpdateApplicant(reference)
-            }
-            ui?.withUi {
-                if (verified) {
-                    showSuccess("✅ Payment verified and recorded. Ref: $reference")
-                } else {
-                    showError("❌ Payment verification failed. Please try again.")
-                }
-                refreshGrid()
-            }
-        }
-    }
 }
