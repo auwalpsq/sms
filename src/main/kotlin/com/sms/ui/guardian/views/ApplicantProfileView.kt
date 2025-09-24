@@ -102,7 +102,7 @@ class ApplicantProfileView(
     private fun buildLayout() {
         val backButton = Button(VaadinIcon.ARROW_LEFT.create()).apply {
             addThemeVariants(ButtonVariant.LUMO_TERTIARY)
-            element.setAttribute("title", "Back to Applications") // tooltip
+            element.setAttribute("title", "Back to Applications")
             addClickListener { ui.ifPresent { it.navigate("guardian/applications") } }
         }
 
@@ -113,6 +113,15 @@ class ApplicantProfileView(
                 justifyContentMode = FlexComponent.JustifyContentMode.START
             }
         )
+
+        // always available
+        tabs.removeAll()
+        tabs.add(detailsTab)
+
+        // only after APPROVED
+        if (applicant?.applicationStatus == Applicant.ApplicationStatus.APPROVED) {
+            tabs.add(paymentsTab, documentsTab)
+        }
 
         tabs.addSelectedChangeListener { updateContent(tabs.selectedTab) }
         add(tabs, content)
@@ -165,6 +174,7 @@ class ApplicantProfileView(
             addFormItem(Paragraph(applicant?.dateOfBirth?.toString() ?: "-"), "Date of Birth")
             addFormItem(Paragraph(applicant?.currentAge?.toString() ?: "-"), "Age")
             addFormItem(Paragraph(applicant?.gender?.name ?: "-"), "Gender")
+            addFormItem(Paragraph(applicant?.submissionDate.toString() ?: "-"), "Submitted On")
             addFormItem(Paragraph(applicant?.intendedClass?.toString() ?: "-"), "Intended Class")
             addFormItem(Paragraph(applicant?.applicationSection?.name ?: "-"), "Section")
             addFormItem(Paragraph(applicant?.guardian?.getFullName() ?: "-"), "Guardian")
@@ -174,17 +184,52 @@ class ApplicantProfileView(
         val dialog = ApplicationFormDialog(
             guardian = applicant!!.guardian!!,
             schoolClassService = schoolClassService,
-            onSave = { updated -> applicantService.save(updated) },
+            onSave = { updated ->
+                applicantService.save(updated).also {
+                    reloadApplicant()  // refresh UI after saving
+                }
+            },
             onDelete = { applicantService.delete(it.id!!) },
             onChange = { reloadApplicant() }
         )
+        wrapper.add(photoField, formLayout)
 
-        val editButton = Button("Edit Details", VaadinIcon.EDIT.create()).apply {
-            addThemeVariants(ButtonVariant.LUMO_PRIMARY)
-            addClickListener { dialog.open(applicant) }
+        when (applicant!!.applicationStatus) {
+            Applicant.ApplicationStatus.PENDING -> {
+                val editButton = Button("Edit Application", VaadinIcon.EDIT.create()).apply {
+                    addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+                    addClickListener { dialog.open(applicant) }
+                }
+                wrapper.add(editButton)
+            }
+
+            Applicant.ApplicationStatus.APPROVED -> {
+                if (applicant?.paymentStatus == PaymentStatus.PAID) {
+                    if (applicant?.isComplete() == false) {
+                        val completeButton = Button("Complete Application", VaadinIcon.EDIT.create()).apply {
+                            addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS)
+                            addClickListener { dialog.open(applicant) }
+                        }
+                        wrapper.add(completeButton)
+                    } else {
+                        wrapper.add(Paragraph("✅ Application is complete.").apply {
+                            style.set("color", "var(--lumo-success-text-color)")
+                        })
+                    }
+                } else {
+                    wrapper.add(Paragraph("⚠ Please complete your application payment before continuing.")
+                        .apply { style.set("color", "var(--lumo-error-text-color)") })
+                }
+            }
+
+
+            Applicant.ApplicationStatus.REJECTED -> {
+                wrapper.add(Paragraph("❌ Application has been rejected.").apply {
+                    style.set("color", "var(--lumo-error-text-color)")
+                })
+            }
         }
 
-        wrapper.add(photoField, formLayout, editButton)
         content.add(wrapper)
     }
 
@@ -341,52 +386,64 @@ class ApplicantProfileView(
             defaultHorizontalComponentAlignment = FlexComponent.Alignment.START
         }
 
-        // Application Form button
-        val appFormLink = Anchor(
-            RouteConfiguration.forApplicationScope().getUrl(
-                ApplicationFormView::class.java,
-                RouteParameters("applicantId", app.id.toString())
-            ),
-            ""
-        ).apply {
-            setTarget("_blank")
-            element.appendChild(Button("View Application Form", VaadinIcon.FILE_TEXT.create()).apply {
-                addThemeVariants(ButtonVariant.LUMO_PRIMARY)
-            }.element)
+        // Application Form button (only after approval + paid + complete)
+        if (app.applicationStatus == Applicant.ApplicationStatus.APPROVED &&
+            app.paymentStatus == PaymentStatus.PAID &&
+            app.isComplete()
+        ) {
+            val appFormLink = Anchor(
+                RouteConfiguration.forApplicationScope().getUrl(
+                    ApplicationFormView::class.java,
+                    RouteParameters("applicantId", app.id.toString())
+                ),
+                ""
+            ).apply {
+                setTarget("_blank")
+                element.appendChild(Button("View Application Form", VaadinIcon.FILE_TEXT.create()).apply {
+                    addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+                }.element)
+            }
+            layout.add(appFormLink)
+        } else {
+            val message = when {
+                app.applicationStatus != Applicant.ApplicationStatus.APPROVED ->
+                    "⚠ Application form is not available until your application is approved."
+
+                app.paymentStatus != PaymentStatus.PAID ->
+                    "⚠ Application form is not available until payment is completed."
+
+                !app.isComplete() ->
+                    "⚠ Please complete your application before viewing the form."
+
+                else -> "⚠ Application form not available yet."
+            }
+
+            layout.add(Paragraph(message).apply {
+                style.set("color", "var(--lumo-error-text-color)")
+            })
         }
-
-        layout.add(appFormLink)
-
-//        // Admission Letter button (only if approved + paid)
-//        if (app.applicationStatus == Applicant.ApplicationStatus.APPROVED &&
-//            app.paymentStatus == PaymentStatus.PAID
-//        ) {
-//            val letterLink = Anchor(
-//                RouteConfiguration.forApplicationScope().getUrl(
-//                    AdmissionLetterView::class.java,
-//                    RouteParameters("applicantId", app.id.toString())
-//                ),
-//                ""
-//            ).apply {
-//                target = "_blank"
-//                element.appendChild(Button("View Admission Letter", VaadinIcon.FILE_PRESENTATION.create()).apply {
-//                    addThemeVariants(ButtonVariant.LUMO_SUCCESS)
-//                }.element)
-//            }
-//            layout.add(letterLink)
-//        } else {
-//            layout.add(Paragraph("Admission Letter not available yet"))
-//        }
 
         content.add(layout)
     }
 
+
     private fun reloadApplicant() {
         launchUiCoroutine {
             applicant = applicantService.findById(applicant!!.id!!)
-            ui?.withUi { updateContent(tabs.selectedTab) }
+            ui?.withUi {
+                updateContent(tabs.selectedTab)
+
+                // If application is complete, show success message
+                if (applicant?.applicationStatus == Applicant.ApplicationStatus.APPROVED &&
+                    applicant?.paymentStatus == PaymentStatus.PAID &&
+                    applicant?.isComplete() == true
+                ) {
+                    showSuccess("✅ Your application is now complete.")
+                }
+            }
         }
     }
+
     @ClientCallable
     fun paymentSuccess(reference: String) {
         launchUiCoroutine {

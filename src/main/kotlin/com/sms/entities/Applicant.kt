@@ -51,6 +51,22 @@ class Applicant(
 
     enum class PaymentStatus { UNPAID, PARTIALLY_PAID, PAID }
 
+    /**
+     * Check if the applicant has completed all requirements after approval & payment.
+     */
+    fun isComplete(): Boolean {
+        return applicationStatus == ApplicationStatus.APPROVED &&
+                paymentStatus == PaymentStatus.PAID &&
+                !firstName.isNullOrBlank() &&
+                !lastName.isNullOrBlank() &&
+                dateOfBirth != null &&
+                gender != null &&
+                !intendedClass.isNullOrBlank() &&
+                !bloodGroup.isNullOrBlank() &&
+                !genotype.isNullOrBlank() &&
+                !photoUrl.isNullOrBlank()
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Applicant) return false
