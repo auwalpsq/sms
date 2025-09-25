@@ -47,12 +47,9 @@ import java.util.UUID
 @RolesAllowed("GUARDIAN")
 @Menu(order = 2.0, icon = "vaadin:form", title = "Apply for Admission")
 class GuardianApplicationView(
-    private val paymentVerificationService: PaymentVerificationService,
     private val applicantService: ApplicantService,
     private val guardianService: GuardianService,
-    private val schoolClassService: SchoolClassService,
-    private val paystackService: PaystackService,
-    private val paymentService: PaymentService
+    private val schoolClassService: SchoolClassService
 ) : VerticalLayout() {
     val user = SecurityContextHolder.getContext().authentication.principal as User
     private val grid = Grid(Applicant::class.java, false)

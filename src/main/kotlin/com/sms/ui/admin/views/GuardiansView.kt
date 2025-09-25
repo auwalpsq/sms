@@ -1,6 +1,7 @@
 package com.sms.ui.admin.views
 
 import com.sms.entities.Guardian
+import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
 import com.sms.ui.components.GuardianDialogForm
 import com.sms.util.launchUiCoroutine
@@ -11,11 +12,10 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
-import com.vaadin.flow.theme.lumo.LumoUtility
-
 
 class GuardiansView(
-    private val guardianService: GuardianService
+    private val guardianService: GuardianService,
+    private val applicantService: ApplicantService
 ) : VerticalLayout() {
 
     private val ui = UI.getCurrent()
@@ -24,7 +24,7 @@ class GuardiansView(
 
     init {
         setSizeFull()
-        spacing = "true"
+        isSpacing = true
 
         // Initialize dialog first
         dialog = createDialog()
@@ -37,14 +37,20 @@ class GuardiansView(
 
     private fun createDialog(): GuardianDialogForm {
         return GuardianDialogForm(
+            applicantService = applicantService,
+            adminMode = true, // ✅ admin adds/edit minimal guardian fields
             isEmailTaken = { email -> guardianService.existsByEmail(email) },
             onSave = { guardian ->
-                guardianService.save(guardian)
-                refreshGrid()
+                launchUiCoroutine {
+                    guardianService.save(guardian)
+                    ui.withUi { refreshGrid() }
+                }
             },
             onDelete = { guardian ->
-                guardianService.delete(guardian)
-                refreshGrid()
+                launchUiCoroutine {
+                    guardianService.delete(guardian)
+                    ui.withUi { refreshGrid() }
+                }
             },
             onChange = { refreshGrid() }
         )
@@ -54,16 +60,17 @@ class GuardiansView(
         grid.addColumn { it.getFullName() }.setHeader("Full Name")
         grid.addColumn { it.email }.setHeader("Email")
         grid.addColumn { it.phoneNumber }.setHeader("Phone Number")
-        //grid.setColumns("email", "phoneNumber")
+
         grid.addItemDoubleClickListener { event ->
             dialog.open(event.item)
         }
+
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
     }
 
     private fun addToolbar() {
         val addButton = Button("Add Guardian") {
-            dialog.open(null)
+            dialog.open(null) // opens in admin mode with empty Guardian
         }
         add(HorizontalLayout(addButton))
     }

@@ -209,6 +209,21 @@ class ApplicationFormDialog(
             gender.isReadOnly = false
         }
     }
+    override fun showDeleteConfirmation(impactDescription: String?) {
+        val impact = if (currentEntity.paymentStatus != Applicant.PaymentStatus.UNPAID) {
+            "⚠️ This application cannot be deleted because payment has already been made."
+        } else {
+            "Deleting this application will permanently remove all details entered so far."
+        }
+
+        super.showDeleteConfirmation(impact)
+    }
+    override fun canDelete(entity: Applicant?): Boolean {
+        // Guardian can delete only if:
+        // 1. The entity exists
+        // 2. No payment has been made yet
+        return entity != null && entity.paymentStatus == Applicant.PaymentStatus.UNPAID
+    }
 
     override fun createNewInstance(): Applicant {
         val applicant = Applicant(guardian = guardian)

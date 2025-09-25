@@ -142,4 +142,10 @@
         WHERE a.id = #{id}
     </select>
 
+    <select id="countByGuardian" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+        FROM applicants
+        WHERE guardian_id = #{guardianId}
+    </select>
+
 </mapper>

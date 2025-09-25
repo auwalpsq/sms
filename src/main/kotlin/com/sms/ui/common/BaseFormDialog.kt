@@ -122,31 +122,52 @@ abstract class BaseFormDialog<T : Any>(
 
     fun open(entity: T?) {
         currentEntity = entity ?: createNewInstance()
-        deleteBtn.isVisible = entity != null
+        // use hook instead of forcing delete
+        deleteBtn.isVisible = canDelete(entity)
         binder.readBean(currentEntity)
         populateForm(entity)
         open()
     }
-    protected open fun showDeleteConfirmation() {
+
+    /**
+     * Hook: override in subclasses if deletion should be restricted.
+     * By default, allows delete when entity is not null.
+     */
+    protected open fun canDelete(entity: T?): Boolean = entity != null
+
+    protected open fun showDeleteConfirmation(impactDescription: String? = null) {
         val dialog = ConfirmDialog().apply {
             setHeader("Confirm Delete")
-            setText("Are you sure you want to delete this item?")
+
+            val baseText = "Are you sure you want to delete this item?"
+            setText(
+                if (impactDescription.isNullOrBlank()) baseText
+                else "$baseText\n\n$impactDescription"
+            )
+
+            setCancelable(true)
             setCancelText("Cancel")
+
             setConfirmText("Delete")
-            val ui : UI? = UI.getCurrent()
+            val ui: UI = UI.getCurrent()
             addConfirmListener {
                 CoroutineScope(Dispatchers.IO).launch {
-                    onDelete(currentEntity)
-                    ui?.withUi {
-                        onChange()
-                        close()
-                        showError("Deleted Successfully")
+                    try {
+                        onDelete(currentEntity)
+                        ui?.withUi {
+                            onChange()
+                            close()
+                            showSuccess("Deleted successfully")
+                        }
+                    } catch (ex: Exception) {
+                        ui?.withUi { showError("Failed to delete: ${ex.message}") }
                     }
                 }
             }
         }
         dialog.open()
     }
+
     open fun populateForm(entity: T?) {
         binder.readBean(entity)
     }

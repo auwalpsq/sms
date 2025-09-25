@@ -34,4 +34,7 @@ interface ApplicantMapper {
     fun findById(@Param("id") id: Long): Applicant?
 
     fun updatePaymentStatus(reference: String, status: String)
+
+    suspend fun countByGuardian(guardianId: Long): Int
+
 }

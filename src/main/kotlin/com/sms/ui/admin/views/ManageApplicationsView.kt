@@ -22,7 +22,7 @@ class ManageApplicationsView(
         setSizeFull()
         val tabSheet = TabSheet()
 
-        val guardianView = GuardiansView(guardianService)
+        val guardianView = GuardiansView(guardianService, applicantService)
         val pendingApplicants = ApplicantsView(applicantService, guardianService)
 
         tabSheet.add("Guardians", guardianView)

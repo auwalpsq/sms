@@ -67,4 +67,7 @@ class ApplicantService(
     suspend fun updatePaymentStatus(reference: String, status: String) {
         applicantMapper.updatePaymentStatus(reference, status)
     }
+    suspend fun countByGuardian(guardianId: Long): Int = withContext(Dispatchers.IO) {
+        applicantMapper.countByGuardian(guardianId)
+    }
 }
