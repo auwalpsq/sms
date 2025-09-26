@@ -2,35 +2,21 @@ package com.sms.ui.guardian.views
 
 import com.sms.entities.Applicant
 import com.sms.entities.Guardian
-import com.sms.entities.Payment
 import com.sms.entities.User
-import com.sms.enums.PaymentCategory
-import com.sms.enums.PaymentStatus
-import com.sms.services.AcademicSessionService
 import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
-import com.sms.services.PaymentService
-import com.sms.services.PaymentTypeService
-import com.sms.services.PaymentVerificationService
-import com.sms.services.PaystackService
 import com.sms.services.SchoolClassService
-import com.sms.ui.common.showError
-import com.sms.ui.common.showSuccess
 import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.guardian.GuardianLayout
-import com.sms.util.PaymentUiUtil
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
-import com.vaadin.flow.component.ClientCallable
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
-import com.vaadin.flow.component.dependency.JavaScript
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Span
-import com.vaadin.flow.component.menubar.MenuBar
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -39,9 +25,7 @@ import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.security.core.context.SecurityContextHolder
-import java.util.UUID
 
-@JavaScript("https://js.paystack.co/v2/inline.js")
 @PageTitle("My Applications")
 @Route(value = "guardian/applications", layout = GuardianLayout::class)
 @RolesAllowed("GUARDIAN")
