@@ -148,4 +148,18 @@
         WHERE guardian_id = #{guardianId}
     </select>
 
+    <update id="approveApplicant" parameterType="long">
+        UPDATE applicants
+        SET application_status = 'APPROVED',
+        updated_at = NOW()
+        WHERE id = #{id};
+    </update>
+
+    <!-- Reject applicant -->
+    <update id="rejectApplicant" parameterType="long">
+        UPDATE applicants
+        SET application_status = 'REJECTED',
+        updated_at = NOW()
+        WHERE id = #{id};
+    </update>
 </mapper>

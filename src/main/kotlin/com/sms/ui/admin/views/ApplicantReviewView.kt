@@ -2,7 +2,6 @@ package com.sms.ui.admin.views
 
 import com.sms.entities.Applicant
 import com.sms.services.ApplicantService
-import com.sms.services.GuardianService
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -87,15 +86,20 @@ class ApplicantReviewView(
 
         // Action buttons
         val actions = HorizontalLayout().apply {
+            if (applicant.applicationStatus == Applicant.ApplicationStatus.PENDING) {
+                add(
+                    Button("Approve").apply {
+                        addThemeVariants(ButtonVariant.LUMO_SUCCESS)
+                        addClickListener { approveApplicant(applicant.id!!) }
+                    },
+                    Button("Reject").apply {
+                        addThemeVariants(ButtonVariant.LUMO_ERROR)
+                        addClickListener { rejectApplicant(applicant.id!!) }
+                    }
+                )
+            }
+
             add(
-                Button("Approve").apply {
-                    addThemeVariants(ButtonVariant.LUMO_SUCCESS)
-                    addClickListener { approveApplicant(applicant) }
-                },
-                Button("Reject").apply {
-                    addThemeVariants(ButtonVariant.LUMO_ERROR)
-                    addClickListener { rejectApplicant(applicant) }
-                },
                 Button("Assign Class").apply {
                     isEnabled = applicant.isComplete()
                     addClickListener { assignClass(applicant) }
@@ -109,10 +113,9 @@ class ApplicantReviewView(
         add(header, H3("Applicant Information"), applicantForm, H3("Guardian Information"), guardianForm, actions)
     }
 
-    private fun approveApplicant(applicant: Applicant) {
+    private fun approveApplicant(applicantId: Long) {
         launchUiCoroutine {
-            applicant.applicationStatus = Applicant.ApplicationStatus.APPROVED
-            applicantService.update(applicant)
+            applicantService.approveApplicant(applicantId)
             ui?.withUi {
                 Notification.show("Applicant approved")
                 ui.navigate("admin/applicants")
@@ -120,10 +123,9 @@ class ApplicantReviewView(
         }
     }
 
-    private fun rejectApplicant(applicant: Applicant) {
+    private fun rejectApplicant(applicantId: Long) {
         launchUiCoroutine {
-            applicant.applicationStatus = Applicant.ApplicationStatus.REJECTED
-            applicantService.update(applicant)
+            applicantService.rejectApplicant(applicantId)
             ui?.withUi {
                 Notification.show("Applicant rejected")
                 ui.navigate("admin/applicants")

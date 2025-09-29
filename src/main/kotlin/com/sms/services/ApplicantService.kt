@@ -70,4 +70,15 @@ class ApplicantService(
     suspend fun countByGuardian(guardianId: Long): Int = withContext(Dispatchers.IO) {
         applicantMapper.countByGuardian(guardianId)
     }
+
+    // 🔹 New dedicated methods
+    @Transactional
+    suspend fun approveApplicant(id: Long) = withContext(Dispatchers.IO) {
+        applicantMapper.approveApplicant(id)
+    }
+
+    @Transactional
+    suspend fun rejectApplicant(id: Long) = withContext(Dispatchers.IO) {
+        applicantMapper.rejectApplicant(id)
+    }
 }

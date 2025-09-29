@@ -37,4 +37,6 @@ interface ApplicantMapper {
 
     suspend fun countByGuardian(guardianId: Long): Int
 
+    fun approveApplicant(@Param("id") id: Long)
+    fun rejectApplicant(@Param("id") id: Long)
 }
