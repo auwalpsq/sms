@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.*
 @Mapper
 interface StudentClassAssignmentMapper {
 
-    suspend fun save(assignment: StudentClassAssignment)
+    suspend fun save(assignment: StudentClassAssignment): Int
 
     suspend fun findByStudentIdAndSessionId(studentId: Long, sessionId: Long): StudentClassAssignment?
 

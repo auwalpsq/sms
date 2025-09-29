@@ -11,6 +11,16 @@ class StudentClassAssignmentService(
 ) {
     @Transactional
     suspend fun assignStudent(assignment: StudentClassAssignment) {
+        val studentId = assignment.student?.id
+            ?: throw IllegalArgumentException("Student is required")
+        val sessionId = assignment.academicSession?.id
+            ?: throw IllegalArgumentException("Academic session is required")
+
+        val existing = mapper.findByStudentIdAndSessionId(studentId, sessionId)
+        if (existing != null) {
+            throw IllegalStateException("This student is already assigned to a class for the selected session.")
+        }
+
         mapper.save(assignment)
     }
 

@@ -77,10 +77,11 @@ class ApplicantsView(
             Button("Open").apply {
                 addThemeVariants(ButtonVariant.LUMO_PRIMARY)
                 addClickListener {
-                    showApplicantDialog(applicant)
+                    ui?.get()?.navigate("admin/applicant/${applicant.id}")
                 }
             }
         }
+
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
     }
 
