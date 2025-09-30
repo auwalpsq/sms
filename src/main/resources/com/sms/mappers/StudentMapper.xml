@@ -60,4 +60,9 @@
     <select id="countAll" resultType="long">
         SELECT COUNT(*) FROM students
     </select>
+
+    <select id="findByApplicantId" resultMap="StudentResultMap">
+        SELECT * FROM students WHERE applicant_id = #{applicantId}
+    </select>
+
 </mapper>

@@ -17,7 +17,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 class AssignClassDialog(
     private val applicant: Applicant,
     private val schoolClassService: SchoolClassService,
-    private val studentService: StudentService
+    private val studentService: StudentService,
+    private val onAssigned: () -> Unit = {}
 ) : Dialog() {
 
     private val ui: UI? = UI.getCurrent()

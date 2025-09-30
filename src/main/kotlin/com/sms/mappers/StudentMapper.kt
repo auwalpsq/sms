@@ -5,12 +5,14 @@ import org.apache.ibatis.annotations.Mapper
 
 @Mapper
 interface StudentMapper {
-    suspend fun save(student: Student): Int
-    suspend fun findById(id: Long): Student?
-    suspend fun findByAdmissionNumber(admissionNumber: String): Student?
-    suspend fun findAll(): List<Student>
-    suspend fun deleteById(id: Long): Int
-    suspend fun countAll(): Long
-    suspend fun findBySession(sessionId: Long): List<Student>
-    suspend fun findByClass(classId: Long): List<Student>
+    fun save(student: Student): Int
+    fun findById(id: Long): Student?
+    fun findByAdmissionNumber(admissionNumber: String): Student?
+    fun findAll(): List<Student>
+    fun deleteById(id: Long): Int
+    fun countAll(): Long
+    fun findBySession(sessionId: Long): List<Student>
+    fun findByClass(classId: Long): List<Student>
+
+    fun findByApplicantId(applicantId: Long): Student?
 }

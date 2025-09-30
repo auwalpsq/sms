@@ -2,6 +2,9 @@ package com.sms.ui.admin.views
 
 import com.sms.entities.Applicant
 import com.sms.services.ApplicantService
+import com.sms.services.SchoolClassService
+import com.sms.services.StudentService
+import com.sms.ui.admin.components.AssignClassDialog
 import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
@@ -29,7 +32,9 @@ import jakarta.annotation.security.RolesAllowed
 @PageTitle("Review Applicant")
 @RolesAllowed("ADMIN")
 class ApplicantReviewView(
-    private val applicantService: ApplicantService
+    private val applicantService: ApplicantService,
+    private val studentService: StudentService,
+    private val schoolClassService: SchoolClassService
 ) : VerticalLayout(), HasUrlParameter<Long> {
 
     private val ui: UI? = UI.getCurrent()
@@ -181,7 +186,23 @@ class ApplicantReviewView(
     }
 
     private fun assignClass(applicant: Applicant) {
-        // open assign class dialog / page (to implement next)
-        showSuccess("Assign class for ${applicant.getFullName()}")
+        val dialog = AssignClassDialog(
+            applicant = applicant,
+            schoolClassService = schoolClassService,   // inject via constructor in view
+            studentService = studentService,      // inject via constructor in view
+
+        ) {
+            // refresh applicant after assigning
+            launchUiCoroutine {
+                val updated = applicantService.findById(applicant.id)
+                ui?.withUi {
+                    if (updated != null) {
+                        this@ApplicantReviewView.applicant = updated
+                        renderApplicantPage(updated)
+                    }
+                }
+            }
+        }
+        dialog.open()
     }
 }

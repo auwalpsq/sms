@@ -17,7 +17,7 @@ data class Student(
     val id: Long = 0,
 
     // 🔹 Unique student admission number
-    @Column(name = "admission_number", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     val admissionNumber: String,
 
     // 🔹 Original applicant record
