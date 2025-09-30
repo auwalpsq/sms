@@ -39,4 +39,5 @@ interface ApplicantMapper {
 
     fun approveApplicant(@Param("id") id: Long)
     fun rejectApplicant(@Param("id") id: Long)
+    fun resetApplicantToPending(@Param("id") id: Long)
 }

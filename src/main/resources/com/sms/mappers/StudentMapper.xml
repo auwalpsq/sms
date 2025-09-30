@@ -5,107 +5,59 @@
 
 <mapper namespace="com.sms.mappers.StudentMapper">
 
-    <resultMap id="studentResultMap" type="com.sms.entities.Student">
-        <!-- Person fields from superclass -->
+    <resultMap id="StudentResultMap" type="com.sms.entities.Student">
         <id property="id" column="id"/>
-        <result property="firstName" column="first_name"/>
-        <result property="middleName" column="middle_name"/>
-        <result property="lastName" column="last_name"/>
-        <result property="gender" column="gender"/>
-        <result property="dateOfBirth" column="date_of_birth"/>
-<!--        <result property="personType" column="person_type"/>-->
-
-        <!-- Student-specific fields -->
         <result property="admissionNumber" column="admission_number"/>
-        <result property="admissionDate" column="admission_date"/>
-        <result property="schoolLevel" column="school_level"/>
-        <result property="bloodGroup" column="blood_group"/>
-        <result property="genotype" column="genotype"/>
-        <result property="knownAllergies" column="known_allergies"/>
-        <result property="photo" column="photo"/>
-        <result property="applicationStatus" column="application_status"/>
-        <result property="previousSchoolName" column="previous_school_name"/>
-        <result property="previousClass" column="previous_class"/>
+        <result property="admittedOn" column="admitted_on"/>
 
-        <!-- Associations -->
-        <association property="currentClass" javaType="com.sms.entities.SchoolClass">
-            <id property="id" column="class_id"/>
-        </association>
-
-        <association property="guardian" javaType="com.sms.entities.Guardian">
-            <id property="id" column="guardian_id"/>
-        </association>
+        <!-- Associations (must all come after result definitions) -->
+        <association property="applicant" column="applicant_id"
+                     javaType="com.sms.entities.Applicant"
+                     select="com.sms.mappers.ApplicantMapper.findById"/>
+        <association property="admittedSession" column="admitted_session_id"
+                     javaType="com.sms.entities.AcademicSession"
+                     select="com.sms.mappers.AcademicSessionMapper.findById"/>
+        <association property="admittedClass" column="admitted_class_id"
+                     javaType="com.sms.entities.SchoolClass"
+                     select="com.sms.mappers.SchoolClassMapper.findById"/>
     </resultMap>
 
-    <select id="findById" resultMap="studentResultMap" parameterType="long">
-        SELECT s.*,
-        p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth,
-        sc.id AS class_id,
-        g.id AS guardian_id
-        FROM students s
-        JOIN persons p ON s.id = p.id
-        LEFT JOIN school_classes sc ON s.class_id = sc.id
-        LEFT JOIN guardians g ON s.guardian_id = g.id
-        WHERE s.id = #{id}
-    </select>
-
-    <select id="findByGuardianId" resultMap="studentResultMap">
-        SELECT s.*, p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth
-        FROM students s
-        JOIN persons p ON s.id = p.id
-        WHERE s.guardian_id = #{guardianId}
-    </select>
-
-    <!-- STEP 1: Insert into persons -->
-    <insert id="insertIntoPerson" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO persons (
-        first_name, middle_name, last_name, gender, date_of_birth, person_type
-        ) VALUES (
-        #{firstName}, #{middleName}, #{lastName}, #{gender}, #{dateOfBirth}, 'STUDENT')
-        RETURNING id
-    </insert>
-
-    <!-- STEP 2: Insert into students -->
-    <insert id="save" parameterType="com.sms.entities.Student">
+    <insert id="save" parameterType="com.sms.entities.Student"
+            useGeneratedKeys="true" keyProperty="id">
         INSERT INTO students (
-        id, admission_number, admission_date, class_id, school_level,
-        blood_group, genotype, known_allergies, photo, application_status,
-        previous_school_name, previous_class, guardian_id
+        admission_number, applicant_id,
+        admitted_session_id, admitted_class_id, admitted_on
         ) VALUES (
-        #{id}, #{admissionNumber}, #{admissionDate}, #{currentClass.id}, #{schoolLevel},
-        #{bloodGroup}, #{genotype}, #{knownAllergies}, #{photo}, #{applicationStatus},
-        #{previousSchoolName}, #{previousClass}, #{guardian.id}
+        #{admissionNumber}, #{applicant.id},
+        #{admittedSession.id}, #{admittedClass.id}, #{admittedOn}
         )
     </insert>
 
-    <update id="update" parameterType="com.sms.entities.Student">
-        UPDATE persons SET
-        first_name = #{firstName},
-        middle_name = #{middleName},
-        last_name = #{lastName},
-        gender = #{gender},
-        date_of_birth = #{dateOfBirth}
-        WHERE id = #{id};
+    <select id="findById" resultMap="StudentResultMap">
+        SELECT * FROM students WHERE id = #{id}
+    </select>
 
-        UPDATE students SET
-        admission_number = #{admissionNumber},
-        admission_date = #{admissionDate},
-        class_id = #{currentClass.id},
-        school_level = #{schoolLevel},
-        blood_group = #{bloodGroup},
-        genotype = #{genotype},
-        known_allergies = #{knownAllergies},
-        photo = #{photo},
-        application_status = #{applicationStatus},
-        previous_school_name = #{previousSchoolName},
-        previous_class = #{previousClass},
-        guardian_id = #{guardian.id}
-        WHERE id = #{id};
-    </update>
+    <select id="findByAdmissionNumber" resultMap="StudentResultMap">
+        SELECT * FROM students WHERE admission_number = #{admissionNumber}
+    </select>
 
-    <delete id="delete" parameterType="long">
-        DELETE FROM students WHERE id = #{id};
-        DELETE FROM persons WHERE id = #{id};
+    <select id="findAll" resultMap="StudentResultMap">
+        SELECT * FROM students
+    </select>
+
+    <select id="findBySession" resultMap="StudentResultMap">
+        SELECT * FROM students WHERE admitted_session_id = #{sessionId}
+    </select>
+
+    <select id="findByClass" resultMap="StudentResultMap">
+        SELECT * FROM students WHERE admitted_class_id = #{classId}
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM students WHERE id = #{id}
     </delete>
 
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM students
+    </select>
 </mapper>

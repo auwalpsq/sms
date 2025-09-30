@@ -1,55 +1,41 @@
 package com.sms.entities
 
-import com.sms.entities.Guardian
-import com.sms.entities.Person
-import com.sms.entities.SchoolClass
-import com.sms.enums.Section
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.DiscriminatorValue
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.FetchType
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.Lob
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDate
-import java.time.Period
 
 @Entity
-@Table(name = "students")
-@DiscriminatorValue("STUDENT")
-class Student(
+@Table(
+    name = "students",
+    uniqueConstraints = [
+        UniqueConstraint(columnNames = ["applicant_id", "admitted_session_id"])
+    ]
+)
+data class Student(
 
-    @Column(unique = true)
-    val admissionNumber: String? = null,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
 
-    @Column(nullable = false)
-    val admissionDate: LocalDate = LocalDate.now(),
+    // 🔹 Unique student admission number
+    @Column(name = "admission_number", unique = true, nullable = false)
+    val admissionNumber: String,
 
-    @OneToMany(mappedBy = "student", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val classAssignments: MutableSet<StudentClassAssignment> = mutableSetOf(),
+    // 🔹 Original applicant record
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applicant_id", nullable = false, unique = true)
+    val applicant: Applicant,
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    val section: Section = Section.PRIMARY,
-
-    val bloodGroup: String? = null,
-    val genotype: String? = null,
-    val knownAllergies: String? = null,
-
-    @Lob
-    val photo: ByteArray? = null,
-
+    // 🔹 Academic session of admission
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guardian_id")
-    val guardian: Guardian? = null
+    @JoinColumn(name = "admitted_session_id", nullable = false)
+    val admittedSession: AcademicSession,
 
-) : Person() {
+    // 🔹 The class student was first admitted into (only one)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admitted_class_id", nullable = false, unique = true)
+    val admittedClass: SchoolClass,
 
-    val currentAge: Int
-        get() = Period.between(dateOfBirth, LocalDate.now()).years
-}
+    // 🔹 Date of admission
+    @Column(nullable = false)
+    val admittedOn: LocalDate = LocalDate.now(),
+)

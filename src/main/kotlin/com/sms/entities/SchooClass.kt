@@ -31,9 +31,4 @@ data class SchoolClass(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")
     var classTeacher: Staff? = null,
-
-    @OneToMany(mappedBy = "schoolClass", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var studentAssignments: MutableSet<StudentClassAssignment> = mutableSetOf()
-) {
-    fun getStudentCount(): Int = studentAssignments.size
-}
+)

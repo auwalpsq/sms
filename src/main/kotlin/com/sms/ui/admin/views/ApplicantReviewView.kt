@@ -2,6 +2,8 @@ package com.sms.ui.admin.views
 
 import com.sms.entities.Applicant
 import com.sms.services.ApplicantService
+import com.sms.ui.common.showError
+import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -11,7 +13,10 @@ import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.H3
 import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.BeforeEvent
@@ -40,17 +45,30 @@ class ApplicantReviewView(
         launchUiCoroutine {
             val loaded = applicantService.findById(id)
             if (loaded != null) {
+                this@ApplicantReviewView.applicant = loaded
                 ui?.withUi { renderApplicantPage(loaded) }
             } else {
-                ui?.withUi { Notification.show("Applicant not found") }
+                ui?.withUi { showError("Applicant not found") }
             }
         }
     }
 
+
     private fun renderApplicantPage(applicant: Applicant) {
         removeAll()
 
-        val header = H2("Review Admission Application")
+        // 🔹 Back button with arrow icon
+        val backButton = Button(Icon(VaadinIcon.ARROW_LEFT)).apply {
+            addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE)
+            addClickListener { ui?.get()?.navigate("admin/manage-applications") }
+        }
+
+        val header = HorizontalLayout(backButton, H2("Review Admission Application")).apply {
+            setAlignItems(FlexComponent.Alignment.CENTER)
+            width = "100%"
+            justifyContentMode = FlexComponent.JustifyContentMode.START
+            isSpacing = true
+        }
 
         // Applicant Information
         val applicantForm = FormLayout().apply {
@@ -99,13 +117,20 @@ class ApplicantReviewView(
                 )
             }
 
+            if (applicant.applicationStatus != Applicant.ApplicationStatus.PENDING &&
+                applicant.paymentStatus == Applicant.PaymentStatus.UNPAID) {
+                add(
+                    Button("Reset to Pending").apply {
+                        addThemeVariants(ButtonVariant.LUMO_CONTRAST)
+                        addClickListener { resetApplicant(applicant) }
+                    }
+                )
+            }
+
             add(
                 Button("Assign Class").apply {
                     isEnabled = applicant.isComplete()
                     addClickListener { assignClass(applicant) }
-                },
-                Button("Back").apply {
-                    addClickListener { ui?.get()?.navigate("admin/applicants") }
                 }
             )
         }
@@ -116,9 +141,13 @@ class ApplicantReviewView(
     private fun approveApplicant(applicantId: Long) {
         launchUiCoroutine {
             applicantService.approveApplicant(applicantId)
+            val updated = applicantService.findById(applicantId)
             ui?.withUi {
-                Notification.show("Applicant approved")
-                ui.navigate("admin/applicants")
+                if (updated != null) {
+                    applicant = updated
+                    showSuccess("Applicant approved")
+                    renderApplicantPage(updated)
+                }
             }
         }
     }
@@ -126,15 +155,33 @@ class ApplicantReviewView(
     private fun rejectApplicant(applicantId: Long) {
         launchUiCoroutine {
             applicantService.rejectApplicant(applicantId)
+            val updated = applicantService.findById(applicantId)
             ui?.withUi {
-                Notification.show("Applicant rejected")
-                ui.navigate("admin/applicants")
+                if (updated != null) {
+                    applicant = updated
+                    showError("Applicant rejected")
+                    renderApplicantPage(updated)
+                }
+            }
+        }
+    }
+
+    private fun resetApplicant(applicant: Applicant) {
+        launchUiCoroutine {
+            applicantService.resetApplicantToPending(applicant.id)
+            val updated = applicantService.findById(applicant.id)
+            ui?.withUi {
+                if (updated != null) {
+                    this@ApplicantReviewView.applicant = updated
+                    showSuccess("Application reset to pending")
+                    renderApplicantPage(updated)
+                }
             }
         }
     }
 
     private fun assignClass(applicant: Applicant) {
         // open assign class dialog / page (to implement next)
-        Notification.show("Assign class for ${applicant.getFullName()}")
+        showSuccess("Assign class for ${applicant.getFullName()}")
     }
 }

@@ -81,4 +81,15 @@ class ApplicantService(
     suspend fun rejectApplicant(id: Long) = withContext(Dispatchers.IO) {
         applicantMapper.rejectApplicant(id)
     }
+    @Transactional
+    suspend fun resetApplicantToPending(applicantId: Long) = withContext(Dispatchers.IO) {
+        val applicant = applicantMapper.findById(applicantId)
+            ?: throw IllegalArgumentException("Applicant not found")
+
+        if (applicant.paymentStatus != Applicant.PaymentStatus.UNPAID) {
+            throw IllegalStateException("Cannot reset application after payment has been made")
+        }
+
+        applicantMapper.resetApplicantToPending(applicantId)
+    }
 }

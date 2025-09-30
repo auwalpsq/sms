@@ -150,16 +150,33 @@
 
     <update id="approveApplicant" parameterType="long">
         UPDATE applicants
-        SET application_status = 'APPROVED',
-        updated_at = NOW()
+        SET application_status = 'APPROVED'
+        WHERE id = #{id};
+
+        UPDATE persons
+        SET updated_at = NOW()
         WHERE id = #{id};
     </update>
 
-    <!-- Reject applicant -->
     <update id="rejectApplicant" parameterType="long">
         UPDATE applicants
-        SET application_status = 'REJECTED',
-        updated_at = NOW()
+        SET application_status = 'REJECTED'
+        WHERE id = #{id};
+
+        UPDATE persons
+        SET updated_at = NOW()
         WHERE id = #{id};
     </update>
+
+    <update id="resetApplicantToPending" parameterType="long">
+        UPDATE applicants
+        SET application_status = 'PENDING'
+        WHERE id = #{id};
+
+        UPDATE persons
+        SET updated_at = NOW()
+        WHERE id = #{id};
+    </update>
+
+
 </mapper>
