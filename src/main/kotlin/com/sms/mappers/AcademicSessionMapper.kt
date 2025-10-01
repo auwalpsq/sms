@@ -9,7 +9,7 @@ interface AcademicSessionMapper {
 
     fun findAll(): List<AcademicSession>
 
-    fun findById(id: Long): AcademicSession
+    fun findById(@Param("id") id: Long): AcademicSession
 
     fun findCurrentSession(): AcademicSession
 

@@ -3,7 +3,6 @@ package com.sms.services
 import com.sms.entities.Student
 import com.sms.entities.StudentClassAssignment
 import com.sms.mappers.StudentMapper
-import com.sms.mappers.StudentClassAssignmentMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -14,10 +13,10 @@ import java.time.LocalDateTime
 @Service
 class StudentService(
     private val studentMapper: StudentMapper,
-    private val studentClassAssignmentMapper: StudentClassAssignmentMapper,
     private val applicantService: ApplicantService,
     private val academicSessionService: AcademicSessionService,
-    private val schoolClassService: SchoolClassService
+    private val schoolClassService: SchoolClassService,
+    private val studentClassAssignmentService: StudentClassAssignmentService
 ) {
 
     // 🔹 Create or update a Student and assign to class
@@ -25,7 +24,6 @@ class StudentService(
     suspend fun assignClass(applicantId: Long, classId: Long): Student = withContext(Dispatchers.IO) {
         val currentSession = academicSessionService.findCurrent()
             ?: throw IllegalStateException("No active academic session found")
-
 
         // 1. Check if student already exists
         var student = studentMapper.findByApplicantId(applicantId)
@@ -39,7 +37,6 @@ class StudentService(
             val applicant = applicantService.findById(applicantId)
                 ?: throw IllegalArgumentException("Applicant with ID $applicantId not found")
 
-
             student = Student(
                 admissionNumber = admissionNumber,
                 applicant = applicant,
@@ -50,17 +47,14 @@ class StudentService(
             studentMapper.save(student)
         }
 
-        // 2. Check if already assigned in this session
-        val existing = studentClassAssignmentMapper.findByStudentIdAndSessionId(student.id, currentSession?.id!!)
-        if (existing == null) {
-            val assignment = StudentClassAssignment(
-                student = student,
-                schoolClass = admittedClass,
-                academicSession = currentSession,
-                assignedDate = LocalDateTime.now()
-            )
-            studentClassAssignmentMapper.save(assignment)
-        }
+        // 2. Delegate assignment logic to StudentClassAssignmentService
+        val assignment = StudentClassAssignment(
+            student = student,
+            schoolClass = admittedClass,
+            academicSession = currentSession,
+            assignedDate = LocalDateTime.now()
+        )
+        studentClassAssignmentService.assignStudent(assignment)
 
         return@withContext student
     }
@@ -109,6 +103,7 @@ class StudentService(
     suspend fun countAll(): Long = withContext(Dispatchers.IO) {
         studentMapper.countAll()
     }
+
     suspend fun findByApplicantId(applicantId: Long): Student? = withContext(Dispatchers.IO) {
         studentMapper.findByApplicantId(applicantId)
     }

@@ -2,11 +2,12 @@ package com.sms.mappers
 
 import com.sms.entities.Student
 import org.apache.ibatis.annotations.Mapper
+import org.apache.ibatis.annotations.Param
 
 @Mapper
 interface StudentMapper {
     fun save(student: Student): Int
-    fun findById(id: Long): Student?
+    fun findById(@Param("id") id: Long): Student?
     fun findByAdmissionNumber(admissionNumber: String): Student?
     fun findAll(): List<Student>
     fun deleteById(id: Long): Int

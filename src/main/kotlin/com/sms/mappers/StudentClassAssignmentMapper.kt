@@ -6,11 +6,18 @@ import org.apache.ibatis.annotations.*
 @Mapper
 interface StudentClassAssignmentMapper {
 
-    suspend fun save(assignment: StudentClassAssignment): Int
+    fun save(assignment: StudentClassAssignment): Int
 
-    suspend fun findByStudentIdAndSessionId(studentId: Long, sessionId: Long): StudentClassAssignment?
+    fun findByStudentIdAndSessionId(
+        @Param("studentId") studentId: Long,
+        @Param("sessionId") sessionId: Long
+    ): StudentClassAssignment?
 
-    suspend fun findAllByClassIdAndSessionId(classId: Long, sessionId: Long): List<StudentClassAssignment>
+    fun findAllByClassIdAndSessionId(
+        @Param("classId") classId: Long,
+        @Param("sessionId") sessionId: Long
+    ): List<StudentClassAssignment>
 
-    suspend fun deleteById(id: Long)
+
+    fun deleteById(id: Long)
 }

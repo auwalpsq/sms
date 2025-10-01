@@ -17,6 +17,7 @@ class StudentClassAssignmentService(
             ?: throw IllegalArgumentException("Academic session is required")
 
         val existing = mapper.findByStudentIdAndSessionId(studentId, sessionId)
+
         if (existing != null) {
             throw IllegalStateException("This student is already assigned to a class for the selected session.")
         }

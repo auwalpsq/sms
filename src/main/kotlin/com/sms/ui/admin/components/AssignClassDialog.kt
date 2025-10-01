@@ -12,6 +12,8 @@ import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.dialog.Dialog
+import com.vaadin.flow.component.orderedlayout.FlexComponent
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 
 class AssignClassDialog(
@@ -55,13 +57,18 @@ class AssignClassDialog(
 
         val cancelButton = Button("Cancel") { close() }
 
+        val buttons = HorizontalLayout(assignButton, cancelButton).apply {
+            justifyContentMode = FlexComponent.JustifyContentMode.END
+            width = "100%"
+        }
+
         add(
             VerticalLayout(
                 classSelect,
-                assignButton,
-                cancelButton
+                buttons
             )
         )
+
 
         // Load available classes
         launchUiCoroutine {

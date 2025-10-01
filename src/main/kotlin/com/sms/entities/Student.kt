@@ -1,6 +1,7 @@
 package com.sms.entities
 
 import jakarta.persistence.*
+import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDate
 
 @Entity
@@ -36,6 +37,6 @@ data class Student(
     val admittedClass: SchoolClass,
 
     // 🔹 Date of admission
-    @Column(nullable = false)
-    val admittedOn: LocalDate = LocalDate.now(),
+    @CreationTimestamp
+    val admittedOn: LocalDate? = LocalDate.now(),
 )
