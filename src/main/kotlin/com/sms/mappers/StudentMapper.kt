@@ -16,4 +16,6 @@ interface StudentMapper {
     fun findByClass(classId: Long): List<Student>
 
     fun findByApplicantId(applicantId: Long): Student?
+
+    fun markAccepted(id: Long): Int
 }

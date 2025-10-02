@@ -107,4 +107,17 @@ class StudentService(
     suspend fun findByApplicantId(applicantId: Long): Student? = withContext(Dispatchers.IO) {
         studentMapper.findByApplicantId(applicantId)
     }
+
+    @Transactional
+    suspend fun acceptAdmission(studentId: Long) {
+        val student = studentMapper.findById(studentId)
+            ?: throw IllegalArgumentException("Student not found with ID: $studentId")
+
+        if (student.admissionAccepted) {
+            throw IllegalStateException("Admission already accepted")
+        }
+
+        studentMapper.markAccepted(studentId)
+    }
+
 }

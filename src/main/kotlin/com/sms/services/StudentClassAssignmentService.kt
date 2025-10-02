@@ -2,12 +2,14 @@ package com.sms.services
 
 import com.sms.entities.StudentClassAssignment
 import com.sms.mappers.StudentClassAssignmentMapper
+import com.sms.mappers.StudentMapper
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class StudentClassAssignmentService(
-    private val mapper: StudentClassAssignmentMapper
+    private val mapper: StudentClassAssignmentMapper,
+    private val studentMapper: StudentMapper
 ) {
     @Transactional
     suspend fun assignStudent(assignment: StudentClassAssignment) {
@@ -35,6 +37,16 @@ class StudentClassAssignmentService(
 
     @Transactional
     suspend fun deleteAssignment(id: Long) {
+        val assignment = mapper.findById(id)
+            ?: throw IllegalArgumentException("Assignment not found")
+
+        val student = studentMapper.findById(assignment.student!!.id!!)
+            ?: throw IllegalArgumentException("Student not found")
+
+        if (student.admissionAccepted) {
+            throw IllegalStateException("Cannot drop assignment. Guardian has already accepted admission.")
+        }
+
         mapper.deleteById(id)
     }
 }

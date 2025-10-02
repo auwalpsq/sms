@@ -3,6 +3,7 @@ package com.sms.ui.admin.views
 import com.sms.entities.Applicant
 import com.sms.services.ApplicantService
 import com.sms.services.SchoolClassService
+import com.sms.services.StudentClassAssignmentService
 import com.sms.services.StudentService
 import com.sms.ui.admin.components.AssignClassDialog
 import com.sms.ui.common.showError
@@ -18,7 +19,6 @@ import com.vaadin.flow.component.html.H3
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
-import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -34,7 +34,8 @@ import jakarta.annotation.security.RolesAllowed
 class ApplicantReviewView(
     private val applicantService: ApplicantService,
     private val studentService: StudentService,
-    private val schoolClassService: SchoolClassService
+    private val schoolClassService: SchoolClassService,
+    private val studentClassAssignmentService: StudentClassAssignmentService
 ) : VerticalLayout(), HasUrlParameter<Long> {
 
     private val ui: UI? = UI.getCurrent()
@@ -139,6 +140,40 @@ class ApplicantReviewView(
                 }
             )
         }
+
+        launchUiCoroutine {
+            val student = applicant.id?.let { studentService.findByApplicantId(it) }
+            if (student != null) {
+                val sessionId = student.admittedSession.id
+                if (sessionId != null) {
+                    val assignment = studentClassAssignmentService.findAssignment(student.id!!, sessionId)
+                    if (assignment != null) {
+                        ui?.withUi {
+                            add(
+                                Button("Drop Assignment").apply {
+                                    addThemeVariants(ButtonVariant.LUMO_ERROR)
+                                    isEnabled = !student.admissionAccepted
+                                    addClickListener {
+                                        launchUiCoroutine {
+                                            try {
+                                                studentClassAssignmentService.deleteAssignment(assignment.id!!)
+                                                ui?.get()?.withUi {
+                                                    showSuccess("Assignment dropped successfully")
+                                                    loadApplicant(applicant.id!!)
+                                                }
+                                            } catch (ex: Exception) {
+                                                ui?.get()?.withUi { showError(ex.message ?: "Failed to drop assignment") }
+                                            }
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
 
         add(header, H3("Applicant Information"), applicantForm, H3("Guardian Information"), guardianForm, actions)
     }

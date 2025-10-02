@@ -31,5 +31,9 @@
     <delete id="deleteById" parameterType="long">
         DELETE FROM student_class_assignments WHERE id = #{id}
     </delete>
+    <select id="findById" resultMap="StudentClassAssignmentResultMap" parameterType="long">
+        SELECT * FROM student_class_assignments WHERE id = #{id}
+    </select>
+
 
 </mapper>

@@ -3,6 +3,7 @@ package com.sms.entities
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Entity
 @Table(
@@ -39,4 +40,7 @@ data class Student(
     // 🔹 Date of admission
     @CreationTimestamp
     val admittedOn: LocalDate? = LocalDate.now(),
+
+    var admissionAccepted: Boolean = false,
+    var admissionAcceptedOn: LocalDateTime? = null
 )

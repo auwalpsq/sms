@@ -20,4 +20,6 @@ interface StudentClassAssignmentMapper {
 
 
     fun deleteById(id: Long)
+
+    fun findById(id: Long): StudentClassAssignment?
 }

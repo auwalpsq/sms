@@ -9,6 +9,8 @@
         <id property="id" column="id"/>
         <result property="admissionNumber" column="admission_number"/>
         <result property="admittedOn" column="admitted_on"/>
+        <result property="admissionAccepted" column="admission_accepted"/>
+        <result property="admissionAcceptedOn" column="admission_accepted_on"/>
 
         <!-- Associations (must all come after result definitions) -->
         <association property="applicant" column="applicant_id"
@@ -26,10 +28,10 @@
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO students (
         admission_number, applicant_id,
-        admitted_session_id, admitted_class_id, admitted_on
+        admitted_session_id, admitted_class_id, admitted_on, admission_accepted
         ) VALUES (
         #{admissionNumber}, #{applicant.id},
-        #{admittedSession.id}, #{admittedClass.id}, #{admittedOn}
+        #{admittedSession.id}, #{admittedClass.id}, #{admittedOn}, #{admissionAccepted}
         )
     </insert>
 
@@ -64,5 +66,12 @@
     <select id="findByApplicantId" resultMap="StudentResultMap">
         SELECT * FROM students WHERE applicant_id = #{applicantId}
     </select>
+
+    <update id="markAccepted" parameterType="long">
+        UPDATE students
+        SET admission_accepted = TRUE,
+        admission_accepted_on = NOW()
+        WHERE id = #{id}
+    </update>
 
 </mapper>
