@@ -1,6 +1,7 @@
 package com.sms.ui.admin.views
 
 import com.sms.entities.Applicant
+import com.sms.services.AcademicSessionService
 import com.sms.services.ApplicantService
 import com.sms.services.SchoolClassService
 import com.sms.services.StudentClassAssignmentService
@@ -35,7 +36,8 @@ class ApplicantReviewView(
     private val applicantService: ApplicantService,
     private val studentService: StudentService,
     private val schoolClassService: SchoolClassService,
-    private val studentClassAssignmentService: StudentClassAssignmentService
+    private val studentClassAssignmentService: StudentClassAssignmentService,
+    private val academicSessionService: AcademicSessionService
 ) : VerticalLayout(), HasUrlParameter<Long> {
 
     private val ui: UI? = UI.getCurrent()
@@ -59,14 +61,13 @@ class ApplicantReviewView(
         }
     }
 
-
     private fun renderApplicantPage(applicant: Applicant) {
         removeAll()
 
         // 🔹 Back button with arrow icon
         val backButton = Button(Icon(VaadinIcon.ARROW_LEFT)).apply {
             addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE)
-            addClickListener { ui?.get()?.navigate("admin/manage-applications") }
+            addClickListener { UI.getCurrent().navigate("admin/manage-applications") }
         }
 
         val header = HorizontalLayout(backButton, H2("Review Admission Application")).apply {
@@ -76,7 +77,7 @@ class ApplicantReviewView(
             isSpacing = true
         }
 
-        // Applicant Information
+        // Applicant Information (build first; we will add Assigned Class row later if exists)
         val applicantForm = FormLayout().apply {
             addFormItem(Span(applicant.applicationNumber), "Application No")
             addFormItem(Span(applicant.getFullName() ?: ""), "Full Name")
@@ -92,6 +93,7 @@ class ApplicantReviewView(
             addFormItem(Span(applicant.applicationStatus.name), "Application Status")
             addFormItem(Span(applicant.applicationSection.name), "Application Section")
             addFormItem(Span(applicant.intendedClass ?: ""), "Application Class")
+            // Note: Assigned Class row will be appended below if an assignment exists
         }
 
         // Guardian Information
@@ -108,7 +110,7 @@ class ApplicantReviewView(
             addFormItem(Span(guardian?.state ?: ""), "State")
         }
 
-        // Action buttons
+        // Action buttons (status-driven). Do NOT add Assign here — assignment logic handled separately below.
         val actions = HorizontalLayout().apply {
             if (applicant.applicationStatus == Applicant.ApplicationStatus.PENDING) {
                 add(
@@ -121,50 +123,76 @@ class ApplicantReviewView(
                         addClickListener { rejectApplicant(applicant.id!!) }
                     }
                 )
-            }
-
-            if (applicant.applicationStatus != Applicant.ApplicationStatus.PENDING &&
-                applicant.paymentStatus == Applicant.PaymentStatus.UNPAID) {
-                add(
-                    Button("Reset to Pending").apply {
-                        addThemeVariants(ButtonVariant.LUMO_CONTRAST)
-                        addClickListener { resetApplicant(applicant) }
+            } else if (applicant.applicationStatus == Applicant.ApplicationStatus.APPROVED) {
+                when {
+                    applicant.paymentStatus == Applicant.PaymentStatus.UNPAID -> {
+                        add(Span("⏳ Awaiting payment before class assignment"))
+                        // allow reset only if unpaid
+                        add(
+                            Button("Reset to Pending").apply {
+                                addThemeVariants(ButtonVariant.LUMO_CONTRAST)
+                                addClickListener { resetApplicant(applicant) }
+                            }
+                        )
                     }
-                )
+                    !applicant.isComplete() -> {
+                        add(Span("📋 Awaiting guardian to complete profile"))
+                        // do not allow reset if paid (we rely on payment check elsewhere)
+                    }
+                    else -> {
+                        // approved + paid + complete → show nothing here re: assignment,
+                        // assignment controls will be added below when we inspect student + assignment state
+                    }
+                }
+            } else /* REJECTED */ {
+                if (applicant.paymentStatus == Applicant.PaymentStatus.UNPAID) {
+                    add(
+                        Button("Reset to Pending").apply {
+                            addThemeVariants(ButtonVariant.LUMO_CONTRAST)
+                            addClickListener { resetApplicant(applicant) }
+                        }
+                    )
+                }
             }
         }
 
+        // -------------------------
+        // Assignment handling (correct, session-aware flow)
+        // -------------------------
         launchUiCoroutine {
-            val student = applicant.id?.let { studentService.findByApplicantId(it) }
-            if (student != null) {
-                val sessionId = student.admittedSession.id
-                if (sessionId != null) {
-                    val assignment = studentClassAssignmentService.findAssignment(student.id!!, sessionId)
+            val currentSession = academicSessionService.findCurrent()
+            if (currentSession == null) {
+                ui?.withUi { showError("No active academic session configured") }
+            } else {
+                // Only consider assignment UI when applicant is approved + paid + (optionally) complete
+                // (we still allow assign if student record not yet created)
+                if (applicant.applicationStatus == Applicant.ApplicationStatus.APPROVED &&
+                    applicant.paymentStatus == Applicant.PaymentStatus.PAID) {
+
+                    // find Student (may be null)
+                    val student = applicant.id?.let { studentService.findByApplicantId(it) }
+
+                    // find assignment for current session (may be null)
+                    val assignment = if (student != null) {
+                        studentClassAssignmentService.findAssignment(student.id!!, currentSession.id)
+                    } else {
+                        null
+                    }
 
                     ui?.withUi {
-                        if (assignment == null) {
-                            // ✅ Show Assign button only if no assignment exists
-                            if (applicant.isComplete()) {
-                                actions.add(
-                                    Button("Assign Class").apply {
-                                        addClickListener { assignClass(applicant) }
-                                    }
-                                )
-                            }
-                        } else {
-                            // ✅ Add assignment details to Applicant Information
-                            val session = assignment.academicSession
-                            val sessionLabel = "${session?.displaySession} - ${session?.term}"
+                        if (assignment != null) {
+                            // show assigned class in form (standard place)
+                            val sessionLabel = "${assignment.academicSession?.displaySession} - ${assignment.academicSession?.term}"
                             applicantForm.addFormItem(
                                 Span("${assignment.schoolClass?.name} ($sessionLabel)"),
                                 "Assigned Class"
                             )
 
-                            // ✅ Add Drop button to actions section
+                            // drop button (only if guardian hasn't accepted)
                             actions.add(
                                 Button("Drop Assignment").apply {
                                     addThemeVariants(ButtonVariant.LUMO_ERROR)
-                                    isEnabled = !student.admissionAccepted
+                                    isEnabled = !(student?.admissionAccepted ?: false)
                                     addClickListener {
                                         launchUiCoroutine {
                                             try {
@@ -180,12 +208,39 @@ class ApplicantReviewView(
                                     }
                                 }
                             )
+                        } else {
+                            // No assignment exists in current session.
+                            // Show Assign button only if applicant is complete (guardians required fields done).
+                            // We allow Assign even if student record is missing — studentService.assignClass will create it.
+                            if (applicant.isComplete()) {
+                                actions.add(
+                                    Button("Assign Class").apply {
+                                        addClickListener {
+                                            // open dialog to pick class; the dialog will call back to this view
+                                            assignClass(applicant)
+                                        }
+                                    }
+                                )
+                            } else {
+                                // If approved+paid but not complete, show a helpful note (we shouldn't allow assignment yet).
+                                if (applicant.applicationStatus == Applicant.ApplicationStatus.APPROVED &&
+                                    applicant.paymentStatus == Applicant.PaymentStatus.PAID &&
+                                    !applicant.isComplete()
+                                ) {
+                                    // This is a rare state — show an explicit message
+                                    applicantForm.addFormItem(
+                                        Span("Application is paid but missing required details. Complete the profile before assignment."),
+                                        "Assignment Status"
+                                    )
+                                }
+                            }
                         }
                     }
-                }
-            }
+                } // end approved+paid block
+            } // end currentSession not-null
         }
 
+        // finally add the assembled content to the view
         add(header, H3("Guardian Information"), guardianForm, H3("Applicant Information"), applicantForm, actions)
     }
 

@@ -34,7 +34,7 @@ data class Student(
 
     // 🔹 The class student was first admitted into (only one)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admitted_class_id", nullable = false, unique = true)
+    @JoinColumn(name = "admitted_class_id", nullable = false)
     val admittedClass: SchoolClass,
 
     // 🔹 Date of admission

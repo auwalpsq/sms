@@ -1,11 +1,9 @@
 package com.sms.ui.admin.components
 
-import com.sms.entities.Applicant
 import com.sms.entities.SchoolClass
+import com.sms.enums.Section
 import com.sms.services.SchoolClassService
-import com.sms.services.StudentService
 import com.sms.ui.common.showError
-import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -23,8 +21,16 @@ class AssignClassDialog(
 
     private val ui: UI? = UI.getCurrent()
 
+    // 🔹 First combo: pick section (Nursery, Primary, Secondary…)
+    private val sectionSelect = ComboBox<Section>("Select Section").apply {
+        setItems(*Section.values())
+        setItemLabelGenerator { it.name }
+    }
+
+    // 🔹 Second combo: classes for that section
     private val classSelect = ComboBox<SchoolClass>("Select Class").apply {
         setItemLabelGenerator { it.name }
+        isEnabled = false
     }
 
     init {
@@ -39,7 +45,6 @@ class AssignClassDialog(
                 showError("Please select a class")
                 return@Button
             }
-
             onAssigned(selectedClass)
             close()
         }
@@ -53,16 +58,25 @@ class AssignClassDialog(
 
         add(
             VerticalLayout(
+                sectionSelect,
                 classSelect,
                 buttons
             )
         )
 
-
-        // Load available classes
-        launchUiCoroutine {
-            val classes = schoolClassService.findAll()
-            ui?.withUi { classSelect.setItems(classes) }
+        // 🔹 React to section change
+        sectionSelect.addValueChangeListener { event ->
+            val selectedSection = event.value
+            if (selectedSection != null) {
+                classSelect.isEnabled = true
+                launchUiCoroutine {
+                    val classes = schoolClassService.findBySection(selectedSection)
+                    ui?.withUi { classSelect.setItems(classes) }
+                }
+            } else {
+                classSelect.clear()
+                classSelect.isEnabled = false
+            }
         }
     }
 }
