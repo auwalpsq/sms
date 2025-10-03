@@ -132,13 +132,6 @@ class ApplicantReviewView(
                     }
                 )
             }
-
-            add(
-                Button("Assign Class").apply {
-                    isEnabled = applicant.isComplete()
-                    addClickListener { assignClass(applicant) }
-                }
-            )
         }
 
         launchUiCoroutine {
@@ -147,9 +140,28 @@ class ApplicantReviewView(
                 val sessionId = student.admittedSession.id
                 if (sessionId != null) {
                     val assignment = studentClassAssignmentService.findAssignment(student.id!!, sessionId)
-                    if (assignment != null) {
-                        ui?.withUi {
-                            add(
+
+                    ui?.withUi {
+                        if (assignment == null) {
+                            // ✅ Show Assign button only if no assignment exists
+                            if (applicant.isComplete()) {
+                                actions.add(
+                                    Button("Assign Class").apply {
+                                        addClickListener { assignClass(applicant) }
+                                    }
+                                )
+                            }
+                        } else {
+                            // ✅ Add assignment details to Applicant Information
+                            val session = assignment.academicSession
+                            val sessionLabel = "${session?.displaySession} - ${session?.term}"
+                            applicantForm.addFormItem(
+                                Span("${assignment.schoolClass?.name} ($sessionLabel)"),
+                                "Assigned Class"
+                            )
+
+                            // ✅ Add Drop button to actions section
+                            actions.add(
                                 Button("Drop Assignment").apply {
                                     addThemeVariants(ButtonVariant.LUMO_ERROR)
                                     isEnabled = !student.admissionAccepted
@@ -174,8 +186,7 @@ class ApplicantReviewView(
             }
         }
 
-
-        add(header, H3("Applicant Information"), applicantForm, H3("Guardian Information"), guardianForm, actions)
+        add(header, H3("Guardian Information"), guardianForm, H3("Applicant Information"), applicantForm, actions)
     }
 
     private fun approveApplicant(applicantId: Long) {
@@ -222,22 +233,21 @@ class ApplicantReviewView(
 
     private fun assignClass(applicant: Applicant) {
         val dialog = AssignClassDialog(
-            applicant = applicant,
-            schoolClassService = schoolClassService,   // inject via constructor in view
-            studentService = studentService,      // inject via constructor in view
-
-        ) {
-            // refresh applicant after assigning
-            launchUiCoroutine {
-                val updated = applicantService.findById(applicant.id)
-                ui?.withUi {
-                    if (updated != null) {
-                        this@ApplicantReviewView.applicant = updated
-                        renderApplicantPage(updated)
+            schoolClassService = schoolClassService,
+            onAssigned = { selectedClass ->
+                launchUiCoroutine {
+                    try {
+                        studentService.assignClass(applicant.id!!, selectedClass.id)
+                        ui?.withUi {
+                            showSuccess("Assigned ${applicant.getFullName()} to ${selectedClass.name}")
+                            loadApplicant(applicant.id!!) // refresh view
+                        }
+                    } catch (ex: Exception) {
+                        ui?.withUi { showError("Failed to assign: ${ex.message}") }
                     }
                 }
             }
-        }
+        )
         dialog.open()
     }
 }

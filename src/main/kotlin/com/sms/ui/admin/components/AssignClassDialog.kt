@@ -17,10 +17,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 
 class AssignClassDialog(
-    private val applicant: Applicant,
     private val schoolClassService: SchoolClassService,
-    private val studentService: StudentService,
-    private val onAssigned: () -> Unit = {}
+    private val onAssigned: (SchoolClass) -> Unit
 ) : Dialog() {
 
     private val ui: UI? = UI.getCurrent()
@@ -42,17 +40,8 @@ class AssignClassDialog(
                 return@Button
             }
 
-            launchUiCoroutine {
-                try {
-                    studentService.assignClass(applicant.id!!, selectedClass.id)
-                    ui?.withUi {
-                        showSuccess("Assigned ${applicant.getFullName()} to ${selectedClass.name}")
-                        close()
-                    }
-                } catch (ex: Exception) {
-                    ui?.withUi { showError("Failed to assign: ${ex.message}") }
-                }
-            }
+            onAssigned(selectedClass)
+            close()
         }
 
         val cancelButton = Button("Cancel") { close() }
