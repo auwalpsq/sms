@@ -47,6 +47,10 @@ class StudentClassAssignmentService(
             throw IllegalStateException("Cannot drop assignment. Guardian has already accepted admission.")
         }
 
+        // Delete the assignment
         mapper.deleteById(id)
+
+        // Also remove the student record
+        studentMapper.deleteById(student.id!!)
     }
 }
