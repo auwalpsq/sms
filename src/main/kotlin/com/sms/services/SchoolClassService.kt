@@ -61,4 +61,7 @@ class SchoolClassService(
     suspend fun findBySection(section: Section): List<String>? {
         return schoolClassMapper.findBySection(section)
     }
+    suspend fun findFullBySection(section: Section): List<SchoolClass> = withContext(Dispatchers.IO) {
+        schoolClassMapper.findFullBySection(section)
+    }
 }

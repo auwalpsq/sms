@@ -181,61 +181,62 @@ class ApplicantReviewView(
 
                     ui?.withUi {
                         if (assignment != null) {
-                            // show assigned class in form (standard place)
-                            val sessionLabel = "${assignment.academicSession?.displaySession} - ${assignment.academicSession?.term}"
+                            // 🔹 Build readable session label
+                            val sessionLabel =
+                                "${assignment.academicSession?.displaySession} - ${assignment.academicSession?.term}"
+
+                            // 🔹 Admission acceptance indicator (with color + icon)
+                            val accepted = student?.admissionAccepted ?: false
+                            val acceptanceLabel = Span().apply {
+                                text = if (accepted) "Accepted" else "Not Yet Accepted"
+                                element.style.set("color", if (accepted) "green" else "red")
+                                element.style.set("font-weight", "bold")
+                            }
+
+                            // 🔹 Show Admitted Class and Admission Acceptance in applicant info
                             applicantForm.addFormItem(
                                 Span("${assignment.schoolClass?.name} ($sessionLabel)"),
-                                "Assigned Class"
+                                "Admitted Class"
                             )
+                            applicantForm.addFormItem(acceptanceLabel, "Admission Acceptance")
 
-                            // drop button (only if guardian hasn't accepted)
+                            // 🔹 Drop button (only if guardian hasn't accepted)
                             actions.add(
-                                Button("Drop Assignment").apply {
+                                Button("Drop Admission").apply {
                                     addThemeVariants(ButtonVariant.LUMO_ERROR)
-                                    isEnabled = !(student?.admissionAccepted ?: false)
+                                    isEnabled = !accepted
                                     addClickListener {
                                         launchUiCoroutine {
                                             try {
                                                 studentClassAssignmentService.deleteAssignment(assignment.id!!)
                                                 ui?.get()?.withUi {
-                                                    showSuccess("Assignment dropped successfully")
+                                                    showSuccess("Admission dropped successfully")
                                                     loadApplicant(applicant.id!!)
                                                 }
                                             } catch (ex: Exception) {
-                                                ui?.get()?.withUi { showError(ex.message ?: "Failed to drop assignment") }
+                                                ui?.get()?.withUi { showError(ex.message ?: "Failed to drop admission") }
                                             }
                                         }
                                     }
                                 }
                             )
                         } else {
-                            // No assignment exists in current session.
-                            // Show Assign button only if applicant is complete (guardians required fields done).
-                            // We allow Assign even if student record is missing — studentService.assignClass will create it.
+                            // 🔹 No assignment yet for current session
                             if (applicant.isComplete()) {
                                 actions.add(
                                     Button("Assign Class").apply {
-                                        addClickListener {
-                                            // open dialog to pick class; the dialog will call back to this view
-                                            assignClass(applicant)
-                                        }
+                                        addClickListener { assignClass(applicant) }
                                     }
                                 )
                             } else {
-                                // If approved+paid but not complete, show a helpful note (we shouldn't allow assignment yet).
-                                if (applicant.applicationStatus == Applicant.ApplicationStatus.APPROVED &&
-                                    applicant.paymentStatus == Applicant.PaymentStatus.PAID &&
-                                    !applicant.isComplete()
-                                ) {
-                                    // This is a rare state — show an explicit message
-                                    applicantForm.addFormItem(
-                                        Span("Application is paid but missing required details. Complete the profile before assignment."),
-                                        "Assignment Status"
-                                    )
-                                }
+                                applicantForm.addFormItem(
+                                    Span("Application is paid but missing required details. Complete the profile before assignment."),
+                                    "Admission Status"
+                                )
                             }
                         }
                     }
+
                 } // end approved+paid block
             } // end currentSession not-null
         }

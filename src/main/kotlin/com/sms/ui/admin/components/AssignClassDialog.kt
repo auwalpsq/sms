@@ -21,13 +21,11 @@ class AssignClassDialog(
 
     private val ui: UI? = UI.getCurrent()
 
-    // 🔹 First combo: pick section (Nursery, Primary, Secondary…)
     private val sectionSelect = ComboBox<Section>("Select Section").apply {
         setItems(*Section.values())
         setItemLabelGenerator { it.name }
     }
 
-    // 🔹 Second combo: classes for that section
     private val classSelect = ComboBox<SchoolClass>("Select Class").apply {
         setItemLabelGenerator { it.name }
         isEnabled = false
@@ -61,17 +59,23 @@ class AssignClassDialog(
                 sectionSelect,
                 classSelect,
                 buttons
-            )
+            ).apply {
+                isSpacing = true
+                isPadding = true
+                alignItems = FlexComponent.Alignment.STRETCH
+            }
         )
 
-        // 🔹 React to section change
         sectionSelect.addValueChangeListener { event ->
             val selectedSection = event.value
             if (selectedSection != null) {
                 classSelect.isEnabled = true
                 launchUiCoroutine {
-                    val classes = schoolClassService.findBySection(selectedSection)
-                    ui?.withUi { classSelect.setItems(classes) }
+                    val classes = schoolClassService.findFullBySection(selectedSection)
+                    ui?.withUi {
+                        classSelect.setItems(classes)
+                        classSelect.clear()
+                    }
                 }
             } else {
                 classSelect.clear()

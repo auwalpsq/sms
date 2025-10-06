@@ -58,4 +58,8 @@
         SELECT name FROM school_classes WHERE section = #{section}
     </select>
 
+    <select id="findFullBySection" parameterType="com.sms.enums.Section" resultMap="SchoolClassResultMap">
+        SELECT * FROM school_classes WHERE section = #{section}
+    </select>
+
 </mapper>

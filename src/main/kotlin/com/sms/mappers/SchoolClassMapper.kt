@@ -26,4 +26,7 @@ interface SchoolClassMapper {
     ): Boolean
 
     fun findBySection(name: Section): List<String>
+
+    fun findFullBySection(section: Section): List<SchoolClass>
+
 }

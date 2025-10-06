@@ -1,6 +1,5 @@
 package com.sms.ui.guardian.views
 
-
 import com.sms.entities.Applicant
 import com.sms.entities.User
 import com.sms.entities.Applicant.PaymentStatus
@@ -13,6 +12,7 @@ import com.sms.services.PaymentTypeService
 import com.sms.services.PaymentVerificationService
 import com.sms.services.PaystackService
 import com.sms.services.SchoolClassService
+import com.sms.services.StudentService
 import com.sms.ui.common.ApplicationFormView
 import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
@@ -27,8 +27,9 @@ import com.vaadin.flow.component.ClientCallable
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
+import com.vaadin.flow.component.dependency.JavaScript
+import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.html.Anchor
-import com.vaadin.flow.component.html.AnchorTargetValue
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.html.Span
@@ -39,14 +40,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.tabs.Tab
 import com.vaadin.flow.component.tabs.Tabs
 import com.vaadin.flow.router.*
-import com.vaadin.flow.server.streams.DownloadHandler
-import com.vaadin.flow.server.streams.DownloadResponse
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.security.core.context.SecurityContextHolder
-import java.io.ByteArrayInputStream
 import java.nio.file.Path
 import java.util.UUID
 
+@JavaScript("https://js.paystack.co/v2/inline.js")
 @Route(value = "guardian/applicant/:id", layout = GuardianLayout::class)
 @PageTitle("Applicant Profile")
 @RolesAllowed("GUARDIAN")
@@ -54,6 +53,7 @@ class ApplicantProfileView(
     private val applicantService: ApplicantService,
     private val paymentService: PaymentService,
     private val schoolClassService: SchoolClassService,
+    private val studentService: StudentService,
     private val paymentTypeService: PaymentTypeService,
     private val paystackService: PaystackService,
     private val academicSessionService: AcademicSessionService,
@@ -67,7 +67,9 @@ class ApplicantProfileView(
     private val detailsTab = Tab("Details")
     private val paymentsTab = Tab("Payments")
     private val documentsTab = Tab("Documents")
-    private val tabs = Tabs(detailsTab, paymentsTab, documentsTab)
+    private val admissionTab = Tab("Admission")
+
+    private val tabs = Tabs(detailsTab, paymentsTab, admissionTab, documentsTab)
 
     private val content = VerticalLayout()
 
@@ -118,9 +120,8 @@ class ApplicantProfileView(
         tabs.removeAll()
         tabs.add(detailsTab)
 
-        // only after APPROVED
         if (applicant?.applicationStatus == Applicant.ApplicationStatus.APPROVED) {
-            tabs.add(paymentsTab, documentsTab)
+            tabs.add(paymentsTab, admissionTab, documentsTab)
         }
 
         tabs.addSelectedChangeListener { updateContent(tabs.selectedTab) }
@@ -133,18 +134,14 @@ class ApplicantProfileView(
         content.removeAll()
         when (selected) {
             detailsTab -> showDetails()
+            admissionTab -> showAdmission()
             paymentsTab -> showPayment()
             documentsTab -> showDocuments()
         }
+
     }
 
     private fun showDetails() {
-        val wrapper = VerticalLayout().apply {
-            isSpacing = true
-            isPadding = true
-            width = "100%"
-        }
-
         val photoField = PhotoUploadField(Path.of("Passport Photo")).apply {
             setPhotoUrl(applicant?.photoUrl)
             upload.isVisible = false
@@ -166,8 +163,8 @@ class ApplicantProfileView(
             )
         }
 
-        val formLayout = com.vaadin.flow.component.formlayout.FormLayout().apply {
-            setResponsiveSteps(com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep("0", 1))
+        val formLayout = FormLayout().apply {
+            setResponsiveSteps(FormLayout.ResponsiveStep("0", 1))
             addFormItem(Paragraph(applicant?.applicationNumber ?: "-"), "Application No")
             addFormItem(applicationStatusBadge, "Status")
             addFormItem(Paragraph(applicant?.getFullName() ?: "-"), "Full Name")
@@ -181,18 +178,20 @@ class ApplicantProfileView(
             addFormItem(Paragraph(applicant?.guardian?.email ?: "-"), "Guardian Email")
         }
 
+        val leftSide = VerticalLayout().apply {
+            isSpacing = true
+            isPadding = true
+            width = "100%"
+            add(photoField, formLayout)
+        }
+
         val dialog = ApplicationFormDialog(
             guardian = applicant!!.guardian!!,
             schoolClassService = schoolClassService,
-            onSave = { updated ->
-                applicantService.save(updated).also {
-                    reloadApplicant()  // refresh UI after saving
-                }
-            },
+            onSave = { updated -> applicantService.save(updated).also { reloadApplicant() } },
             onDelete = { applicantService.delete(it.id!!) },
             onChange = { reloadApplicant() }
         )
-        wrapper.add(photoField, formLayout)
 
         when (applicant!!.applicationStatus) {
             Applicant.ApplicationStatus.PENDING -> {
@@ -200,7 +199,7 @@ class ApplicantProfileView(
                     addThemeVariants(ButtonVariant.LUMO_PRIMARY)
                     addClickListener { dialog.open(applicant) }
                 }
-                wrapper.add(editButton)
+                leftSide.add(editButton)
             }
 
             Applicant.ApplicationStatus.APPROVED -> {
@@ -210,30 +209,46 @@ class ApplicantProfileView(
                             addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS)
                             addClickListener { dialog.open(applicant) }
                         }
-                        wrapper.add(completeButton)
+                        leftSide.add(completeButton)
                     } else {
-                        wrapper.add(Paragraph("✅ Application is complete.").apply {
-                            style.set("color", "var(--lumo-success-text-color)")
-                        })
+                        leftSide.add(
+                            Paragraph("✅ Application is complete.").apply {
+                                style.set("color", "var(--lumo-success-text-color)")
+                            }
+                        )
+                        val appFormLink = Anchor(
+                            RouteConfiguration.forApplicationScope().getUrl(
+                                ApplicationFormView::class.java,
+                                RouteParameters("applicantId", applicant!!.id.toString())
+                            ),
+                            ""
+                        ).apply {
+                            setTarget("_blank")
+                            element.appendChild(
+                                Button("View Application Form", VaadinIcon.FILE_TEXT.create()).apply {
+                                    addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+                                }.element
+                            )
+                        }
+                        leftSide.add(appFormLink)
                     }
                 } else {
-                    wrapper.add(Paragraph("⚠ Please complete your application payment before continuing.")
-                        .apply { style.set("color", "var(--lumo-error-text-color)") })
+                    leftSide.add(
+                        Paragraph("⚠ Please complete your application payment before continuing.")
+                            .apply { style.set("color", "var(--lumo-error-text-color)") }
+                    )
                 }
             }
 
-
             Applicant.ApplicationStatus.REJECTED -> {
-                wrapper.add(Paragraph("❌ Application has been rejected.").apply {
+                leftSide.add(Paragraph("❌ Application has been rejected.").apply {
                     style.set("color", "var(--lumo-error-text-color)")
                 })
             }
         }
 
-        content.add(wrapper)
+        content.add(leftSide)
     }
-
-
 
     private fun showPayment() {
         launchUiCoroutine {
@@ -426,7 +441,76 @@ class ApplicantProfileView(
         content.add(layout)
     }
 
+    private fun showAdmission() {
+        content.removeAll()
+        val app = applicant ?: return
 
+        val rightSide = VerticalLayout().apply {
+            add(H2("Admission Details"), Paragraph("Loading..."))
+        }
+
+        launchUiCoroutine {
+            try {
+                val student = studentService.findByApplicantId(app.id!!)
+                ui?.withUi {
+                    rightSide.removeAll()
+                    rightSide.add(H2("Admission Details"))
+
+                    if (student != null) {
+                        val studentInfo = FormLayout().apply {
+                            setResponsiveSteps(
+                                FormLayout.ResponsiveStep("0", 1)
+                            )
+                            addFormItem(Paragraph(student.admissionNumber), "Admission Number")
+                            addFormItem(Paragraph(student.admittedClass.name), "Assigned Class")
+                            addFormItem(Paragraph(student.admittedClass.section.name), "Section")
+                            addFormItem(Paragraph(student.admittedSession.displaySession), "Academic Session")
+                            addFormItem(Paragraph(student.admittedOn?.toString() ?: "-"), "Admitted On")
+                        }
+                        rightSide.add(studentInfo)
+
+                        if (student.admissionAccepted) {
+                            rightSide.add(
+                                Paragraph("✅ Admission Accepted on ${student.admissionAcceptedOn ?: "N/A"}").apply {
+                                    style.set("color", "var(--lumo-success-text-color)")
+                                }
+                            )
+                        } else {
+                            val acceptButton = Button("Accept Admission", VaadinIcon.CHECK.create()).apply {
+                                addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS)
+                                addClickListener {
+                                    launchUiCoroutine {
+                                        try {
+                                            studentService.acceptAdmission(student.id)
+                                            ui?.get()?.withUi {
+                                                showSuccess("✅ You have accepted the admission.")
+                                                reloadApplicant()
+                                            }
+                                        } catch (e: Exception) {
+                                            ui?.get()?.withUi {
+                                                showError("Failed to accept admission: ${e.message}")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            rightSide.add(acceptButton)
+                        }
+                    } else {
+                        rightSide.add(
+                            Paragraph("ℹ️ No class has been assigned yet. Please check back later.").apply {
+                                style.set("color", "var(--lumo-secondary-text-color)")
+                            }
+                        )
+                    }
+
+                    content.add(rightSide)
+                }
+            } catch (e: Exception) {
+                ui?.withUi { showError("Error loading admission details: ${e.message}") }
+            }
+        }
+    }
     private fun reloadApplicant() {
         launchUiCoroutine {
             applicant = applicantService.findById(applicant!!.id!!)
@@ -475,4 +559,5 @@ class ApplicantProfileView(
             reloadApplicant()
         }
     }
+
 }
