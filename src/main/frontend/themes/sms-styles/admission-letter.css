@@ -1,0 +1,59 @@
+.admission-letter {
+    padding: 40px;
+    color: #333;
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.admission-content {
+    margin-top: 20px;
+    line-height: 1.6;
+}
+
+.admission-content h1 {
+    font-size: 1.8em;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.admission-content h2 {
+    font-size: 1.2em;
+    text-align: center;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.admission-content p {
+    margin: 8px 0;
+}
+
+.admission-content strong {
+    color: #000;
+}
+
+.admission-content .details {
+    margin-top: 20px;
+    padding: 16px;
+    background-color: #fafafa;
+    border-radius: 6px;
+}
+
+.admission-content .details p {
+    margin: 6px 0;
+}
+
+.admission-content footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.85em;
+    color: #777;
+}
+
+.admission-letter .btn-bar {
+    margin-top: 20px;
+    text-align: center;
+}

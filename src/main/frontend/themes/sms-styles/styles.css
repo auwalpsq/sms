@@ -1,4 +1,5 @@
 @import url('./application-form.css');
+@import url('./admission-letter.css');
 
 /* global defaults */
 html, :host() {
