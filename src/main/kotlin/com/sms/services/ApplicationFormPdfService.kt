@@ -21,7 +21,7 @@ class ApplicationFormPdfService(
     }
 
 
-    fun renderHtml(templateName: String, model: Map<String, Any>): String {
+    fun renderHtml(templateName: String, model: Map<String, Any?>): String {
         val ctx = Context()
         ctx.setVariables(model)
 
@@ -35,7 +35,7 @@ class ApplicationFormPdfService(
         )
     }
 
-    fun renderPdf(templateName: String, model: Map<String, Any>): ByteArray{
+    fun renderPdf(templateName: String, model: Map<String, Any?>): ByteArray{
             val html = renderHtml(templateName, model)
 
             prince.setInputType(InputType.HTML)

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Admission Letter</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; color: #333; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .school-logo { width: 100px; height: auto; margin-bottom: 10px; }
+        .details { margin-top: 20px; }
+        .details p { margin: 4px 0; }
+        .signature { margin-top: 40px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <img th:if="${schoolLogo != null}" th:src="${schoolLogo}" class="school-logo" alt="School Logo" />
+    <h1>School Name</h1>
+    <p>Address Line 1, City, State, Nigeria</p>
+</div>
+
+<p th:text="'Date: ' + ${#dates.format(#dates.createNow(), 'dd MMMM yyyy')}"></p>
+
+<p>
+    <strong>Dear <span th:text="${guardian.getFullName()}">Guardian Name</span>,</strong>
+</p>
+
+<p>
+    We are delighted to inform you that
+    <strong th:text="${applicant.getFullName()}">Student Name</strong>
+    has been offered provisional admission into
+    <strong th:text="${schoolClass.name}">Class Name</strong>
+    for the
+    <strong th:text="${session.displaySession}">Academic Session</strong> session.
+</p>
+
+<div class="details">
+    <p><strong>Admission Number:</strong> <span th:text="${student.admissionNumber}">-</span></p>
+    <p><strong>Application Number:</strong> <span th:text="${applicant.applicationNumber}">-</span></p>
+    <p><strong>Admitted Class:</strong> <span th:text="${schoolClass.name}">-</span></p>
+    <p><strong>Section:</strong> <span th:text="${schoolClass.section != null ? schoolClass.section.name : '-'}">-</span></p>
+    <p><strong>Session:</strong> <span th:text="${session.displaySession}">-</span></p>
+    <p><strong>Date of Admission:</strong> <span th:text="${#temporals.format(student.admittedOn, 'dd MMM yyyy')}">-</span></p>
+</div>
+
+<p>
+    Kindly log in to your guardian portal to confirm acceptance of this offer. We look forward to welcoming
+    your ward to our school community.
+</p>
+
+<div class="signature">
+    <div>
+        <p>___________________________</p>
+        <p>Guardian’s Signature</p>
+    </div>
+    <div>
+        <p>___________________________</p>
+        <p>Admissions Officer</p>
+    </div>
+</div>
+
+<footer style="margin-top: 40px; text-align: center; font-size: 0.9em; color: #777;">
+    <p>School Name · Address · contact@school.edu.ng · +234 800 000 0000</p>
+</footer>
+</body>
+</html>

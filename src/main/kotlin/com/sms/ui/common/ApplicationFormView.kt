@@ -3,9 +3,6 @@ package com.sms.ui.common
 import com.sms.entities.Applicant
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.Div
-import com.vaadin.flow.component.html.H1
-import com.vaadin.flow.component.html.Image
-import com.vaadin.flow.component.html.Paragraph
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.*
 import com.sms.services.ApplicantService

@@ -13,6 +13,7 @@ import com.sms.services.PaymentVerificationService
 import com.sms.services.PaystackService
 import com.sms.services.SchoolClassService
 import com.sms.services.StudentService
+import com.sms.ui.common.AdmissionLetterView
 import com.sms.ui.common.ApplicationFormView
 import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
@@ -475,7 +476,25 @@ class ApplicantProfileView(
                                     style.set("color", "var(--lumo-success-text-color)")
                                 }
                             )
-                        } else {
+
+                            // Add link to admission letter
+                            val letterLink = Anchor(
+                                RouteConfiguration.forApplicationScope().getUrl(
+                                    AdmissionLetterView::class.java,
+                                    RouteParameters("studentId", student.id.toString())
+                                ),
+                                ""
+                            ).apply {
+                                setTarget("_blank")
+                                element.appendChild(
+                                    Button("View Admission Letter", VaadinIcon.FILE_TEXT.create()).apply {
+                                        addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+                                    }.element
+                                )
+                            }
+                            rightSide.add(letterLink)
+                        }
+                        else {
                             val acceptButton = Button("Accept Admission", VaadinIcon.CHECK.create()).apply {
                                 addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS)
                                 addClickListener {
