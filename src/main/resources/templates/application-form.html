@@ -8,13 +8,7 @@
 <body>
 <div class="application-form">
 
-    <!-- Letterhead -->
-    <div class="application-letterhead">
-        <img th:src="${schoolLogo}" alt="School Logo"/>
-        <h1>SCHOOL NAME PLACEHOLDER</h1>
-        <p>Address Line 1, City, State</p>
-        <p>Phone: +234 XXX XXX XXXX | Email: info@school.com</p>
-    </div>
+    <div th:replace="~{fragments/school-header :: schoolHeader}"></div>
 
     <!-- Personal Information -->
     <div class="application-section">

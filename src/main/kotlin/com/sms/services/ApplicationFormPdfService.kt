@@ -14,10 +14,18 @@ class ApplicationFormPdfService(
     private val templateEngine: TemplateEngine,
     private val prince: Prince
 ) {
-    private val css: String by lazy {
-        val cssStream = this::class.java.getResourceAsStream("/static/css/application-form.css")
-        cssStream?.readBytes()?.toString(StandardCharsets.UTF_8)
-            ?: throw IOException("Could not load application-form.css from /static/css")
+    private val cssFiles = listOf(
+        "/static/css/school-header.css",
+        "/static/css/application-form.css",
+        "/static/css/admission-letter.css"
+    )
+
+    private val combinedCss: String by lazy {
+        cssFiles.joinToString("\n") { path ->
+            val cssStream = this::class.java.getResourceAsStream(path)
+                ?: throw IOException("Could not load CSS file at $path")
+            cssStream.readBytes().toString(StandardCharsets.UTF_8)
+        }
     }
 
 
@@ -31,7 +39,7 @@ class ApplicationFormPdfService(
         // Inject CSS before </head>
         return html.replaceFirst(
             "</head>",
-            "<style>$css</style></head>"
+            "<style>$combinedCss</style></head>"
         )
     }
 

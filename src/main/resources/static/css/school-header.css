@@ -1,0 +1,22 @@
+.school-header {
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+.school-header .school-header-logo {
+    max-height: 80px;
+    margin-bottom: 0.5rem;
+}
+
+.school-header .school-header-title {
+    margin: 0;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+}
+
+.school-header .school-header-address,
+.school-header .school-header-contact {
+    margin: 0.2rem 0;
+    font-size: 0.95rem;
+}

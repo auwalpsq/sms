@@ -13,20 +13,24 @@ class SchoolHeader(
 ) : Div() {
 
     init {
-        addClassName("application-letterhead")
-        style["text-align"] = "center"
+        addClassName("school-header")
 
         val logo = Image(logoPath, "School Logo").apply {
-            addClassName("logo")
-            style["max-height"] = "80px"
-            style["margin-bottom"] = "0.5rem"
+            addClassName("school-header-logo")
         }
 
-        add(
-            logo,
-            H1(schoolName),
-            Paragraph(address),
-            Paragraph(contactInfo)
-        )
+        val title = H1(schoolName).apply {
+            addClassName("school-header-title")
+        }
+
+        val addressParagraph = Paragraph(address).apply {
+            addClassName("school-header-address")
+        }
+
+        val contactParagraph = Paragraph(contactInfo).apply {
+            addClassName("school-header-contact")
+        }
+
+        add(logo, title, addressParagraph, contactParagraph)
     }
 }

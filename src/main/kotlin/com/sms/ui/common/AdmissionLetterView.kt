@@ -6,13 +6,10 @@ import com.sms.services.StudentService
 import com.sms.ui.components.SchoolHeader
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
+import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.html.Anchor
-import com.vaadin.flow.component.html.Div
-import com.vaadin.flow.component.html.H1
-import com.vaadin.flow.component.html.H2
-import com.vaadin.flow.component.html.Paragraph
+import com.vaadin.flow.component.html.*
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -45,6 +42,9 @@ class AdmissionLetterView(
         val header = SchoolHeader()
         content.addClassName("admission-content")
 
+        val imageUrl = this::class.java.getResource("/static/images/placeholder.png")?.toExternalForm()
+            ?: throw IllegalStateException("Image not found in resources")
+
         // --- Buttons ---
         val printBtn = Button("Print", VaadinIcon.PRINT.create()).apply {
             addClickListener { ui?.get()?.page?.executeJs("window.print();") }
@@ -57,7 +57,8 @@ class AdmissionLetterView(
                     "applicant" to student!!.applicant,
                     "guardian" to student!!.applicant.guardian,
                     "schoolClass" to student!!.admittedClass,
-                    "session" to student!!.admittedSession
+                    "session" to student!!.admittedSession,
+                    "schoolLogo" to imageUrl
                 )
                 val pdfBytes = applicationFormPdfService.renderPdf("admission-letter", model)
                 DownloadResponse(
@@ -115,27 +116,56 @@ class AdmissionLetterView(
         val title = H1("Admission Letter")
         val sub = H2("Admission Offer for ${applicant.getFullName()}")
 
-        val intro = Paragraph(
-            "Dear ${guardian?.getFullName() ?: "Parent/Guardian"},\n\n" +
-                    "We are delighted to inform you that ${applicant.getFullName()} has been offered admission " +
-                    "into ${schoolClass.name} for the ${session.displaySession} academic session."
-        )
+        val intro = Paragraph().apply {
+            add(Text("Dear "))
+            add(spanUnderline(guardian?.getFullName() ?: "Parent/Guardian"))
+            add(Text(","))
+            add(
+                Text(
+                    "We are delighted to inform you that "
+                )
+            )
+            add(spanUnderline(applicant.getFullName()))
+            add(
+                Text(
+                    " has been offered admission into "
+                )
+            )
+            add(spanUnderline(schoolClass.name))
+            add(
+                Text(" for the ")
+            )
+            add(spanUnderline(session.displaySession))
+            add(Text(" academic session."))
+        }
 
         val details = Div().apply {
-            add(Paragraph("Admission Number: ${student.admissionNumber}"))
-            add(Paragraph("Application Number: ${applicant.applicationNumber ?: "-"}"))
-            add(Paragraph("Admitted Class: ${schoolClass.name}"))
-            add(Paragraph("Section: ${schoolClass.section?.name ?: "-"}"))
-            add(Paragraph("Session: ${session.displaySession}"))
-            add(Paragraph("Date of Admission: ${student.admittedOn ?: "-"}"))
+            addClassNames("details")
+            add(detailParagraph("Admission Number", student.admissionNumber))
+            add(detailParagraph("Application Number", applicant.applicationNumber ?: "-"))
+            add(detailParagraph("Admitted Class", schoolClass.name))
+            add(detailParagraph("Section", schoolClass.section?.name ?: "-"))
+            add(detailParagraph("Session", session.displaySession))
+            add(detailParagraph("Date of Admission", student.admittedOn?.toString() ?: "-"))
         }
 
         val closing = Paragraph(
             "Please confirm acceptance of this offer through your guardian portal. " +
-                    "If you have any questions, kindly contact the Admissions Office.\n\n" +
+                    "If you have any questions, kindly contact the Admissions Office. " +
                     "Congratulations once again on your successful admission."
         )
 
         content.add(title, sub, intro, details, closing)
     }
+
+    private fun spanUnderline(text: String): Span =
+        Span(text).apply {
+            addClassNames("underline", "typewriter")
+        }
+
+    private fun detailParagraph(label: String, value: String): Paragraph =
+        Paragraph().apply {
+            add(Text("$label: "))
+            add(spanUnderline(value))
+        }
 }
