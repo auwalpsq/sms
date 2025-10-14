@@ -3,9 +3,11 @@ package com.sms.ui.common
 import com.sms.entities.Student
 import com.sms.services.ApplicationFormPdfService
 import com.sms.services.StudentService
+import com.sms.ui.components.PhotoUploadField
 import com.sms.ui.components.SchoolHeader
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
+import com.vaadin.flow.component.Html
 import com.vaadin.flow.component.Text
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
@@ -19,6 +21,7 @@ import com.vaadin.flow.server.streams.DownloadHandler
 import com.vaadin.flow.server.streams.DownloadResponse
 import jakarta.annotation.security.RolesAllowed
 import java.io.ByteArrayInputStream
+import java.nio.file.Path
 
 @Route("guardian/admission-letter/:studentId")
 @RolesAllowed("GUARDIAN")
@@ -31,6 +34,7 @@ class AdmissionLetterView(
     private var student: Student? = null
     private val ui = UI.getCurrent()
     private val content = Div()
+    private val passportField = PhotoUploadField(Path.of("Passport Photo"))
 
     init {
         addClassName("admission-letter")
@@ -39,11 +43,7 @@ class AdmissionLetterView(
         isSpacing = true
         defaultHorizontalComponentAlignment = FlexComponent.Alignment.CENTER
 
-        val header = SchoolHeader()
         content.addClassName("admission-content")
-
-        val imageUrl = this::class.java.getResource("/static/images/placeholder.png")?.toExternalForm()
-            ?: throw IllegalStateException("Image not found in resources")
 
         // --- Buttons ---
         val printBtn = Button("Print", VaadinIcon.PRINT.create()).apply {
@@ -52,18 +52,20 @@ class AdmissionLetterView(
 
         val downloadBtn = Anchor(
             DownloadHandler.fromInputStream { _ ->
+                val s = student ?: return@fromInputStream null
                 val model = mapOf(
-                    "student" to student!!,
-                    "applicant" to student!!.applicant,
-                    "guardian" to student!!.applicant.guardian,
-                    "schoolClass" to student!!.admittedClass,
-                    "session" to student!!.admittedSession,
-                    "schoolLogo" to imageUrl
+                    "student" to s,
+                    "applicant" to s.applicant,
+                    "guardian" to s.applicant.guardian,
+                    "schoolClass" to s.admittedClass,
+                    "session" to s.admittedSession,
+                    "schoolLogo" to "/static/images/placeholder.png",
+                    "passportPhoto" to (s.applicant.photoUrl ?: "/static/images/placeholder.png")
                 )
                 val pdfBytes = applicationFormPdfService.renderPdf("admission-letter", model)
                 DownloadResponse(
                     ByteArrayInputStream(pdfBytes),
-                    "admission-letter-${student!!.admissionNumber}.pdf",
+                    "admission-letter-${s.admissionNumber}.pdf",
                     "application/pdf",
                     pdfBytes.size.toLong()
                 )
@@ -79,7 +81,7 @@ class AdmissionLetterView(
             isSpacing = true
         }
 
-        add(header, content, btnBar)
+        add(content, btnBar)
     }
 
     override fun beforeEnter(event: BeforeEnterEvent) {
@@ -113,6 +115,37 @@ class AdmissionLetterView(
         val schoolClass = student.admittedClass
         val session = student.admittedSession
 
+        // --- School header ---
+        val header = SchoolHeader()
+
+        // --- Passport photo setup (view-only) ---
+        passportField.apply {
+            setPhotoUrl(applicant.photoUrl ?: "/images/placeholder.png")
+            upload.isVisible = false
+            replaceButton.isVisible = false
+            imagePreview.isVisible = true
+            imagePreview.width = "80px"
+            imagePreview.height = "80px"
+            content.alignItems = FlexComponent.Alignment.END
+        }
+
+        // --- Layout: Header on top, passport below (right aligned) ---
+        val headerContainer = VerticalLayout().apply {
+            width = "100%"
+            isPadding = false
+            isSpacing = false
+            alignItems = FlexComponent.Alignment.CENTER
+            add(header)
+
+            val passportWrapper = HorizontalLayout(passportField).apply {
+                width = "100%"
+                justifyContentMode = FlexComponent.JustifyContentMode.END
+                style["margin-top"] = "8px"
+            }
+
+            add(passportWrapper)
+        }
+
         val title = H1("Admission Letter")
         val sub = H2("Admission Offer for ${applicant.getFullName()}")
 
@@ -120,21 +153,11 @@ class AdmissionLetterView(
             add(Text("Dear "))
             add(spanUnderline(guardian?.getFullName() ?: "Parent/Guardian"))
             add(Text(","))
-            add(
-                Text(
-                    "We are delighted to inform you that "
-                )
-            )
+            add(Text(" We are delighted to inform you that "))
             add(spanUnderline(applicant.getFullName()))
-            add(
-                Text(
-                    " has been offered admission into "
-                )
-            )
+            add(Text(" has been offered admission into "))
             add(spanUnderline(schoolClass.name))
-            add(
-                Text(" for the ")
-            )
+            add(Text(" for the "))
             add(spanUnderline(session.displaySession))
             add(Text(" academic session."))
         }
@@ -155,17 +178,19 @@ class AdmissionLetterView(
                     "Congratulations once again on your successful admission."
         )
 
-        content.add(title, sub, intro, details, closing)
+        content.add(headerContainer, title, sub, intro, details, closing)
     }
 
     private fun spanUnderline(text: String): Span =
         Span(text).apply {
-            addClassNames("underline", "typewriter")
+            addClassNames("underline")
+            style.set("border-bottom", "1px solid #000")
+            style.set("padding-bottom", "2px")
+            style.set("font-weight", "600")
         }
 
     private fun detailParagraph(label: String, value: String): Paragraph =
         Paragraph().apply {
-            add(Text("$label: "))
-            add(spanUnderline(value))
+            add(Html("<strong>$label:</strong> "), spanUnderline(value))
         }
 }

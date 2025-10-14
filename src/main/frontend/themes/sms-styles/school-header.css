@@ -1,18 +1,25 @@
 .school-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* centers all child elements horizontally */
+    justify-content: center;
     text-align: center;
     font-family: 'Arial', sans-serif;
     color: #333;
+    margin-bottom: 1rem;
 }
 
 .school-header .school-header-logo {
     max-height: 80px;
     margin-bottom: 0.5rem;
+    display: block;
 }
 
 .school-header .school-header-title {
     margin: 0;
     font-size: 1.8rem;
     text-transform: uppercase;
+    font-weight: bold;
 }
 
 .school-header .school-header-address,
