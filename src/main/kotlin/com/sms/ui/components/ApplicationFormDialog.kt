@@ -69,7 +69,7 @@ class ApplicationFormDialog(
         setItems(emptyList())
         //setItemLabelGenerator{it.toString()}
     }
-    private val photoUpload = PhotoUploadField(Paths.get("Passport Photo")).apply {
+    private val photoUpload = PhotoUploadField(Paths.get("src/main/resources/static/images/passports")).apply {
         isVisible = false
     }
     private val bloodGroup = ComboBox<String>("Blood Group").apply {

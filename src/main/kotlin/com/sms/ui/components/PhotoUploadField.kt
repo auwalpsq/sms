@@ -13,7 +13,7 @@ import java.util.*
 
 class PhotoUploadField(
     private val uploadDirectory: Path,
-    private val placeholderImage: String = "/images/placeholder.png"
+    private val placeholderImage: String = "/images/passports/placeholder.png"
 ) : Composite<VerticalLayout>() {
 
     var imagePreview = Image(placeholderImage, "Photo preview").apply {
@@ -43,14 +43,14 @@ class PhotoUploadField(
         val inMemoryHandler = UploadHandler.inMemory { metadata, data ->
             val filePath: Path
 
-            if (uploadedFileUrl != null && uploadedFileUrl!!.startsWith("/uploads/")) {
+            if (uploadedFileUrl != null) {
                 // Overwrite existing file
-                filePath = uploadDirectory.resolve(uploadedFileUrl!!.removePrefix("/uploads/"))
+                filePath = uploadDirectory.resolve(uploadedFileUrl)
             } else {
                 // New file
                 val fileName = UUID.randomUUID().toString() + "_" + metadata.fileName
                 filePath = uploadDirectory.resolve(fileName)
-                uploadedFileUrl = "/uploads/$fileName"
+                uploadedFileUrl = fileName
             }
 
             Files.createDirectories(uploadDirectory)
@@ -83,7 +83,7 @@ class PhotoUploadField(
             try {
                 // Resolve the actual file path
                 val filePath = uploadDirectory.resolve(
-                    uploadedFileUrl?.removePrefix("/uploads/") ?: ""
+                    uploadedFileUrl ?: ""
                 ).toFile()
 
                 if (filePath.exists()) {

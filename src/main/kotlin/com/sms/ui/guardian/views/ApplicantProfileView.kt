@@ -143,7 +143,7 @@ class ApplicantProfileView(
     }
 
     private fun showDetails() {
-        val photoField = PhotoUploadField(Path.of("Passport Photo")).apply {
+        val photoField = PhotoUploadField(Path.of("src/main/resources/static/images/passports")).apply {
             setPhotoUrl(applicant?.photoUrl)
             upload.isVisible = false
             replaceButton.isVisible = false

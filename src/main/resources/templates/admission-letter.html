@@ -12,9 +12,10 @@
     <!-- Reuse your school header fragment -->
     <div th:replace="~{fragments/school-header :: schoolHeader}"></div>
     <div class="passport-container">
-        <img th:src="${passportPhoto}" alt="Passport Photo" class="passport-photo" />
-    </div>
+        <img th:src="@{${passportPhoto}}" alt="Passport Photo"
+             style="width:80px; height:80px; object-fit:cover; border:1px solid #000;" />
 
+    </div>
 
     <div class="admission-content">
         <h1>Admission Letter</h1>

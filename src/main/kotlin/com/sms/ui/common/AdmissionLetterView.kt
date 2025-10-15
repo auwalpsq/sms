@@ -49,6 +49,8 @@ class AdmissionLetterView(
         val printBtn = Button("Print", VaadinIcon.PRINT.create()).apply {
             addClickListener { ui?.get()?.page?.executeJs("window.print();") }
         }
+        val imageUrl = this::class.java.getResource("/static/images/placeholder.png")?.toExternalForm()
+            ?: throw IllegalStateException("Image not found in resources")
 
         val downloadBtn = Anchor(
             DownloadHandler.fromInputStream { _ ->
@@ -59,8 +61,12 @@ class AdmissionLetterView(
                     "guardian" to s.applicant.guardian,
                     "schoolClass" to s.admittedClass,
                     "session" to s.admittedSession,
-                    "schoolLogo" to "/static/images/placeholder.png",
-                    "passportPhoto" to (s.applicant.photoUrl ?: "/static/images/placeholder.png")
+                    "schoolLogo" to imageUrl,
+                    "passportPhoto" to (s.applicant.photoUrl?.let {
+                        // Ensure it points to the correct physical folder for Thymeleaf
+                        "/Passport Photo/${Path.of(it.removePrefix("/uploads/")).fileName}"
+                    } ?: "/static/images/placeholder.png")
+
                 )
                 val pdfBytes = applicationFormPdfService.renderPdf("admission-letter", model)
                 DownloadResponse(

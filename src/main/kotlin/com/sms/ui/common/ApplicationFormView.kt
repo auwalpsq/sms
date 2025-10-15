@@ -46,7 +46,7 @@ class ApplicationFormView(
         // Section container
         content.addClassName("application-section")
 
-        val imageUrl = this::class.java.getResource("/static/images/placeholder.png")?.toExternalForm()
+        val imageUrl = this::class.java.getResource("images/passports/placeholder.png")?.toExternalForm()
             ?: throw IllegalStateException("Image not found in resources")
 
         // Print button
