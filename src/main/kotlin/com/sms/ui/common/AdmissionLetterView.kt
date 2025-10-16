@@ -34,7 +34,7 @@ class AdmissionLetterView(
     private var student: Student? = null
     private val ui = UI.getCurrent()
     private val content = Div()
-    private val passportField = PhotoUploadField(Path.of("Passport Photo"))
+    private val passportField = PhotoUploadField(Path.of("src/main/resources/static/images/passports"))
 
     init {
         addClassName("admission-letter")
@@ -49,11 +49,13 @@ class AdmissionLetterView(
         val printBtn = Button("Print", VaadinIcon.PRINT.create()).apply {
             addClickListener { ui?.get()?.page?.executeJs("window.print();") }
         }
-        val imageUrl = this::class.java.getResource("/static/images/placeholder.png")?.toExternalForm()
+        val imageUrl = this::class.java.getResource("/static/images/passports/placeholder.png")?.toExternalForm()
             ?: throw IllegalStateException("Image not found in resources")
 
         val downloadBtn = Anchor(
             DownloadHandler.fromInputStream { _ ->
+                val passport = this::class.java.getResource("/static/images/passports/${student?.applicant?.photoUrl}")?.toExternalForm()
+                    ?: throw IllegalStateException("Passport not found in resources")
                 val s = student ?: return@fromInputStream null
                 val model = mapOf(
                     "student" to s,
@@ -62,10 +64,7 @@ class AdmissionLetterView(
                     "schoolClass" to s.admittedClass,
                     "session" to s.admittedSession,
                     "schoolLogo" to imageUrl,
-                    "passportPhoto" to (s.applicant.photoUrl?.let {
-                        // Ensure it points to the correct physical folder for Thymeleaf
-                        "/Passport Photo/${Path.of(it.removePrefix("/uploads/")).fileName}"
-                    } ?: "/static/images/placeholder.png")
+                    "passport" to passport
 
                 )
                 val pdfBytes = applicationFormPdfService.renderPdf("admission-letter", model)

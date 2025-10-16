@@ -10,6 +10,12 @@
 
     <div th:replace="~{fragments/school-header :: schoolHeader}"></div>
 
+    <!-- Passport -->
+    <div class="passport-container">
+        <img th:src="${passport}" alt="Passport Photo"
+             style="width:80px; height:80px; object-fit:cover; border:1px solid #000;" />
+    </div>
+
     <!-- Personal Information -->
     <div class="application-section">
         <h2>Personal Information</h2>

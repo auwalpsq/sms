@@ -7,6 +7,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.*
 import com.sms.services.ApplicantService
 import com.sms.services.ApplicationFormPdfService
+import com.sms.ui.components.PhotoUploadField
 import com.sms.ui.components.SchoolHeader
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
@@ -20,6 +21,7 @@ import com.vaadin.flow.server.streams.DownloadHandler
 import com.vaadin.flow.server.streams.DownloadResponse
 import jakarta.annotation.security.RolesAllowed
 import java.io.ByteArrayInputStream
+import java.nio.file.Path
 
 @Route("guardian/application-form/:applicantId")
 @RolesAllowed("GUARDIAN")
@@ -33,6 +35,9 @@ class ApplicationFormView(
     private val content = Div()
     private val ui: UI? = UI.getCurrent()
 
+    private val passportField = PhotoUploadField(Path.of("src/main/resources/static/images/passports"))
+
+
     init {
         addClassName("application-form") // main wrapper
         setSizeFull()
@@ -42,11 +47,10 @@ class ApplicationFormView(
         justifyContentMode = FlexComponent.JustifyContentMode.START
 
         val header = SchoolHeader()
-
         // Section container
         content.addClassName("application-section")
 
-        val imageUrl = this::class.java.getResource("images/passports/placeholder.png")?.toExternalForm()
+        val imageUrl = this::class.java.getResource("/static/images/passports/placeholder.png")?.toExternalForm()
             ?: throw IllegalStateException("Image not found in resources")
 
         // Print button
@@ -58,10 +62,13 @@ class ApplicationFormView(
 // Download button (PrinceXML PDF)
         val princeDownloadBtn = Anchor(
             DownloadHandler.fromInputStream { _ ->
+                val passportUrl = this::class.java.getResource("/static/images/passports/${applicant?.photoUrl}")
+                    ?.toExternalForm() ?: imageUrl
                 val model = mapOf(
                     "applicant" to applicant!!,
                     "guardian" to applicant!!.guardian!!,
-                    "schoolLogo" to imageUrl
+                    "schoolLogo" to imageUrl,
+                    "passport" to passportUrl
                 )
                 val pdfBytes = applicationFormPdfService.renderPdf("application-form", model)
 
@@ -105,6 +112,23 @@ class ApplicationFormView(
     private fun showApplicantDetails(applicant: Applicant) {
         content.removeAll()
 
+        // --- Passport Photo Section ---
+        passportField.apply {
+            setPhotoUrl(applicant.photoUrl ?: "/images/passports/placeholder.png")
+            content.alignItems = FlexComponent.Alignment.END
+            upload.isVisible = false
+            replaceButton.isVisible = false
+            imagePreview.isVisible = true
+            imagePreview.width = "80px"
+            imagePreview.height = "80px"
+        }
+
+        val passportWrapper = HorizontalLayout(passportField).apply {
+            width = "100%"
+            justifyContentMode = FlexComponent.JustifyContentMode.END
+        }
+
+        content.add(passportWrapper)
         // Personal info section
         val personalSection = Div().apply {
             addClassName("application-section")

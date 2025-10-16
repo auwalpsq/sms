@@ -9,7 +9,7 @@ class SchoolHeader(
     private val schoolName: String = "SCHOOL NAME PLACEHOLDER",
     private val address: String = "Address Line 1, City, State",
     private val contactInfo: String = "Phone: +234 XXX XXX XXXX | Email: info@school.com",
-    private val logoPath: String = "images/passports/placeholder.png"
+    private val logoPath: String = "/images/passports/placeholder.png"
 ) : Div() {
 
     init {
