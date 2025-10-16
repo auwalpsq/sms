@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mappers.StaffMapper">
+
+    <resultMap id="StaffResultMap" type="com.sms.entities.Staff">
+        <id column="id" property="id"/>
+        <result column="staff_id" property="staffId"/>
+        <result column="staff_type" property="staffType"/>
+        <result column="qualification" property="qualification"/>
+        <result column="employment_date" property="employmentDate"/>
+    </resultMap>
+
+    <insert id="save" parameterType="com.sms.entities.Staff" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO staff (staff_id, staff_type, qualification, employment_date)
+        VALUES (#{staffId}, #{staffType}, #{qualification}, #{employmentDate})
+    </insert>
+
+</mapper>

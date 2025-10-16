@@ -7,6 +7,7 @@ import java.time.*
 @Table(name = "staff")
 @DiscriminatorValue("STAFF")
 data class Staff(
+
     @Column(unique = true)
     val staffId: String = "",
 
@@ -16,14 +17,13 @@ data class Staff(
     @Enumerated(EnumType.STRING)
     val qualification: Qualification = Qualification.BACHELORS,
 
+    val specialization: String? = null, // e.g. "Mathematics", "English", "ICT"
+
     val employmentDate: LocalDate = LocalDate.now(),
 
-    @ElementCollection
-    @CollectionTable(name = "staff_subjects", joinColumns = [JoinColumn(name = "staff_id")])
-    val subjects: Set<String> = emptySet(),
+    val yearsOfExperience: Int? = null, // optional extra for HR reporting
 
 ) : ContactPerson() {
-    //constructor() : this(staffId = "")
 
     fun getYearsOfService(): Int = Period.between(employmentDate, LocalDate.now()).years
 }

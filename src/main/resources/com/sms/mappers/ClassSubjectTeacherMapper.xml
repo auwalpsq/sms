@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mappers.ClassSubjectTeacherMapper">
+
+    <resultMap id="ClassSubjectTeacherResultMap" type="com.sms.entities.ClassSubjectTeacher">
+        <id column="id" property="id"/>
+        <result column="assigned_date" property="assignedDate"/>
+        <result column="end_date" property="endDate"/>
+
+        <association property="schoolClass" column="class_id" javaType="com.sms.entities.SchoolClass"/>
+        <association property="subject" column="subject_id" javaType="com.sms.entities.Subject"/>
+        <association property="teacher" column="teacher_id" javaType="com.sms.entities.Staff"/>
+        <association property="academicSession" column="academic_session_id" javaType="com.sms.entities.AcademicSession"/>
+    </resultMap>
+
+    <insert id="save" parameterType="com.sms.entities.ClassSubjectTeacher" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO class_subject_teacher
+        (class_id, subject_id, teacher_id, academic_session_id, assigned_date, end_date)
+        VALUES
+        (#{schoolClass.id}, #{subject.id}, #{teacher.id}, #{academicSession.id}, #{assignedDate}, #{endDate})
+    </insert>
+
+</mapper>
