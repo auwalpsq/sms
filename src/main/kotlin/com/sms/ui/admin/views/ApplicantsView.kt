@@ -1,8 +1,10 @@
 package com.sms.ui.admin.views
 
+import com.sms.broadcast.UiBroadcaster
 import com.sms.entities.Applicant
 import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
+import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -44,6 +46,37 @@ class ApplicantsView(
         add(statusFilter, grid)
         refresh(null)
         //loadPendingApplicants()
+
+        // Define how to handle incoming events
+        val listener: (String, Map<String, Any>) -> Unit = { type, data ->
+            ui?.access {
+                when (type) {
+                    "APPLICATION_UPDATED" -> {
+                        val applicantId = data["applicantId"] as? Long
+                        val status = data["status"] as? String
+                        Notification.show("Application #$applicantId updated to $status")
+                        refresh(null)
+                    }
+
+                    "NEW_APPLICATION" -> {
+                        val appNumber = data["appNumber"] as? String
+                        val status = data["status"] as? String
+                        showSuccess("A new application has been submitted!\nApplication Number $appNumber\nStatus $status")
+                        refresh(null)
+                    }
+
+                    else -> {
+                        Notification.show("Received event: $type")
+                    }
+                }
+            }
+        }
+
+        // Register listener
+        UiBroadcaster.register(listener)
+
+        // Unregister when view is detached
+        ui?.addDetachListener { UiBroadcaster.unregister(listener) }
     }
 
     private fun configureGrid() {

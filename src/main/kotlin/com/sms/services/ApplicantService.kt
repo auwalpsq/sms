@@ -1,10 +1,12 @@
 package com.sms.services
 
 import com.sms.entities.Applicant
+import com.sms.events.UiNotificationEvent
 import com.sms.mappers.ApplicantMapper
 import com.sms.util.ApplicationNumberGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -12,7 +14,8 @@ import java.time.LocalDate
 @Service
 @Transactional
 class ApplicantService(
-    private val applicantMapper: ApplicantMapper
+    private val applicantMapper: ApplicantMapper,
+    private val eventPublisher: ApplicationEventPublisher
 ) {
 
     @Transactional
@@ -27,6 +30,14 @@ class ApplicantService(
 
             applicantMapper.insertIntoPerson(applicant)
             applicantMapper.insertIntoApplicant(applicant)
+
+            eventPublisher.publishEvent(
+                UiNotificationEvent(
+                    this,
+                    "NEW_APPLICATION",
+                    mapOf("appNumber" to applicant.applicationNumber, "status" to applicant.applicationStatus)
+                )
+            )
         } else {
             // Existing applicant: just update
             applicantMapper.update(applicant)
