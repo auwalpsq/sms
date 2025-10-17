@@ -1,44 +1,44 @@
 package com.sms.broadcast
 
-import com.vaadin.flow.component.UI
 import java.util.concurrent.CopyOnWriteArraySet
 
 object UiBroadcaster {
 
     private val listeners = CopyOnWriteArraySet<(String, Map<String, Any>) -> Unit>()
-    private val userListeners = mutableMapOf<String, MutableSet<(String, Map<String, Any>) -> Unit>>()
+    private val userListeners = mutableMapOf<String, CopyOnWriteArraySet<(String, Map<String, Any>) -> Unit>>()
 
-    /** 🔹 Register a general listener (for all users) */
     fun register(listener: (String, Map<String, Any>) -> Unit) {
         listeners.add(listener)
     }
 
-    /** 🔹 Unregister a listener */
     fun unregister(listener: (String, Map<String, Any>) -> Unit) {
         listeners.remove(listener)
     }
 
-    /** 🔹 Register a listener for a specific user (like guardian) */
     fun registerForUser(username: String, listener: (String, Map<String, Any>) -> Unit) {
-        userListeners.computeIfAbsent(username) { mutableSetOf() }.add(listener)
+        val normalized = username.trim().lowercase()
+        userListeners.computeIfAbsent(normalized) { CopyOnWriteArraySet() }.add(listener)
+        println("✅ Registered listener for user: $normalized (Total: ${userListeners[normalized]?.size})")
     }
 
-    /** 🔹 Unregister user listener */
     fun unregisterForUser(username: String, listener: (String, Map<String, Any>) -> Unit) {
-        userListeners[username]?.remove(listener)
+        val normalized = username.trim().lowercase()
+        userListeners[normalized]?.remove(listener)
+        println("🧹 Unregistered listener for user: $normalized")
     }
 
-    /** 🔹 Broadcast a message to all connected UIs */
     fun broadcast(eventType: String, data: Map<String, Any>) {
-        for (listener in listeners) {
-            listener(eventType, data)
-        }
+        listeners.forEach { it(eventType, data) }
     }
 
-    /** 🔹 Broadcast a message only to a specific user (e.g. guardian) */
     fun broadcastToUser(username: String, eventType: String, data: Map<String, Any>) {
-        userListeners[username]?.forEach { listener ->
-            listener(eventType, data)
+        val normalized = username.trim().lowercase()
+        val listenersForUser = userListeners[normalized]
+        if (listenersForUser.isNullOrEmpty()) {
+            println("⚠️ No listeners registered for user: $normalized")
+        } else {
+            println("📢 Broadcasting '$eventType' to ${listenersForUser.size} listener(s) for $normalized")
+            listenersForUser.forEach { it(eventType, data) }
         }
     }
 }
