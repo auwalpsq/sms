@@ -1,11 +1,13 @@
 package com.sms.ui.guardian.views
 
+import com.sms.broadcast.UiBroadcaster
 import com.sms.entities.Applicant
 import com.sms.entities.Guardian
 import com.sms.entities.User
 import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
 import com.sms.services.SchoolClassService
+import com.sms.ui.common.showInteractiveNotification
 import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.guardian.GuardianLayout
 import com.sms.util.launchUiCoroutine
@@ -17,6 +19,7 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.notification.NotificationVariant
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -36,6 +39,7 @@ class GuardianApplicationView(
     private val schoolClassService: SchoolClassService
 ) : VerticalLayout() {
     val user = SecurityContextHolder.getContext().authentication.principal as User
+    private val username = user.username
     private val grid = Grid(Applicant::class.java, false)
     private var formDialog: ApplicationFormDialog? = null
     private var currentGuardian: Guardian? = null
@@ -57,6 +61,34 @@ class GuardianApplicationView(
         }
 
         configureGrid()
+
+        val listener: (String, Map<String, Any>) -> Unit = { type, data ->
+            ui?.access {
+                when (type) {
+                    "APPLICATION_APPROVED" -> {
+                        val applicantName = data["applicantName"] as? String ?: "Unknown"
+                        showInteractiveNotification(
+                            title = "Application Approved",
+                            message = "Congratulations! $applicantName has been approved.",
+                            variant = NotificationVariant.LUMO_SUCCESS
+                        )
+                    }
+
+                    "APPLICATION_REJECTED" -> {
+                        val applicantName = data["applicantName"] as? String ?: "Unknown"
+                        showInteractiveNotification(
+                            title = "Application Rejected",
+                            message = "Unfortunately, $applicantName’s application was rejected.",
+                            variant = NotificationVariant.LUMO_ERROR
+                        )
+                    }
+                }
+            }
+        }
+
+        UiBroadcaster.registerForUser(username, listener)
+        ui?.addDetachListener { UiBroadcaster.unregisterForUser(username, listener) }
+
     }
 
     private fun createFormDialog() {

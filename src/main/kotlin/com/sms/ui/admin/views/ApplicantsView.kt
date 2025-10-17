@@ -4,6 +4,7 @@ import com.sms.broadcast.UiBroadcaster
 import com.sms.entities.Applicant
 import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
+import com.sms.ui.common.showInteractiveNotification
 import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
@@ -19,6 +20,7 @@ import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.H3
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.notification.Notification
+import com.vaadin.flow.component.notification.NotificationVariant
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -47,26 +49,17 @@ class ApplicantsView(
         refresh(null)
         //loadPendingApplicants()
 
-        // Define how to handle incoming events
         val listener: (String, Map<String, Any>) -> Unit = { type, data ->
             ui?.access {
                 when (type) {
-                    "APPLICATION_UPDATED" -> {
-                        val applicantId = data["applicantId"] as? Long
-                        val status = data["status"] as? String
-                        Notification.show("Application #$applicantId updated to $status")
-                        refresh(null)
-                    }
-
                     "NEW_APPLICATION" -> {
-                        val appNumber = data["appNumber"] as? String
-                        val status = data["status"] as? String
-                        showSuccess("A new application has been submitted!\nApplication Number $appNumber\nStatus $status")
-                        refresh(null)
-                    }
-
-                    else -> {
-                        Notification.show("Received event: $type")
+                        val appNumber = data["appNumber"] as? String ?: "Unknown"
+                        val status = data["status"] as? String ?: "Pending"
+                        showInteractiveNotification(
+                            title = "New Application Submitted",
+                            message = "Application No: $appNumber\nStatus: $status",
+                            variant = NotificationVariant.LUMO_SUCCESS
+                        )
                     }
                 }
             }
@@ -213,8 +206,15 @@ class ApplicantsView(
 
     private fun approveApplicant(applicant: Applicant, dialog: Dialog) {
         launchUiCoroutine {
-            applicant.applicationStatus = Applicant.ApplicationStatus.APPROVED
-            applicantService.update(applicant)
+            applicantService.approveApplicant(applicant.id)
+            val guardianUsername = applicant.guardian?.email ?: return@launchUiCoroutine
+
+            UiBroadcaster.broadcastToUser(
+                guardianUsername,
+                "APPLICATION_APPROVED",
+                mapOf("applicantName" to applicant.getFullName())
+            )
+
             ui?.withUi {
                 Notification.show("Applicant approved")
                 dialog.close()
@@ -225,8 +225,15 @@ class ApplicantsView(
 
     private fun rejectApplicant(applicant: Applicant, dialog: Dialog) {
         launchUiCoroutine {
-            applicant.applicationStatus = Applicant.ApplicationStatus.REJECTED
-            applicantService.update(applicant)
+            applicantService.rejectApplicant(applicant.id)
+
+            val guardianUsername = applicant.guardian?.email ?: return@launchUiCoroutine
+            UiBroadcaster.broadcastToUser(
+                guardianUsername,
+                "APPLICATION_REJECTED",
+                mapOf("applicantName" to applicant.getFullName())
+            )
+
             ui?.withUi {
                 Notification.show("Applicant rejected")
                 dialog.close()

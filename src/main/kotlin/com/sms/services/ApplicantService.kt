@@ -1,5 +1,6 @@
 package com.sms.services
 
+import com.sms.broadcast.UiBroadcaster
 import com.sms.entities.Applicant
 import com.sms.events.UiNotificationEvent
 import com.sms.mappers.ApplicantMapper
@@ -14,8 +15,7 @@ import java.time.LocalDate
 @Service
 @Transactional
 class ApplicantService(
-    private val applicantMapper: ApplicantMapper,
-    private val eventPublisher: ApplicationEventPublisher
+    private val applicantMapper: ApplicantMapper
 ) {
 
     @Transactional
@@ -31,13 +31,14 @@ class ApplicantService(
             applicantMapper.insertIntoPerson(applicant)
             applicantMapper.insertIntoApplicant(applicant)
 
-            eventPublisher.publishEvent(
-                UiNotificationEvent(
-                    this,
-                    "NEW_APPLICATION",
-                    mapOf("appNumber" to applicant.applicationNumber, "status" to applicant.applicationStatus)
+            UiBroadcaster.broadcast(
+                "NEW_APPLICATION",
+                mapOf(
+                    "appNumber" to applicant.applicationNumber,
+                    "status" to applicant.applicationStatus.name
                 )
             )
+
         } else {
             // Existing applicant: just update
             applicantMapper.update(applicant)
