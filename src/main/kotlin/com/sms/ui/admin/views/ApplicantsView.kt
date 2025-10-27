@@ -208,7 +208,7 @@ class ApplicantsView(
         launchUiCoroutine {
             applicantService.approveApplicant(applicant.id)
             val guardianUsername = applicant.guardian?.email ?: return@launchUiCoroutine
-
+            println(guardianUsername)
             UiBroadcaster.broadcastToUser(
                 guardianUsername,
                 "APPLICATION_APPROVED",
@@ -228,6 +228,7 @@ class ApplicantsView(
             applicantService.rejectApplicant(applicant.id)
 
             val guardianUsername = applicant.guardian?.email ?: return@launchUiCoroutine
+            println(guardianUsername)
             UiBroadcaster.broadcastToUser(
                 guardianUsername,
                 "APPLICATION_REJECTED",

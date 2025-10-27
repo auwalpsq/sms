@@ -72,6 +72,7 @@ class GuardianApplicationView(
                             message = "Congratulations! $applicantName has been approved.",
                             variant = NotificationVariant.LUMO_SUCCESS
                         )
+                        refreshGrid()
                     }
 
                     "APPLICATION_REJECTED" -> {
@@ -81,6 +82,16 @@ class GuardianApplicationView(
                             message = "Unfortunately, $applicantName’s application was rejected.",
                             variant = NotificationVariant.LUMO_ERROR
                         )
+                        refreshGrid()
+                    }
+                    "APPLICATION_RESET" -> {
+                        val applicantName = data["applicantName"] as? String ?: "Unknown"
+                        showInteractiveNotification(
+                            title = "Application Rejected",
+                            message = "Unfortunately, $applicantName’s application was rejected.",
+                            variant = NotificationVariant.LUMO_ERROR
+                        )
+                        refreshGrid()
                     }
                 }
             }

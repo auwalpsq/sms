@@ -2,12 +2,10 @@ package com.sms.services
 
 import com.sms.broadcast.UiBroadcaster
 import com.sms.entities.Applicant
-import com.sms.events.UiNotificationEvent
 import com.sms.mappers.ApplicantMapper
 import com.sms.util.ApplicationNumberGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate

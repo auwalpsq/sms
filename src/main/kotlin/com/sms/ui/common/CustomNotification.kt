@@ -1,5 +1,7 @@
 package com.sms.ui.common
 
+import com.sms.util.launchUiCoroutine
+import com.sms.util.withUi
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.html.H3
@@ -42,6 +44,7 @@ fun showError(message: String) {
  * A richer, reusable notification that appears for long-running or real-time events.
  * Example use case: "New Application Submitted", "Application Approved", etc.
  */
+
 fun showInteractiveNotification(
     title: String,
     message: String,
@@ -49,33 +52,37 @@ fun showInteractiveNotification(
     durationMs: Long = 30_000L
 ) {
     val ui = UI.getCurrent()
-    ui?.access {
-        val notification = Notification()
-        notification.addThemeVariants(variant)
-        notification.position = Notification.Position.TOP_CENTER
-        notification.isOpened = true
+    launchUiCoroutine {
+        if (ui == null) return@launchUiCoroutine
 
-        val titleText = H3(title)
-        val messageText = Span(message)
+        ui?.withUi {
+            val notification = Notification()
+            notification.addThemeVariants(variant)
+            notification.position = Notification.Position.TOP_CENTER
+            notification.isOpened = true
 
-        val okButton = Button("OK") {
-            notification.close()
-        }
+            val titleText = H3(title)
+            val messageText = Span(message)
 
-        val content = VerticalLayout(titleText, messageText, HorizontalLayout(okButton)).apply {
-            isSpacing = true
-            isPadding = false
-        }
+            val okButton = Button("OK") {
+                notification.close()
+            }
 
-        notification.add(content)
-        notification.open()
+            val content = VerticalLayout(titleText, messageText, HorizontalLayout(okButton)).apply {
+                isSpacing = true
+                isPadding = false
+            }
 
-        // Automatically close after duration unless manually closed
-        CoroutineScope(Dispatchers.Default).launch {
-            delay(durationMs)
-            ui.access {
-                if (notification.isOpened) {
-                    notification.close()
+            notification.add(content)
+            notification.open()
+
+            // 🕒 Automatically close after delay
+            launchUiCoroutine {
+                delay(durationMs)
+                ui?.withUi {
+                    if (notification.isOpened) {
+                        notification.close()
+                    }
                 }
             }
         }

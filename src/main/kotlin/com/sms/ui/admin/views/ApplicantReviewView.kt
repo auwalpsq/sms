@@ -1,5 +1,6 @@
 package com.sms.ui.admin.views
 
+import com.sms.broadcast.UiBroadcaster
 import com.sms.entities.Applicant
 import com.sms.services.AcademicSessionService
 import com.sms.services.ApplicantService
@@ -249,6 +250,13 @@ class ApplicantReviewView(
         launchUiCoroutine {
             applicantService.approveApplicant(applicantId)
             val updated = applicantService.findById(applicantId)
+            val guardianUsername = applicant?.guardian?.email ?: return@launchUiCoroutine
+
+            UiBroadcaster.broadcastToUser(
+                guardianUsername,
+                "APPLICATION_APPROVED",
+                mapOf("applicantName" to applicant!!.getFullName())
+            )
             ui?.withUi {
                 if (updated != null) {
                     applicant = updated
@@ -263,6 +271,13 @@ class ApplicantReviewView(
         launchUiCoroutine {
             applicantService.rejectApplicant(applicantId)
             val updated = applicantService.findById(applicantId)
+            val guardianUsername = applicant?.guardian?.email ?: return@launchUiCoroutine
+
+            UiBroadcaster.broadcastToUser(
+                guardianUsername,
+                "APPLICATION_REJECTED",
+                mapOf("applicantName" to applicant!!.getFullName())
+            )
             ui?.withUi {
                 if (updated != null) {
                     applicant = updated
@@ -277,6 +292,13 @@ class ApplicantReviewView(
         launchUiCoroutine {
             applicantService.resetApplicantToPending(applicant.id)
             val updated = applicantService.findById(applicant.id)
+
+            val guardianUsername = applicant?.guardian?.email ?: return@launchUiCoroutine
+            UiBroadcaster.broadcastToUser(
+                guardianUsername,
+                "APPLICATION_RESET",
+                mapOf("applicantName" to applicant!!.getFullName())
+            )
             ui?.withUi {
                 if (updated != null) {
                     this@ApplicantReviewView.applicant = updated
