@@ -18,13 +18,11 @@ object UiBroadcaster {
     fun registerForUser(username: String, listener: (String, Map<String, Any>) -> Unit) {
         val normalized = username.trim().lowercase()
         userListeners.computeIfAbsent(normalized) { CopyOnWriteArraySet() }.add(listener)
-        println("✅ Registered listener for user: $normalized (Total: ${userListeners[normalized]?.size})")
     }
 
     fun unregisterForUser(username: String, listener: (String, Map<String, Any>) -> Unit) {
         val normalized = username.trim().lowercase()
         userListeners[normalized]?.remove(listener)
-        println("🧹 Unregistered listener for user: $normalized")
     }
 
     fun broadcast(eventType: String, data: Map<String, Any>) {

@@ -26,6 +26,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.router.Menu
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
+import com.vaadin.flow.server.VaadinSession
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.security.core.context.SecurityContextHolder
 
@@ -62,43 +63,55 @@ class GuardianApplicationView(
 
         configureGrid()
 
-        val listener: (String, Map<String, Any>) -> Unit = { type, data ->
-            ui?.access {
-                when (type) {
-                    "APPLICATION_APPROVED" -> {
-                        val applicantName = data["applicantName"] as? String ?: "Unknown"
-                        showInteractiveNotification(
-                            title = "Application Approved",
-                            message = "Congratulations! $applicantName has been approved.",
-                            variant = NotificationVariant.LUMO_SUCCESS
-                        )
-                        refreshGrid()
-                    }
+        val session = VaadinSession.getCurrent()
+        val listenerKey = "guardianListener_$username"
 
-                    "APPLICATION_REJECTED" -> {
-                        val applicantName = data["applicantName"] as? String ?: "Unknown"
-                        showInteractiveNotification(
-                            title = "Application Rejected",
-                            message = "Unfortunately, $applicantName’s application was rejected.",
-                            variant = NotificationVariant.LUMO_ERROR
-                        )
-                        refreshGrid()
-                    }
-                    "APPLICATION_RESET" -> {
-                        val applicantName = data["applicantName"] as? String ?: "Unknown"
-                        showInteractiveNotification(
-                            title = "Application Rejected",
-                            message = "Unfortunately, $applicantName’s application was rejected.",
-                            variant = NotificationVariant.LUMO_ERROR
-                        )
-                        refreshGrid()
+        if(session.getAttribute(listenerKey) == null){
+            val listener: (String, Map<String, Any>) -> Unit = { type, data ->
+                ui?.access {
+                    when (type) {
+                        "APPLICATION_APPROVED" -> {
+                            val applicantName = data["applicantName"] as? String ?: "Unknown"
+                            showInteractiveNotification(
+                                title = "Application Approved",
+                                message = "Congratulations! $applicantName has been approved.",
+                                variant = NotificationVariant.LUMO_SUCCESS
+                            )
+                            refreshGrid()
+                        }
+
+                        "APPLICATION_REJECTED" -> {
+                            val applicantName = data["applicantName"] as? String ?: "Unknown"
+                            showInteractiveNotification(
+                                title = "Application Rejected",
+                                message = "Unfortunately, $applicantName’s application was rejected.",
+                                variant = NotificationVariant.LUMO_ERROR
+                            )
+                            refreshGrid()
+                        }
+                        "APPLICATION_RESET" -> {
+                            val applicantName = data["applicantName"] as? String ?: "Unknown"
+                            showInteractiveNotification(
+                                title = "Application Reset",
+                                message = "Unfortunately, $applicantName’s application was reset to pending.",
+                                variant = NotificationVariant.LUMO_WARNING
+                            )
+                            refreshGrid()
+                        }
                     }
                 }
             }
+
+            UiBroadcaster.registerForUser(username, listener)
+            session.setAttribute(listenerKey, listener)
+
+            // Optional cleanup when session closes
+            ui?.addDetachListener {
+                UiBroadcaster.unregisterForUser(username, listener)
+                session.setAttribute(listenerKey, null)
+            }
         }
 
-        UiBroadcaster.registerForUser(username, listener)
-        ui?.addDetachListener { UiBroadcaster.unregisterForUser(username, listener) }
 
     }
 
