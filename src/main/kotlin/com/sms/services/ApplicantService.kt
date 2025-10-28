@@ -85,11 +85,38 @@ class ApplicantService(
     @Transactional
     suspend fun approveApplicant(id: Long) = withContext(Dispatchers.IO) {
         applicantMapper.approveApplicant(id)
+        val applicant = applicantMapper.findById(id)
+        val guardianUsername = applicant?.guardian!!.email
+
+        UiBroadcaster.broadcastToUser(
+            guardianUsername,
+            "APPLICATION_APPROVED",
+            mapOf("applicantName" to applicant!!.getFullName())
+        )
+        UiBroadcaster.broadcastToUser(
+            guardianUsername,
+            "APPLICATION_UPDATE",
+            mapOf("applicantName" to applicant!!.getFullName())
+        )
     }
 
     @Transactional
     suspend fun rejectApplicant(id: Long) = withContext(Dispatchers.IO) {
         applicantMapper.rejectApplicant(id)
+        val applicant = applicantMapper.findById(id)
+
+        val guardianUsername = applicant?.guardian!!.email
+
+        UiBroadcaster.broadcastToUser(
+            guardianUsername,
+            "APPLICATION_REJECTED",
+            mapOf("applicantName" to applicant!!.getFullName())
+        )
+        UiBroadcaster.broadcastToUser(
+            guardianUsername,
+            "APPLICATION_UPDATE",
+            mapOf("applicantName" to applicant!!.getFullName())
+        )
     }
     @Transactional
     suspend fun resetApplicantToPending(applicantId: Long) = withContext(Dispatchers.IO) {
@@ -101,5 +128,18 @@ class ApplicantService(
         }
 
         applicantMapper.resetApplicantToPending(applicantId)
+        val guardianUsername = applicant?.guardian!!.email
+
+        UiBroadcaster.broadcastToUser(
+            guardianUsername,
+            "APPLICATION_RESET",
+            mapOf("applicantName" to applicant!!.getFullName())
+        )
+
+        UiBroadcaster.broadcastToUser(
+            guardianUsername,
+            "APPLICATION_UPDATE",
+            mapOf("applicantName" to applicant!!.getFullName())
+        )
     }
 }

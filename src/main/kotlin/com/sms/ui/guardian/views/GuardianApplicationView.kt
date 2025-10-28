@@ -63,56 +63,7 @@ class GuardianApplicationView(
 
         configureGrid()
 
-        val session = VaadinSession.getCurrent()
-        val listenerKey = "guardianListener_$username"
-
-        if(session.getAttribute(listenerKey) == null){
-            val listener: (String, Map<String, Any>) -> Unit = { type, data ->
-                ui?.access {
-                    when (type) {
-                        "APPLICATION_APPROVED" -> {
-                            val applicantName = data["applicantName"] as? String ?: "Unknown"
-                            showInteractiveNotification(
-                                title = "Application Approved",
-                                message = "Congratulations! $applicantName has been approved.",
-                                variant = NotificationVariant.LUMO_SUCCESS
-                            )
-                            refreshGrid()
-                        }
-
-                        "APPLICATION_REJECTED" -> {
-                            val applicantName = data["applicantName"] as? String ?: "Unknown"
-                            showInteractiveNotification(
-                                title = "Application Rejected",
-                                message = "Unfortunately, $applicantName’s application was rejected.",
-                                variant = NotificationVariant.LUMO_ERROR
-                            )
-                            refreshGrid()
-                        }
-                        "APPLICATION_RESET" -> {
-                            val applicantName = data["applicantName"] as? String ?: "Unknown"
-                            showInteractiveNotification(
-                                title = "Application Reset",
-                                message = "Unfortunately, $applicantName’s application was reset to pending.",
-                                variant = NotificationVariant.LUMO_WARNING
-                            )
-                            refreshGrid()
-                        }
-                    }
-                }
-            }
-
-            UiBroadcaster.registerForUser(username, listener)
-            session.setAttribute(listenerKey, listener)
-
-            // Optional cleanup when session closes
-            ui?.addDetachListener {
-                UiBroadcaster.unregisterForUser(username, listener)
-                session.setAttribute(listenerKey, null)
-            }
-        }
-
-
+        registerUpdateListener()
     }
 
     private fun createFormDialog() {
@@ -198,5 +149,25 @@ class GuardianApplicationView(
             ui?.access { grid.setItems(emptyList()) }
         }
     }
+    // ✅ Only listen for APPLICATION_UPDATE
+    private fun registerUpdateListener() {
+        val session = VaadinSession.getCurrent()
+        val listenerKey = "guardianApplicationUpdate_$username"
 
+        if (session.getAttribute(listenerKey) == null) {
+            val listener: (String, Map<String, Any>) -> Unit = { type, _ ->
+                if (type == "APPLICATION_UPDATE") {
+                    ui?.access { refreshGrid() }
+                }
+            }
+
+            UiBroadcaster.registerForUser(username, listener)
+            session.setAttribute(listenerKey, listener)
+
+            ui?.addDetachListener {
+                UiBroadcaster.unregisterForUser(username, listener)
+                session.setAttribute(listenerKey, null)
+            }
+        }
+    }
 }

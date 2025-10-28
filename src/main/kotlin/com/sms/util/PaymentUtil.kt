@@ -1,5 +1,6 @@
 package com.sms.util
 
+import com.sms.broadcast.UiBroadcaster
 import com.sms.entities.Applicant
 import com.sms.services.PaymentVerificationService
 import com.sms.services.PaystackService
@@ -63,6 +64,14 @@ object PaymentUiUtil {
             val ok = paystackService.verify(reference)
             if (ok) {
                 paymentVerificationService.verifyAndUpdateApplicant(reference)
+                UiBroadcaster.broadcast(
+                    "PAYMENT_SUCCESS",
+                    mapOf(
+                        "reference" to reference,
+                        "message" to "A new payment has been successfully verified.",
+                        "timestamp" to System.currentTimeMillis()
+                    )
+                )
             }
             ok
         } catch (e: Exception) {
