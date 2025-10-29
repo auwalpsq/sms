@@ -64,14 +64,6 @@ object PaymentUiUtil {
             val ok = paystackService.verify(reference)
             if (ok) {
                 paymentVerificationService.verifyAndUpdateApplicant(reference)
-                UiBroadcaster.broadcast(
-                    "PAYMENT_SUCCESS",
-                    mapOf(
-                        "reference" to reference,
-                        "message" to "A new payment has been successfully verified.",
-                        "timestamp" to System.currentTimeMillis()
-                    )
-                )
             }
             ok
         } catch (e: Exception) {

@@ -1,8 +1,10 @@
 package com.sms.ui.admin.views
 
+import com.sms.broadcast.UiBroadcaster
 import com.sms.entities.Payment
 import com.sms.enums.PaymentStatus
 import com.sms.services.PaymentService
+import com.sms.ui.common.showInteractiveNotification
 import com.sms.util.FormatUtil
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
@@ -12,6 +14,7 @@ import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.icon.VaadinIcon
+import com.vaadin.flow.component.notification.NotificationVariant
 import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
@@ -42,6 +45,8 @@ class PaymentsView(
         configureToolbar()
 
         loadPayments()
+
+        registerPaymentBroadcastListener()
     }
 
     private fun configureFilters() {
@@ -97,6 +102,30 @@ class PaymentsView(
                 statusFilter.value?.let { paymentService.findByStatus(it) }
                     ?: paymentService.findAll()
             ui?.withUi { grid.setItems(payments) }
+        }
+    }
+    // 👇 Listen for payment events
+    private fun registerPaymentBroadcastListener() {
+        val session = ui?.session
+        val key = "paymentSuccessListener"
+
+        // Prevent duplicate registration
+        if (session?.getAttribute(key) != null) return
+
+        val listener: (String, Map<String, Any>) -> Unit = { eventType, data ->
+            if (eventType == "PAYMENT_SUCCESS") {
+                ui?.access {
+                    loadPayments()
+                }
+            }
+        }
+
+        UiBroadcaster.register(listener)
+        session?.setAttribute(key, listener)
+
+        ui?.addDetachListener {
+            UiBroadcaster.unregister(listener)
+            session?.setAttribute(key, null)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.sms.services
 
+import com.sms.broadcast.UiBroadcaster
 import com.sms.entities.Applicant
 import com.sms.entities.Payment
 import com.sms.enums.PaymentStatus
@@ -22,6 +23,14 @@ class PaymentVerificationService(
         if (payment.status != PaymentStatus.SUCCESS) {
             payment.status = PaymentStatus.SUCCESS
             paymentService.updateStatus(reference, payment.status) // ✅ persist payment update
+            UiBroadcaster.broadcast(
+                "PAYMENT_SUCCESS",
+                mapOf(
+                    "reference" to reference,
+                    "message" to "A new payment from ${payment.applicant?.getFullName()} has been successfully verified.",
+                    "timestamp" to System.currentTimeMillis()
+                )
+            )
         }
 
         // Update applicant if linked

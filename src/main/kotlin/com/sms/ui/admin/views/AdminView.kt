@@ -152,11 +152,9 @@ class AdminView(
                     }
 
                     "PAYMENT_SUCCESS" -> {
-                        val applicantName = data["applicantName"] as? String ?: "Unknown Applicant"
-                        val status = data["status"] as? String ?: "PAID"
                         showInteractiveNotification(
                             title = "Payment Notification",
-                            message = "$applicantName’s payment was marked as $status.",
+                            message = "${data["message"]} with reference ${data["reference"]} at ${data["timestamp"]}",
                             variant = NotificationVariant.LUMO_SUCCESS
                         )
                     }
