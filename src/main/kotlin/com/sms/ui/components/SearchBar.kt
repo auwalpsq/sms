@@ -8,6 +8,8 @@ import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.textfield.TextField
+import com.vaadin.flow.component.KeyDownEvent
+import com.vaadin.flow.component.ComponentEventListener
 
 /**
  * A reusable search bar component for views like ApplicantsView, GuardiansView, etc.
@@ -21,7 +23,7 @@ class SearchBar(
         placeholder = placeholderText
         width = "300px"
         // ✅ Explicitly specify listener type
-        addKeyDownListener(Key.ENTER, {
+        addKeyDownListener(Key.ENTER, ComponentEventListener<KeyDownEvent> {
             onSearch(value.trim())
         })
     }

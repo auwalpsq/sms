@@ -110,6 +110,17 @@
         WHERE a.application_status = #{status}
     </select>
 
+    <select id="searchApplicants" resultMap="applicantResultMap">
+        SELECT * FROM applicant
+        WHERE
+        (LOWER(first_name) LIKE LOWER(#{query})
+        OR LOWER(last_name) LIKE LOWER(#{query})
+        OR LOWER(application_number) LIKE LOWER(#{query}))
+        <if test="status != null">
+            AND application_status = #{status}
+        </if>
+    </select>
+
     <!-- Find all applicants -->
     <select id="findAll" resultMap="applicantResultMap">
         SELECT a.*,
@@ -178,15 +189,5 @@
         WHERE id = #{id};
     </update>
 
-    <select id="searchApplicants" resultMap="ApplicantResultMap">
-        SELECT * FROM applicant
-        WHERE
-        (LOWER(first_name) LIKE LOWER(#{query})
-        OR LOWER(last_name) LIKE LOWER(#{query})
-        OR LOWER(application_number) LIKE LOWER(#{query}))
-        <if test="status != null">
-            AND application_status = #{status}
-        </if>
-    </select>
 
 </mapper>

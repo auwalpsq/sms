@@ -16,7 +16,6 @@ import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.textfield.TextField
 import com.vaadin.flow.data.validator.StringLengthValidator
-import kotlinx.coroutines.runBlocking
 import java.nio.file.Paths
 import java.time.LocalDate
 

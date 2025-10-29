@@ -58,7 +58,6 @@ class ApplicantsView(
         }
 
         add(statusFilter, searchBar, grid)
-        refresh(null)
 
         refresh(null)
         //loadPendingApplicants()
