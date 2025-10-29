@@ -142,4 +142,9 @@ class ApplicantService(
             mapOf("applicantName" to applicant!!.getFullName())
         )
     }
+
+    suspend fun searchApplicants(query: String, status: Applicant.ApplicationStatus?): List<Applicant> {
+        return applicantMapper.searchApplicants("%$query%", status)
+    }
+
 }

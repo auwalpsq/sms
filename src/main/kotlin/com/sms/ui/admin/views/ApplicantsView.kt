@@ -5,6 +5,7 @@ import com.sms.entities.Applicant
 import com.sms.entities.User
 import com.sms.services.ApplicantService
 import com.sms.ui.common.showInteractiveNotification
+import com.sms.ui.components.SearchBar
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -42,8 +43,23 @@ class ApplicantsView(
 
     init {
         add(H2("Applicants"))
+        setSizeFull()
         configureGrid()
-        add(statusFilter, grid)
+        // Create a search bar that filters by applicant name or application number
+        val searchBar = SearchBar("Search applicants...") { query ->
+            launchUiCoroutine {
+                val applicants = if (query.isBlank()) {
+                    applicantService.findByOptionalStatus(statusFilter.value)
+                } else {
+                    applicantService.searchApplicants(query, statusFilter.value)
+                }
+                ui?.withUi { grid.setItems(applicants) }
+            }
+        }
+
+        add(statusFilter, searchBar, grid)
+        refresh(null)
+
         refresh(null)
         //loadPendingApplicants()
 
@@ -115,6 +131,7 @@ class ApplicantsView(
             }
         }
 
+        grid.isAllRowsVisible = true
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
     }
 
