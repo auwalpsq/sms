@@ -111,14 +111,20 @@
     </select>
 
     <select id="searchApplicants" resultMap="applicantResultMap">
-        SELECT * FROM applicant
-        WHERE
-        (LOWER(first_name) LIKE LOWER(#{query})
-        OR LOWER(last_name) LIKE LOWER(#{query})
-        OR LOWER(application_number) LIKE LOWER(#{query}))
+        SELECT a.*,
+        p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth,
+        p.created_at, p.updated_at
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        WHERE (
+        LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        OR LOWER(a.application_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        )
         <if test="status != null">
-            AND application_status = #{status}
+            AND a.application_status = #{status}
         </if>
+        ORDER BY p.created_at DESC
     </select>
 
     <!-- Find all applicants -->
@@ -189,5 +195,37 @@
         WHERE id = #{id};
     </update>
 
+    <!-- Paginated applicants (joined with persons) -->
+    <select id="findPage" resultMap="applicantResultMap">
+        SELECT a.*,
+        p.first_name,
+        p.middle_name,
+        p.last_name,
+        p.gender,
+        p.date_of_birth,
+        p.created_at,
+        p.updated_at
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        ORDER BY p.created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- Paginated applicants by status -->
+    <select id="findPageByStatus" resultMap="applicantResultMap">
+        SELECT a.*,
+        p.first_name,
+        p.middle_name,
+        p.last_name,
+        p.gender,
+        p.date_of_birth,
+        p.created_at,
+        p.updated_at
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        WHERE a.application_status = #{status}
+        ORDER BY p.created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
 
 </mapper>

@@ -60,4 +60,35 @@ class GuardianService(
     suspend fun findByEmail(email: String): Guardian? = withContext(Dispatchers.IO) {
         guardianMapper.findByEmail(email)
     }
+    /**
+     * Returns a page of guardians. `page` is 1-based (page = 1 => first page).
+     */
+    suspend fun findPage(page: Int, pageSize: Int): List<Guardian> = withContext(Dispatchers.IO) {
+        val safePage = if (page < 1) 1 else page
+        val offset = (safePage - 1) * pageSize
+        guardianMapper.findPage(offset, pageSize)
+    }
+
+    /**
+     * Search with paging. `page` is 1-based.
+     */
+    suspend fun findPageBySearch(query: String, page: Int, pageSize: Int): List<Guardian> = withContext(Dispatchers.IO) {
+        val safePage = if (page < 1) 1 else page
+        val offset = (safePage - 1) * pageSize
+        guardianMapper.findPageBySearch(query, offset, pageSize)
+    }
+
+    /**
+     * Simple search without paging (optional).
+     */
+    suspend fun search(query: String): List<Guardian> = withContext(Dispatchers.IO) {
+        guardianMapper.search(query)
+    }
+
+    /**
+     * Optional count for total pages if you want to show page numbers.
+     */
+    suspend fun countAll(): Int = withContext(Dispatchers.IO) {
+        guardianMapper.countAll()
+    }
 }

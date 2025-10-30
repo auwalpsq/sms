@@ -25,8 +25,8 @@ class ManageApplicationsView(
         val guardianView = GuardiansView(guardianService, applicantService)
         val applicants = ApplicantsView(applicantService)
 
-        tabSheet.add("Guardians", guardianView)
         tabSheet.add("Applicants", applicants)
+        tabSheet.add("Guardians", guardianView)
         tabSheet.setSizeFull()
         add(tabSheet)
     }

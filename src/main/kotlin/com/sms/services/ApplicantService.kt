@@ -146,5 +146,18 @@ class ApplicantService(
     suspend fun searchApplicants(query: String, status: Applicant.ApplicationStatus?): List<Applicant> {
         return applicantMapper.searchApplicants("%$query%", status)
     }
+    suspend fun findPageByStatus(
+        status: Applicant.ApplicationStatus?,
+        page: Int,
+        size: Int
+    ): List<Applicant> {
+        val safePage = if(page < 1) 1 else page
+        val offset = (safePage - 1) * size
+        return if (status == null) {
+            applicantMapper.findPage(offset, size)
+        } else {
+            applicantMapper.findPageByStatus(status, offset, size)
+        }
+    }
 
 }

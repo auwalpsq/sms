@@ -7,8 +7,11 @@ import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
+import com.vaadin.flow.component.icon.Icon
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.Menu
@@ -44,6 +47,8 @@ class ManageAcademicSessionsView(
         }
 
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
+        grid.columns.forEach { column -> column.isAutoWidth = true }
+        grid.isAllRowsVisible = true
     }
 
     private fun configureDialog() {
@@ -59,8 +64,9 @@ class ManageAcademicSessionsView(
     }
 
     private fun buildToolbar(): HorizontalLayout {
-        val addBtn = Button("Add Academic Session") {
-            formDialog.open(null)
+        val addBtn = Button("Add Academic Session", Icon(VaadinIcon.PLUS)).apply {
+            addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+            addClickListener {  formDialog.open(null)}
         }
         return HorizontalLayout(addBtn)
     }
@@ -70,6 +76,7 @@ class ManageAcademicSessionsView(
             val sessions = sessionService.findAll()
             ui?.withUi {
                 grid.setItems(sessions ?: emptyList())
+                grid.recalculateColumnWidths()
             }
         }
     }

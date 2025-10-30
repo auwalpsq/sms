@@ -15,4 +15,23 @@ interface GuardianMapper {
     fun findAll(): List<Guardian>
     fun existsByEmail(@Param("email") email: String): Boolean
     fun findByEmail(email: String): Guardian?
+
+    // Paged list
+    fun findPage(
+        @Param("offset") offset: Int,
+        @Param("size") size: Int
+    ): List<Guardian>
+
+    // Paged search
+    fun findPageBySearch(
+        @Param("query") query: String,
+        @Param("offset") offset: Int,
+        @Param("size") size: Int
+    ): List<Guardian>
+
+    // Non-paged search (optional)
+    fun search(@Param("query") query: String): List<Guardian>
+
+    // Optional count helper
+    fun countAll(): Int
 }

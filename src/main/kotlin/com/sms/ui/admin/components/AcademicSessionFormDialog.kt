@@ -36,8 +36,12 @@ class AcademicSessionFormDialog(
     }
 
     override fun configureBinder() {
-        binder.forField(yearField).bind(AcademicSession::startYear, AcademicSession::startYear::set)
-        binder.forField(termField).bind(AcademicSession::term, AcademicSession::term::set)
+        binder.forField(yearField)
+            .asRequired("Year is required")
+            .bind(AcademicSession::startYear, AcademicSession::startYear::set)
+        binder.forField(termField)
+            .asRequired("Term is required")
+            .bind(AcademicSession::term, AcademicSession::term::set)
         binder.forField(currentCheckbox).bind(AcademicSession::isCurrent, AcademicSession::isCurrent::set)
     }
 

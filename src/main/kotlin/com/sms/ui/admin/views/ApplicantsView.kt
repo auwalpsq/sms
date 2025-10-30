@@ -5,6 +5,7 @@ import com.sms.entities.Applicant
 import com.sms.entities.User
 import com.sms.services.ApplicantService
 import com.sms.ui.common.showInteractiveNotification
+import com.sms.ui.components.PaginationBar
 import com.sms.ui.components.SearchBar
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
@@ -14,9 +15,10 @@ import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.combobox.ComboBox
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
-import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.notification.NotificationVariant
+import com.vaadin.flow.component.orderedlayout.FlexComponent
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.ComponentRenderer
 import com.vaadin.flow.server.VaadinSession
@@ -25,42 +27,59 @@ import org.springframework.security.core.context.SecurityContextHolder
 class ApplicantsView(
     private val applicantService: ApplicantService
 ) : VerticalLayout() {
-
     val user = SecurityContextHolder.getContext().authentication.principal as User
     private val username = user.username
 
     private val ui: UI? = UI.getCurrent()
     private val grid = Grid(Applicant::class.java, false)
-    private val statusFilter = ComboBox<Applicant.ApplicationStatus>().apply {
-        setItems(Applicant.ApplicationStatus.values().toList())
-        isClearButtonVisible = true
-        placeholder = "All"
-        addValueChangeListener { event ->
-            val selected = event.value
-            refresh(selected)
-        }
-    }
+    private val statusFilter = ComboBox<Applicant.ApplicationStatus>()
+    private lateinit var paginationBar: PaginationBar
 
     init {
-        add(H2("Applicants"))
         setSizeFull()
         configureGrid()
+
+        statusFilter.apply {
+            setItems(Applicant.ApplicationStatus.values().toList())
+            isClearButtonVisible = true
+            placeholder = "All"
+        }
+
+        paginationBar = PaginationBar(pageSize = 10) { page ->
+            refresh(statusFilter.value, page)
+        }
+
+        statusFilter.addValueChangeListener { event ->
+            refresh(event.value, paginationBar.getCurrentPage())
+        }
+
         // Create a search bar that filters by applicant name or application number
         val searchBar = SearchBar("Search applicants...") { query ->
             launchUiCoroutine {
                 val applicants = if (query.isBlank()) {
-                    applicantService.findByOptionalStatus(statusFilter.value)
+                    applicantService.findPageByStatus(statusFilter.value, paginationBar.getCurrentPage(), 10)
                 } else {
                     applicantService.searchApplicants(query, statusFilter.value)
                 }
-                ui?.withUi { grid.setItems(applicants) }
+                ui?.withUi {
+                    paginationBar.update(applicants.size)
+                    grid.setItems(applicants)
+                }
             }
         }
 
-        add(statusFilter, searchBar, grid)
+        // Create a horizontal layout for the filter and search bar
+        val filterBar = HorizontalLayout(statusFilter, searchBar).apply {
+            defaultVerticalComponentAlignment = FlexComponent.Alignment.END
+            width = "100%"
+            isSpacing = true
+            setPadding(false)
+            setMargin(false)
+        }
 
-        refresh(null)
-        //loadPendingApplicants()
+        // Add everything to the main layout
+        add(filterBar, grid, paginationBar)
+        paginationBar.reset()
 
         val session = VaadinSession.getCurrent()
         val listenerKey = "adminListener_$username"
@@ -97,7 +116,7 @@ class ApplicantsView(
     private fun configureGrid() {
         grid.addColumn { it.applicationNumber }.setHeader("Application No.")
             .setAutoWidth(true).setFlexGrow(0)
-        grid.addColumn { it.getFullName() ?: "N/A" }.setHeader("Applicant Name")
+        grid.addColumn { it.getFullName() ?: "N/A" }.setHeader("Applicant Name").setAutoWidth(true)
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
                 Span(applicant.applicationStatus.name).apply {
@@ -108,7 +127,7 @@ class ApplicantsView(
                     })
                 }
             }
-        ).setHeader("Status")
+        ).setHeader("Status").setAutoWidth(true)
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
                 Span(applicant.paymentStatus.name).apply {
@@ -119,7 +138,7 @@ class ApplicantsView(
                     })
                 }
             }
-        ).setHeader("Payment")
+        ).setHeader("Payment").setAutoWidth(true)
 
         grid.addComponentColumn { applicant ->
             Button("Open").apply {
@@ -128,7 +147,7 @@ class ApplicantsView(
                     ui?.get()?.navigate("admin/applicant/${applicant.id}")
                 }
             }
-        }
+        }.setHeader("Action").setAutoWidth(true)
 
         grid.isAllRowsVisible = true
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
@@ -141,13 +160,16 @@ class ApplicantsView(
             ui?.withUi { grid.setItems(applicants) }
         }
     }
-    private fun refresh(status: Applicant.ApplicationStatus?) {
+    private fun refresh(status: Applicant.ApplicationStatus?, page: Int) {
         launchUiCoroutine {
-            val applicants = applicantService.findByOptionalStatus(status)
+            val applicants = applicantService.findPageByStatus(status, page, 10)
             ui?.withUi {
+                paginationBar.update(applicants.size)
                 grid.setItems(applicants)
+                grid.recalculateColumnWidths()
             }
         }
     }
+
 
 }

@@ -14,6 +14,7 @@ import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.ButtonVariant
+import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.icon.Icon
 import com.vaadin.flow.component.icon.VaadinIcon
 
@@ -43,7 +44,6 @@ class PaymentsTypeView(
     }
 
     private fun configureGrid() {
-        grid.setSizeFull()
         grid.addColumn(PaymentType::category).setHeader("Description").isAutoWidth = true
         grid.addColumn { FormatUtil.formatCurrency(it.amount) }
             .setHeader("Amount")
@@ -54,6 +54,9 @@ class PaymentsTypeView(
         grid.asSingleSelect().addValueChangeListener {
             it.value?.let { dialog.open(it) }
         }
+
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
+        grid.isAllRowsVisible = true
     }
 
     private fun configureFormDialog() {
@@ -71,7 +74,10 @@ class PaymentsTypeView(
     private fun refreshGrid() {
         launchUiCoroutine {
             val paymentTypes = paymentTypeService.findAll()
-            ui?.withUi { grid.setItems(paymentTypes) }
+            ui?.withUi {
+                grid.setItems(paymentTypes)
+                grid.recalculateColumnWidths()
+            }
         }
     }
 }

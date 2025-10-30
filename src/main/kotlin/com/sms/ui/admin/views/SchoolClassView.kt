@@ -15,6 +15,7 @@ import com.vaadin.flow.router.Route
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.router.Menu
 import jakarta.annotation.security.RolesAllowed
 import kotlinx.coroutines.Dispatchers
@@ -33,8 +34,7 @@ class SchoolClassView(
     private val ui: UI = UI.getCurrent()
 
     init {
-        setSizeFull()
-        spacing = "false"
+        isSpacing = true
         isPadding = false
 
         configureGrid()
@@ -60,6 +60,8 @@ class SchoolClassView(
             it.value?.let { schoolClass -> dialog.open(schoolClass) }
         }
         grid.columns.forEach { column -> column.isAutoWidth = true }
+        grid.isAllRowsVisible = true
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
     }
 
     private fun configureDialog() {
@@ -80,6 +82,7 @@ class SchoolClassView(
             val classes = schoolClassService.findAll()
             ui?.withUi {
                 grid.setItems(classes)
+                grid.recalculateColumnWidths()
             }
         }
     }

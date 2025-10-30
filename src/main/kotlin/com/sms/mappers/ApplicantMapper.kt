@@ -41,5 +41,17 @@ interface ApplicantMapper {
     fun rejectApplicant(@Param("id") id: Long)
     fun resetApplicantToPending(@Param("id") id: Long)
 
-    fun searchApplicants(string: String, status: Applicant.ApplicationStatus?): List<Applicant>
+    fun searchApplicants(query: String, status: Applicant.ApplicationStatus?): List<Applicant>
+
+    fun findPage(
+        @Param("offset") offset: Int,
+        @Param("size") size: Int
+    ): List<Applicant>
+
+    fun findPageByStatus(
+        @Param("status") status: Applicant.ApplicationStatus,
+        @Param("offset") offset: Int,
+        @Param("size") size: Int
+    ): List<Applicant>
+
 }

@@ -25,8 +25,9 @@ class ManagePaymentsView(
         val paymentTypeView = PaymentsTypeView(paymentTypeService)
         val paymentView = PaymentsView(paymentService) // You would implement this similarly
 
-        tabSheet.add("Payment Types", paymentTypeView)
         tabSheet.add("Payments", paymentView)
+        tabSheet.add("Payment Types", paymentTypeView)
+
         tabSheet.setSizeFull()
 
         add(tabSheet)
