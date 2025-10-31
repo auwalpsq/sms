@@ -4,6 +4,7 @@ import com.sms.broadcast.UiBroadcaster
 import com.sms.entities.Applicant
 import com.sms.mappers.ApplicantMapper
 import com.sms.util.ApplicationNumberGenerator
+import com.sms.util.PageResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -149,15 +150,23 @@ class ApplicantService(
     suspend fun findPageByStatus(
         status: Applicant.ApplicationStatus?,
         page: Int,
-        size: Int
-    ): List<Applicant> {
-        val safePage = if(page < 1) 1 else page
-        val offset = (safePage - 1) * size
-        return if (status == null) {
-            applicantMapper.findPage(offset, size)
-        } else {
-            applicantMapper.findPageByStatus(status, offset, size)
-        }
+        pageSize: Int
+    ): PageResult<Applicant> {
+        val offset = (page - 1) * pageSize
+        val items = applicantMapper.findPageByStatus(status, offset, pageSize)
+        val totalCount = applicantMapper.countByStatus(status)
+        return PageResult(items, totalCount)
+    }
+    suspend fun searchApplicantsPaginated(
+        query: String,
+        status: Applicant.ApplicationStatus?,
+        page: Int,
+        pageSize: Int
+    ): PageResult<Applicant> {
+        val offset = (page - 1) * pageSize
+        val items = applicantMapper.searchApplicantsPaginated("%$query%", status, offset, pageSize)
+        val totalCount = applicantMapper.countSearchApplicants("%$query%", status)
+        return PageResult(items, totalCount)
     }
 
 }

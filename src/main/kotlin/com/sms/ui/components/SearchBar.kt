@@ -16,13 +16,12 @@ import com.vaadin.flow.component.ComponentEventListener
  */
 class SearchBar(
     placeholderText: String = "Search...",
-    onSearch: (String) -> Unit
+    private val onSearch: (String) -> Unit
 ) : HorizontalLayout() {
 
     private val searchField = TextField().apply {
         placeholder = placeholderText
         width = "300px"
-        // ✅ Explicitly specify listener type
         addKeyDownListener(Key.ENTER, ComponentEventListener<KeyDownEvent> {
             onSearch(value.trim())
         })
@@ -39,7 +38,7 @@ class SearchBar(
         addThemeVariants(ButtonVariant.LUMO_TERTIARY)
         addClickListener {
             searchField.clear()
-            onSearch("") // clear filter
+            onSearch("") // Clear filter
         }
     }
 
@@ -48,4 +47,11 @@ class SearchBar(
         isSpacing = true
         add(searchField, searchButton, clearButton)
     }
+
+    /** ✅ Expose the search value to parent views */
+    var value: String
+        get() = searchField.value.trim()
+        set(newValue) {
+            searchField.value = newValue
+        }
 }

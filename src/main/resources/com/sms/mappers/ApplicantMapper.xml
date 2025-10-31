@@ -225,7 +225,64 @@
         JOIN persons p ON a.id = p.id
         WHERE a.application_status = #{status}
         ORDER BY p.created_at DESC
-        LIMIT #{size} OFFSET #{offset}
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countByStatus" parameterType="string" resultType="int">
+        SELECT COUNT(*)
+        FROM applicants a
+        <where>
+            <if test="status != null">
+                a.application_status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!-- Search applicants with pagination -->
+    <select id="searchApplicantsPaginated" resultMap="applicantResultMap">
+        SELECT a.*,
+        p.first_name,
+        p.middle_name,
+        p.last_name,
+        p.gender,
+        p.date_of_birth,
+        p.created_at,
+        p.updated_at
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        <where>
+            <if test="query != null and query != ''">
+                (
+                LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(a.application_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                )
+            </if>
+            <if test="status != null">
+                AND a.application_status = #{status}
+            </if>
+        </where>
+        ORDER BY p.created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- Count total search results -->
+    <select id="countSearchApplicants" resultType="int">
+        SELECT COUNT(*)
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        <where>
+            <if test="query != null and query != ''">
+                (
+                LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(a.application_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                )
+            </if>
+            <if test="status != null">
+                AND a.application_status = #{status}
+            </if>
+        </where>
     </select>
 
 </mapper>

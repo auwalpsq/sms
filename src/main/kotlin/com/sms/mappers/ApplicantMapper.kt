@@ -2,7 +2,6 @@ package com.sms.mappers
 
 import com.sms.entities.Applicant
 import org.apache.ibatis.annotations.*
-import org.springframework.expression.spel.ast.BeanReference
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -49,9 +48,22 @@ interface ApplicantMapper {
     ): List<Applicant>
 
     fun findPageByStatus(
-        @Param("status") status: Applicant.ApplicationStatus,
+        @Param("status") status: Applicant.ApplicationStatus?,
         @Param("offset") offset: Int,
-        @Param("size") size: Int
+        @Param("pageSize") size: Int
     ): List<Applicant>
 
+    fun countByStatus(status: Applicant.ApplicationStatus?): Int
+
+    fun searchApplicantsPaginated(
+        @Param("query") query: String?,
+        @Param("status") status: Applicant.ApplicationStatus?,
+        @Param("offset") offset: Int,
+        @Param("pageSize") limit: Int
+    ): List<Applicant>
+
+    fun countSearchApplicants(
+        @Param("query") query: String?,
+        @Param("status") status: Applicant.ApplicationStatus?
+    ): Int
 }

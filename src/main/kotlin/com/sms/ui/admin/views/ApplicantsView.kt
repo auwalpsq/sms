@@ -27,48 +27,48 @@ import org.springframework.security.core.context.SecurityContextHolder
 class ApplicantsView(
     private val applicantService: ApplicantService
 ) : VerticalLayout() {
-    val user = SecurityContextHolder.getContext().authentication.principal as User
-    private val username = user.username
 
-    private val ui: UI? = UI.getCurrent()
+    private val user = SecurityContextHolder.getContext().authentication.principal as User
+    private val username = user.username
+    private val ui = UI.getCurrent()
+
     private val grid = Grid(Applicant::class.java, false)
     private val statusFilter = ComboBox<Applicant.ApplicationStatus>()
     private lateinit var paginationBar: PaginationBar
+    private lateinit var searchBar: SearchBar
+
+    private val pageSize = 10
 
     init {
         setSizeFull()
         configureGrid()
+        configureFilters()
+        setupBroadcaster()
 
+        refresh(null, null, 1)
+    }
+
+    private fun configureFilters() {
         statusFilter.apply {
             setItems(Applicant.ApplicationStatus.values().toList())
             isClearButtonVisible = true
             placeholder = "All"
         }
 
-        paginationBar = PaginationBar(pageSize = 10) { page ->
-            refresh(statusFilter.value, page)
+        searchBar = SearchBar("Search applicants...") { query ->
+            refresh(statusFilter.value, query, 1)
+            paginationBar.reset()
         }
 
-        statusFilter.addValueChangeListener { event ->
-            refresh(event.value, paginationBar.getCurrentPage())
+        paginationBar = PaginationBar(pageSize) { page ->
+            refresh(statusFilter.value, searchBar.value, page)
         }
 
-        // Create a search bar that filters by applicant name or application number
-        val searchBar = SearchBar("Search applicants...") { query ->
-            launchUiCoroutine {
-                val applicants = if (query.isBlank()) {
-                    applicantService.findPageByStatus(statusFilter.value, paginationBar.getCurrentPage(), 10)
-                } else {
-                    applicantService.searchApplicants(query, statusFilter.value)
-                }
-                ui?.withUi {
-                    paginationBar.update(applicants.size)
-                    grid.setItems(applicants)
-                }
-            }
+        statusFilter.addValueChangeListener {
+            refresh(statusFilter.value, searchBar.value, 1)
+            paginationBar.reset()
         }
 
-        // Create a horizontal layout for the filter and search bar
         val filterBar = HorizontalLayout(statusFilter, searchBar).apply {
             defaultVerticalComponentAlignment = FlexComponent.Alignment.END
             width = "100%"
@@ -77,65 +77,42 @@ class ApplicantsView(
             setMargin(false)
         }
 
-        // Add everything to the main layout
         add(filterBar, grid, paginationBar)
-        paginationBar.reset()
-
-        val session = VaadinSession.getCurrent()
-        val listenerKey = "adminListener_$username"
-
-        if(session.getAttribute(listenerKey) == null){
-            val listener: (String, Map<String, Any>) -> Unit = { type, data ->
-                ui?.access {
-                    when (type) {
-                        "NEW_APPLICATION" -> {
-                            val appNumber = data["appNumber"] as? String ?: "Unknown"
-                            val status = data["status"] as? String ?: "Pending"
-                            showInteractiveNotification(
-                                title = "New Application Submitted",
-                                message = "Application No: $appNumber\nStatus: $status",
-                                variant = NotificationVariant.LUMO_SUCCESS
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Register listener
-            UiBroadcaster.register(listener)
-            session.setAttribute(listenerKey, listener)
-
-            // Unregister when view is detached
-            ui?.addDetachListener {
-                UiBroadcaster.unregister(listener)
-                session.setAttribute(listenerKey, null)
-            }
-        }
     }
 
     private fun configureGrid() {
         grid.addColumn { it.applicationNumber }.setHeader("Application No.")
             .setAutoWidth(true).setFlexGrow(0)
-        grid.addColumn { it.getFullName() ?: "N/A" }.setHeader("Applicant Name").setAutoWidth(true)
+
+        grid.addColumn { it.getFullName() ?: "N/A" }
+            .setHeader("Applicant Name").setAutoWidth(true)
+
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
                 Span(applicant.applicationStatus.name).apply {
-                    element.setAttribute("theme", when (applicant.applicationStatus) {
-                        Applicant.ApplicationStatus.PENDING -> "badge warning"
-                        Applicant.ApplicationStatus.APPROVED -> "badge success"
-                        Applicant.ApplicationStatus.REJECTED -> "badge error"
-                    })
+                    element.setAttribute(
+                        "theme",
+                        when (applicant.applicationStatus) {
+                            Applicant.ApplicationStatus.PENDING -> "badge warning"
+                            Applicant.ApplicationStatus.APPROVED -> "badge success"
+                            Applicant.ApplicationStatus.REJECTED -> "badge error"
+                        }
+                    )
                 }
             }
         ).setHeader("Status").setAutoWidth(true)
+
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
                 Span(applicant.paymentStatus.name).apply {
-                    element.setAttribute("theme", when (applicant.paymentStatus) {
-                        Applicant.PaymentStatus.UNPAID -> "badge error"
-                        Applicant.PaymentStatus.PAID -> "badge success"
-                        Applicant.PaymentStatus.PARTIALLY_PAID -> "badge contrast" // or "badge warning"
-                    })
+                    element.setAttribute(
+                        "theme",
+                        when (applicant.paymentStatus) {
+                            Applicant.PaymentStatus.UNPAID -> "badge error"
+                            Applicant.PaymentStatus.PAID -> "badge success"
+                            Applicant.PaymentStatus.PARTIALLY_PAID -> "badge contrast"
+                        }
+                    )
                 }
             }
         ).setHeader("Payment").setAutoWidth(true)
@@ -149,27 +126,55 @@ class ApplicantsView(
             }
         }.setHeader("Action").setAutoWidth(true)
 
-        grid.isAllRowsVisible = true
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
+        grid.isAllRowsVisible = true
     }
 
-    private fun loadApplicants() {
+    private fun refresh(status: Applicant.ApplicationStatus?, query: String?, page: Int) {
         launchUiCoroutine {
-            val applicants = applicantService.findByOptionalStatus(null)
-            //val pending = applicantService.findByStatus(Applicant.ApplicationStatus.PENDING)
-            ui?.withUi { grid.setItems(applicants) }
-        }
-    }
-    private fun refresh(status: Applicant.ApplicationStatus?, page: Int) {
-        launchUiCoroutine {
-            val applicants = applicantService.findPageByStatus(status, page, 10)
+            val pageResult = if (!query.isNullOrBlank()) {
+                applicantService.searchApplicantsPaginated(query, status, page, pageSize)
+            } else {
+                applicantService.findPageByStatus(status, page, pageSize)
+            }
+
             ui?.withUi {
-                paginationBar.update(applicants.size)
-                grid.setItems(applicants)
-                grid.recalculateColumnWidths()
+                grid.setItems(pageResult.items)
+                paginationBar.update(pageResult.totalCount)
             }
         }
     }
 
+    private fun setupBroadcaster() {
+        val session = VaadinSession.getCurrent()
+        val listenerKey = "adminListener_$username"
 
+        if (session.getAttribute(listenerKey) == null) {
+            val listener: (String, Map<String, Any>) -> Unit = { type, data ->
+                ui?.access {
+                    when (type) {
+                        "NEW_APPLICATION" -> {
+                            val appNumber = data["appNumber"] as? String ?: "Unknown"
+                            val status = data["status"] as? String ?: "Pending"
+                            showInteractiveNotification(
+                                title = "New Application Submitted",
+                                message = "Application No: $appNumber\nStatus: $status",
+                                variant = NotificationVariant.LUMO_SUCCESS
+                            )
+                            // Refresh to show new item
+                            refresh(statusFilter.value, searchBar.value, paginationBar.getCurrentPage())
+                        }
+                    }
+                }
+            }
+
+            UiBroadcaster.register(listener)
+            session.setAttribute(listenerKey, listener)
+
+            ui?.addDetachListener {
+                UiBroadcaster.unregister(listener)
+                session.setAttribute(listenerKey, null)
+            }
+        }
+    }
 }

@@ -41,13 +41,21 @@ class GuardiansView(
         // 🔍 Search bar
         val searchBar = SearchBar("Search guardians...") { query ->
             launchUiCoroutine {
-                val guardians = if (query.isBlank()) {
-                    guardianService.findPage(paginationBar.getCurrentPage(), 3)
+                var isBlank = false
+                val guardians: List<Guardian>
+                if (query.isBlank()) {
+                    guardians = guardianService.findPage(paginationBar.getCurrentPage(), 7)
+                    isBlank = true
                 } else {
-                    guardianService.search(query)
+                    guardians = guardianService.search(query)
+                    isBlank = false
                 }
                 ui?.withUi {
-                    paginationBar.update(guardians.size)
+                    if(isBlank){
+                        paginationBar.update(guardians.size)
+                    }else{
+                        paginationBar.update(guardians.size)
+                    }
                     grid.setItems(guardians)
                 }
             }
@@ -60,7 +68,7 @@ class GuardiansView(
         }
 
         // 🧭 Pagination
-        paginationBar = PaginationBar(pageSize = 3) { page ->
+        paginationBar = PaginationBar(pageSize = 7) { page ->
             refreshGrid(page)
         }
 
@@ -109,7 +117,7 @@ class GuardiansView(
 
     private fun refreshGrid(page: Int = 1) {
         launchUiCoroutine {
-            val guardians = guardianService.findPage(page, 3)
+            val guardians = guardianService.findPage(page, 7)
             ui.withUi {
                 paginationBar.update(guardians.size)
                 grid.setItems(guardians)
