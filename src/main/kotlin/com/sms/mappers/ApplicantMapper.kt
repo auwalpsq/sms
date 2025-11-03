@@ -9,31 +9,24 @@ import java.time.format.DateTimeFormatter
 interface ApplicantMapper {
 
     fun findByGuardianId(guardianId: Long): List<Applicant>
-
     fun findByStatus(status: String): List<Applicant>
-
     fun insertIntoPerson(applicant: Applicant)
-
     fun insertIntoApplicant(applicant: Applicant)
-
     fun update(applicant: Applicant)
-
     fun delete(id: Long)
 
     @Update("UPDATE applicants SET photo_url = #{photoUrl} WHERE id = #{id}")
     fun updatePhoto(@Param("id") id: Long, @Param("photoUrl") photoUrl: String)
 
-    suspend fun findLatestApplicationNumberForToday(@Param("datePrefix") datePrefix: String = LocalDate.now().format(
-        DateTimeFormatter.ofPattern("yyyyMMdd"))): String?
+    suspend fun findLatestApplicationNumberForToday(
+        @Param("datePrefix") datePrefix: String = LocalDate.now()
+            .format(DateTimeFormatter.ofPattern("yyyyMMdd"))
+    ): String?
 
     fun findAll(): List<Applicant>
-
     fun findByOptionalStatus(status: Applicant.ApplicationStatus?): List<Applicant>
-
     fun findById(@Param("id") id: Long): Applicant?
-
     fun updatePaymentStatus(reference: String, status: String)
-
     suspend fun countByGuardian(guardianId: Long): Int
 
     fun approveApplicant(@Param("id") id: Long)
@@ -42,24 +35,25 @@ interface ApplicantMapper {
 
     fun searchApplicants(query: String, status: Applicant.ApplicationStatus?): List<Applicant>
 
+    // ✅ fixed pagination methods
     fun findPage(
         @Param("offset") offset: Int,
-        @Param("size") size: Int
+        @Param("pageSize") pageSize: Int
     ): List<Applicant>
 
     fun findPageByStatus(
         @Param("status") status: Applicant.ApplicationStatus?,
         @Param("offset") offset: Int,
-        @Param("pageSize") size: Int
+        @Param("pageSize") pageSize: Int
     ): List<Applicant>
 
-    fun countByStatus(status: Applicant.ApplicationStatus?): Int
+    fun countByStatus(@Param("status") status: Applicant.ApplicationStatus?): Int
 
     fun searchApplicantsPaginated(
         @Param("query") query: String?,
         @Param("status") status: Applicant.ApplicationStatus?,
         @Param("offset") offset: Int,
-        @Param("pageSize") limit: Int
+        @Param("pageSize") pageSize: Int
     ): List<Applicant>
 
     fun countSearchApplicants(

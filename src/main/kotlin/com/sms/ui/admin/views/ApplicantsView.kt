@@ -82,10 +82,10 @@ class ApplicantsView(
 
     private fun configureGrid() {
         grid.addColumn { it.applicationNumber }.setHeader("Application No.")
-            .setAutoWidth(true).setFlexGrow(0)
+            .setAutoWidth(true)
 
         grid.addColumn { it.getFullName() ?: "N/A" }
-            .setHeader("Applicant Name").setAutoWidth(true)
+            .setHeader("Applicant Name").setAutoWidth(true).setFlexGrow(2)
 
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
@@ -141,6 +141,7 @@ class ApplicantsView(
             ui?.withUi {
                 grid.setItems(pageResult.items)
                 paginationBar.update(pageResult.totalCount)
+                grid.recalculateColumnWidths()
             }
         }
     }

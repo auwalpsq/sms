@@ -63,4 +63,48 @@
         LIMIT 1
     </select>
 
+    <select id="findPaged" resultMap="PaymentResultMap">
+        SELECT p.*
+        FROM payments p
+        LEFT JOIN applicants a ON p.applicant_id = a.id
+        LEFT JOIN persons ap ON a.id = ap.id
+        <where>
+            <if test="status != null">
+                AND p.status = #{status}
+            </if>
+            <if test="searchQuery != null and searchQuery != ''">
+                AND (
+                LOWER(p.reference) LIKE LOWER(CONCAT('%', #{searchQuery}, '%'))
+                OR LOWER(ap.first_name) LIKE LOWER(CONCAT('%', #{searchQuery}, '%'))
+                OR LOWER(ap.middle_name) LIKE LOWER(CONCAT('%', #{searchQuery}, '%'))
+                OR LOWER(ap.last_name) LIKE LOWER(CONCAT('%', #{searchQuery}, '%'))
+                OR CAST(p.id AS TEXT) LIKE CONCAT('%', #{searchQuery}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY p.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countPaged" resultType="int">
+        SELECT COUNT(*)
+        FROM payments p
+        LEFT JOIN applicants a ON p.applicant_id = a.id
+        LEFT JOIN persons ap ON a.id = ap.id
+        <where>
+            <if test="status != null">
+                AND p.status = #{status}
+            </if>
+            <if test="searchQuery != null and searchQuery != ''">
+                AND (
+                LOWER(p.reference) LIKE LOWER(CONCAT('%', #{searchQuery}, '%'))
+                OR LOWER(ap.first_name) LIKE LOWER(CONCAT('%', #{searchQuery}, '%'))
+                OR LOWER(ap.middle_name) LIKE LOWER(CONCAT('%', #{searchQuery}, '%'))
+                OR LOWER(ap.last_name) LIKE LOWER(CONCAT('%', #{searchQuery}, '%'))
+                OR CAST(p.id AS TEXT) LIKE CONCAT('%', #{searchQuery}, '%')
+                )
+            </if>
+        </where>
+    </select>
+
 </mapper>

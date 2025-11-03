@@ -29,6 +29,8 @@ class GuardiansView(
     private lateinit var dialog: GuardianDialogForm
     private lateinit var paginationBar: PaginationBar
 
+    private var currentSearchQuery: String? = null
+
     init {
         setSizeFull()
         isSpacing = true
@@ -38,27 +40,10 @@ class GuardiansView(
 
         configureGrid()
 
-        // 🔍 Search bar
         val searchBar = SearchBar("Search guardians...") { query ->
-            launchUiCoroutine {
-                var isBlank = false
-                val guardians: List<Guardian>
-                if (query.isBlank()) {
-                    guardians = guardianService.findPage(paginationBar.getCurrentPage(), 7)
-                    isBlank = true
-                } else {
-                    guardians = guardianService.search(query)
-                    isBlank = false
-                }
-                ui?.withUi {
-                    if(isBlank){
-                        paginationBar.update(guardians.size)
-                    }else{
-                        paginationBar.update(guardians.size)
-                    }
-                    grid.setItems(guardians)
-                }
-            }
+            currentSearchQuery = query.trim().ifEmpty { null }
+            paginationBar.reset()
+            refreshGrid(1)
         }
 
         // ➕ Add button
@@ -67,8 +52,7 @@ class GuardiansView(
             addClickListener { dialog.open(null) }
         }
 
-        // 🧭 Pagination
-        paginationBar = PaginationBar(pageSize = 7) { page ->
+        paginationBar = PaginationBar(pageSize = 10) { page ->
             refreshGrid(page)
         }
 
@@ -117,11 +101,14 @@ class GuardiansView(
 
     private fun refreshGrid(page: Int = 1) {
         launchUiCoroutine {
-            val guardians = guardianService.findPage(page, 7)
+            val pageSize = paginationBar.pageSize
+            val result = guardianService.findPage(currentSearchQuery, page, pageSize)
+            val totalCount = result.totalCount
+            val guardians = result.items
+
             ui.withUi {
-                paginationBar.update(guardians.size)
                 grid.setItems(guardians)
-                grid.recalculateColumnWidths()
+                paginationBar.update(totalCount)
             }
         }
     }

@@ -8,8 +8,6 @@
     <!-- ✅ Result Map -->
     <resultMap id="guardianResultMap" type="com.sms.entities.Guardian">
         <id property="id" column="id" javaType="long"/>
-
-        <!-- Person -->
         <result property="firstName" column="first_name"/>
         <result property="middleName" column="middle_name"/>
         <result property="lastName" column="last_name"/>
@@ -17,22 +15,18 @@
         <result property="dateOfBirth" column="date_of_birth" javaType="java.time.LocalDate"/>
         <result property="createdAt" column="created_at" javaType="java.time.LocalDateTime"/>
         <result property="updatedAt" column="updated_at" javaType="java.time.LocalDateTime"/>
-
-        <!-- ContactPerson -->
         <result property="email" column="email"/>
         <result property="phoneNumber" column="phone_number"/>
         <result property="address" column="address"/>
         <result property="city" column="city"/>
         <result property="state" column="state"/>
-
-        <!-- Guardian -->
         <result property="guardianId" column="guardian_id"/>
         <result property="occupation" column="occupation"/>
         <result property="employer" column="employer"/>
         <result property="alternatePhone" column="alternate_phone"/>
     </resultMap>
 
-    <!-- ✅ Insert Steps -->
+    <!-- ✅ Inserts -->
     <insert id="insertIntoPersons" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.sms.entities.Guardian">
         INSERT INTO persons (first_name, middle_name, last_name, gender, date_of_birth, person_type, created_at, updated_at)
         VALUES (#{firstName}, #{middleName}, #{lastName}, #{gender}, #{dateOfBirth}, 'GUARDIAN', #{createdAt}, #{updatedAt})
@@ -83,90 +77,22 @@
         DELETE FROM persons WHERE id = #{id};
     </delete>
 
-    <!-- ✅ Find by ID -->
     <select id="findById" parameterType="long" resultMap="guardianResultMap">
         SELECT
-        p.id,
+        g.*,
         p.first_name,
         p.middle_name,
         p.last_name,
         p.gender,
         p.date_of_birth,
         p.created_at,
-        p.updated_at,
-        c.email,
-        c.phone_number,
-        c.address,
-        c.city,
-        c.state,
-        g.guardian_id,
-        g.occupation,
-        g.employer,
-        g.alternate_phone
-        FROM persons p
-        JOIN contact_details c ON p.id = c.id
-        JOIN guardians g ON c.id = g.id
-        WHERE p.id = #{id}
+        p.updated_at
+        FROM guardians g
+        JOIN persons p ON g.id = p.id
+        WHERE g.id = #{id}
     </select>
 
-    <!-- ✅ Find All -->
-    <select id="findAll" resultMap="guardianResultMap">
-        SELECT
-        p.id,
-        p.first_name,
-        p.middle_name,
-        p.last_name,
-        p.gender,
-        p.date_of_birth,
-        p.created_at,
-        p.updated_at,
-        c.email,
-        c.phone_number,
-        c.address,
-        c.city,
-        c.state,
-        g.guardian_id,
-        g.occupation,
-        g.employer,
-        g.alternate_phone
-        FROM persons p
-        JOIN contact_details c ON p.id = c.id
-        JOIN guardians g ON c.id = g.id
-        ORDER BY p.created_at DESC
-    </select>
-
-    <!-- ✅ Check if email exists -->
-    <select id="existsByEmail" parameterType="string" resultType="boolean">
-        SELECT COUNT(*) > 0 FROM contact_details WHERE LOWER(email) = LOWER(#{email})
-    </select>
-
-    <!-- ✅ Find by Email -->
-    <select id="findByEmail" parameterType="string" resultMap="guardianResultMap">
-        SELECT
-        p.id,
-        p.first_name,
-        p.middle_name,
-        p.last_name,
-        p.gender,
-        p.date_of_birth,
-        p.created_at,
-        p.updated_at,
-        c.email,
-        c.phone_number,
-        c.address,
-        c.city,
-        c.state,
-        g.guardian_id,
-        g.occupation,
-        g.employer,
-        g.alternate_phone
-        FROM persons p
-        JOIN contact_details c ON p.id = c.id
-        JOIN guardians g ON c.id = g.id
-        WHERE LOWER(c.email) = LOWER(#{email})
-    </select>
-
-    <!-- ✅ Pagination -->
+    <!-- ✅ Unified paginated + search query -->
     <select id="findPage" resultMap="guardianResultMap">
         SELECT
         p.id,
@@ -189,79 +115,36 @@
         FROM persons p
         JOIN contact_details c ON p.id = c.id
         JOIN guardians g ON c.id = g.id
+        <where>
+            <if test="query != null and query.trim() != ''">
+                (
+                LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(c.email) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(c.phone_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                )
+            </if>
+        </where>
         ORDER BY p.created_at DESC, p.id DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
-    <!-- ✅ Search with Pagination -->
-    <select id="findPageBySearch" resultMap="guardianResultMap">
-        SELECT
-        p.id,
-        p.first_name,
-        p.middle_name,
-        p.last_name,
-        p.gender,
-        p.date_of_birth,
-        p.created_at,
-        p.updated_at,
-        c.email,
-        c.phone_number,
-        c.address,
-        c.city,
-        c.state,
-        g.guardian_id,
-        g.occupation,
-        g.employer,
-        g.alternate_phone
+    <!-- ✅ Count for pagination (supports search) -->
+    <select id="countFiltered" resultType="int">
+        SELECT COUNT(*)
         FROM persons p
         JOIN contact_details c ON p.id = c.id
         JOIN guardians g ON c.id = g.id
-        WHERE (
-        LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
-        OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
-        OR LOWER(c.email) LIKE LOWER(CONCAT('%', #{query}, '%'))
-        OR LOWER(c.phone_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
-        )
-        ORDER BY p.created_at DESC
-        LIMIT #{size} OFFSET #{offset}
+        <where>
+            <if test="query != null and query.trim() != ''">
+                (
+                LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(c.email) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(c.phone_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                )
+            </if>
+        </where>
     </select>
-
-    <!-- ✅ Count for Pagination -->
-    <select id="countAll" resultType="int">
-        SELECT COUNT(*) FROM guardians
-    </select>
-
-    <!-- ✅ Simple search (no paging) -->
-    <select id="search" resultMap="guardianResultMap">
-        SELECT
-        p.id,
-        p.first_name,
-        p.middle_name,
-        p.last_name,
-        p.gender,
-        p.date_of_birth,
-        p.created_at,
-        p.updated_at,
-        c.email,
-        c.phone_number,
-        c.address,
-        c.city,
-        c.state,
-        g.guardian_id,
-        g.occupation,
-        g.employer,
-        g.alternate_phone
-        FROM persons p
-        JOIN contact_details c ON p.id = c.id
-        JOIN guardians g ON c.id = g.id
-        WHERE (
-        LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
-        OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
-        OR LOWER(c.email) LIKE LOWER(CONCAT('%', #{query}, '%'))
-        OR LOWER(c.phone_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
-        )
-        ORDER BY p.created_at DESC
-    </select>
-
 
 </mapper>

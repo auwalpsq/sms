@@ -6,6 +6,7 @@ import com.sms.enums.PaymentCategory
 import com.sms.enums.PaymentStatus
 import com.sms.enums.Term
 import com.sms.mappers.PaymentMapper
+import com.sms.util.PageResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -51,4 +52,17 @@ class PaymentService(private val paymentMapper: PaymentMapper) {
     suspend fun findLatestByApplicant(applicantId: Long): Payment? = withContext(Dispatchers.IO) {
         paymentMapper.findLatestByApplicant(applicantId)
     }
+
+    suspend fun findPaged(
+        searchQuery: String?,
+        status: PaymentStatus?,
+        page: Int,
+        pageSize: Int
+    ): PageResult<Payment> = withContext(Dispatchers.IO) {
+        val offset = (page - 1) * pageSize
+        val items = paymentMapper.findPaged(searchQuery, status, offset, pageSize)
+        val total = paymentMapper.countPaged(searchQuery, status)
+        PageResult(items, total)
+    }
+
 }

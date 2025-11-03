@@ -38,4 +38,17 @@ interface PaymentMapper {
     ): Payment?
 
     fun findLatestByApplicant(applicantId: Long): Payment?
+
+    fun findPaged(
+        @Param("searchQuery") searchQuery: String?,
+        @Param("status") status: PaymentStatus?,
+        @Param("offset") offset: Int,
+        @Param("limit") limit: Int
+    ): List<Payment>
+
+    fun countPaged(
+        @Param("searchQuery") searchQuery: String?,
+        @Param("status") status: PaymentStatus?
+    ): Int
+
 }

@@ -2,6 +2,7 @@ package com.sms.services
 
 import com.sms.entities.Guardian
 import com.sms.mappers.GuardianMapper
+import com.sms.util.PageResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
@@ -14,13 +15,16 @@ class GuardianService(
     private val guardianMapper: GuardianMapper,
     private val userDetailsManager: MyUserDetailsManager
 ) {
+
     suspend fun save(guardian: Guardian): Guardian = withContext(Dispatchers.IO) {
         if (guardian.id == 0L) {
+            // Insert into base tables
             guardianMapper.insertIntoPersons(guardian)
             guardianMapper.insertIntoContactDetails(guardian)
             guardian.guardianId = generateGuardianId(guardian.id)
             guardianMapper.insertIntoGuardians(guardian)
 
+            // Auto-create user account for guardian
             userDetailsManager.createUserWithRoles(
                 username = guardian.email,
                 password = guardian.phoneNumber,
@@ -29,13 +33,10 @@ class GuardianService(
                 enabled = true,
                 guardian
             )
-            guardian
         } else {
             guardianMapper.update(guardian)
-
-            guardian
         }
-
+        guardian
     }
 
     suspend fun delete(guardian: Guardian): Int = withContext(Dispatchers.IO) {
@@ -53,42 +54,49 @@ class GuardianService(
     suspend fun existsByEmail(email: String): Boolean = withContext(Dispatchers.IO) {
         guardianMapper.existsByEmail(email)
     }
+
+    suspend fun findByEmail(email: String): Guardian? = withContext(Dispatchers.IO) {
+        guardianMapper.findByEmail(email)
+    }
+
     fun generateGuardianId(latestId: Long): String {
         val year = LocalDate.now().year
         return "GDN-$year-${String.format("%04d", latestId)}"
     }
-    suspend fun findByEmail(email: String): Guardian? = withContext(Dispatchers.IO) {
-        guardianMapper.findByEmail(email)
-    }
+
     /**
-     * Returns a page of guardians. `page` is 1-based (page = 1 => first page).
+     * ✅ Unified paginated finder with optional search query.
+     * `page` is 1-based (page = 1 => first page).
      */
-    suspend fun findPage(page: Int, pageSize: Int): List<Guardian> = withContext(Dispatchers.IO) {
+    suspend fun findPage(query: String?, page: Int, pageSize: Int): PageResult<Guardian> = withContext(Dispatchers.IO) {
         val safePage = if (page < 1) 1 else page
         val offset = (safePage - 1) * pageSize
-        guardianMapper.findPage(offset, pageSize)
+
+        val items = guardianMapper.findPage(query, offset, pageSize)
+        val totalCount = guardianMapper.countFiltered(query)
+
+        PageResult(items, totalCount)
     }
 
-    /**
-     * Search with paging. `page` is 1-based.
-     */
-    suspend fun findPageBySearch(query: String, page: Int, pageSize: Int): List<Guardian> = withContext(Dispatchers.IO) {
-        val safePage = if (page < 1) 1 else page
-        val offset = (safePage - 1) * pageSize
-        guardianMapper.findPageBySearch(query, offset, pageSize)
-    }
 
     /**
-     * Simple search without paging (optional).
+     * ✅ Smarter variant: fetch pageSize + 1 records to check if next page exists.
+     * Useful for Vaadin LazyDataProvider.
      */
-    suspend fun search(query: String): List<Guardian> = withContext(Dispatchers.IO) {
-        guardianMapper.search(query)
-    }
+    suspend fun findPageWithNextCheck(query: String?, page: Int, pageSize: Int): Pair<List<Guardian>, Boolean> =
+        withContext(Dispatchers.IO) {
+            val safePage = if (page < 1) 1 else page
+            val offset = (safePage - 1) * pageSize
+            val results = guardianMapper.findPage(query, offset, pageSize + 1)
+            val hasNext = results.size > pageSize
+            val trimmed = if (hasNext) results.dropLast(1) else results
+            Pair(trimmed, hasNext)
+        }
 
     /**
-     * Optional count for total pages if you want to show page numbers.
+     * ✅ Optional count helper if you need total pages in the UI.
      */
-    suspend fun countAll(): Int = withContext(Dispatchers.IO) {
-        guardianMapper.countAll()
+    suspend fun countFiltered(query: String?): Int = withContext(Dispatchers.IO) {
+        guardianMapper.countFiltered(query)
     }
 }

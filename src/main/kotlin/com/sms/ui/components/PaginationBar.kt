@@ -8,7 +8,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import kotlin.math.ceil
 
 class PaginationBar(
-    private val pageSize: Int = 10,
+    var pageSize: Int = 10,
     private val onPageChange: (Int) -> Unit
 ) : HorizontalLayout() {
 

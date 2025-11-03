@@ -7,7 +7,6 @@ import com.sms.entities.User
 import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
 import com.sms.services.SchoolClassService
-import com.sms.ui.common.showInteractiveNotification
 import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.guardian.GuardianLayout
 import com.sms.util.launchUiCoroutine
@@ -19,7 +18,6 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Span
-import com.vaadin.flow.component.notification.NotificationVariant
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.ComponentRenderer
