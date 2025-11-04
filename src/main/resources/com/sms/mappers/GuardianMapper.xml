@@ -11,11 +11,11 @@
         <result property="firstName" column="first_name"/>
         <result property="middleName" column="middle_name"/>
         <result property="lastName" column="last_name"/>
-        <result property="gender" column="gender" javaType="com.sms.entities.Gender"/>
+        <result property="gender" column="gender" javaType="com.sms.enums.Gender"/>
         <result property="dateOfBirth" column="date_of_birth" javaType="java.time.LocalDate"/>
         <result property="createdAt" column="created_at" javaType="java.time.LocalDateTime"/>
         <result property="updatedAt" column="updated_at" javaType="java.time.LocalDateTime"/>
-        <result property="email" column="email"/>
+        <result property="email" column="email" />
         <result property="phoneNumber" column="phone_number"/>
         <result property="address" column="address"/>
         <result property="city" column="city"/>

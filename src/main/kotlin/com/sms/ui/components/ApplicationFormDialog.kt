@@ -1,7 +1,7 @@
 package com.sms.ui.components
 
 import com.sms.entities.Applicant
-import com.sms.entities.Gender
+import com.sms.enums.Gender
 import com.sms.entities.Guardian
 import com.sms.entities.RelationshipType
 import com.sms.enums.Section

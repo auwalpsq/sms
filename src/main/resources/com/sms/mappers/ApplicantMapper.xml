@@ -11,7 +11,7 @@
         <result property="firstName" column="first_name" javaType="string"/>
         <result property="middleName" column="middle_name" javaType="string"/>
         <result property="lastName" column="last_name" javaType="string"/>
-        <result property="gender" column="gender" javaType="com.sms.entities.Gender"/>
+        <result property="gender" column="gender" javaType="com.sms.enums.Gender"/>
         <result property="dateOfBirth" column="date_of_birth" javaType="java.time.LocalDate"/>
         <result property="createdAt" column="created_at" javaType="java.time.LocalDateTime" />
         <result property="updatedAt" column="updated_at" javaType="java.time.LocalDateTime" />

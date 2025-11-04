@@ -1,19 +1,75 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.sms.mappers.StaffMapper">
 
-    <resultMap id="StaffResultMap" type="com.sms.entities.Staff">
-        <id column="id" property="id"/>
+    <resultMap id="StaffResultMap" type="com.sms.entities.Staff" extends="com.sms.mappers.ContactPersonMapper.ContactPersonResultMap">
         <result column="staff_id" property="staffId"/>
         <result column="staff_type" property="staffType"/>
         <result column="qualification" property="qualification"/>
+        <result column="specialization" property="specialization"/>
         <result column="employment_date" property="employmentDate"/>
+        <result column="years_of_experience" property="yearsOfExperience"/>
     </resultMap>
 
-    <insert id="save" parameterType="com.sms.entities.Staff" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO staff (staff_id, staff_type, qualification, employment_date)
-        VALUES (#{staffId}, #{staffType}, #{qualification}, #{employmentDate})
+    <insert id="save" parameterType="com.sms.entities.Staff">
+        INSERT INTO staff (id, staff_id, staff_type, qualification, specialization, employment_date, years_of_experience)
+        VALUES (#{id}, #{staffId}, #{staffType}, #{qualification}, #{specialization}, #{employmentDate}, #{yearsOfExperience})
     </insert>
+
+    <update id="update" parameterType="com.sms.entities.Staff">
+        UPDATE staff
+        SET staff_id = #{staffId},
+        staff_type = #{staffType},
+        qualification = #{qualification},
+        specialization = #{specialization},
+        employment_date = #{employmentDate},
+        years_of_experience = #{yearsOfExperience}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findById" parameterType="long" resultMap="StaffResultMap">
+        SELECT p.*, c.*, s.*
+        FROM persons p
+        JOIN contact_details c ON p.id = c.id
+        JOIN staff s ON p.id = s.id
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="StaffResultMap">
+        SELECT p.*, c.*, s.*
+        FROM persons p
+        JOIN contact_details c ON p.id = c.id
+        JOIN staff s ON p.id = s.id
+        <where>
+            <if test="search != null and search.trim() != ''">
+                (LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(s.staff_id) LIKE LOWER(CONCAT('%', #{search}, '%')))
+            </if>
+        </where>
+        ORDER BY s.employment_date DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM persons p
+        JOIN contact_details c ON p.id = c.id
+        JOIN staff s ON p.id = s.id
+        <where>
+            <if test="search != null and search.trim() != ''">
+                (LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR LOWER(s.staff_id) LIKE LOWER(CONCAT('%', #{search}, '%')))
+            </if>
+        </where>
+    </select>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM staff WHERE id = #{id}
+    </delete>
 
 </mapper>

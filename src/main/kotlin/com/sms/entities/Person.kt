@@ -1,5 +1,6 @@
 package com.sms.entities
 
+import com.sms.enums.Gender
 import jakarta.persistence.*
 import java.time.*
 import org.hibernate.annotations.CreationTimestamp
@@ -45,5 +46,3 @@ class Person(
 
     override fun hashCode(): Int = if (id != 0L) id.hashCode() else super.hashCode()
 }
-
-enum class Gender { MALE, FEMALE, UNSPECIFIED }

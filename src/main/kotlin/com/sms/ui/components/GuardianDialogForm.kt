@@ -1,6 +1,6 @@
 package com.sms.ui.components
 
-import com.sms.entities.Gender
+import com.sms.enums.Gender
 import com.sms.entities.Guardian
 import com.sms.services.ApplicantService
 import com.sms.ui.common.BaseFormDialog
@@ -8,9 +8,7 @@ import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
-import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.combobox.ComboBox
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.TextField

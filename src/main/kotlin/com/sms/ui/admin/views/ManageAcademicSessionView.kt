@@ -22,7 +22,7 @@ import jakarta.annotation.security.RolesAllowed
 @Route("admin/sessions", layout = AdminView::class)
 @PageTitle("Manage Academic Sessions")
 @RolesAllowed("ADMIN")
-@Menu(order = 0.0, icon = "vaadin:calendar", title = "Manage Academic Sessions")
+@Menu(order = 4.0, icon = "vaadin:calendar", title = "Manage Academic Sessions")
 class ManageAcademicSessionsView(
     private val sessionService: AcademicSessionService
 ) : VerticalLayout() {

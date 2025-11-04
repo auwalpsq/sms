@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
 @PageTitle("School Classes")
 @Route(value = "classes", layout = AdminView::class)
 @RolesAllowed("ADMIN")
-@Menu(order = 2.0, icon = "vaadin:group", title = "Manage Classes")
+@Menu(order = 4.0, icon = "vaadin:group", title = "Manage Classes")
 class SchoolClassView(
     private val schoolClassService: SchoolClassService
 ) : VerticalLayout() {

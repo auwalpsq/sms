@@ -1,5 +1,7 @@
 package com.sms.entities
 
+import com.sms.enums.Qualification
+import com.sms.enums.StaffType
 import jakarta.persistence.*
 import java.time.*
 
@@ -26,12 +28,4 @@ data class Staff(
 ) : ContactPerson() {
 
     fun getYearsOfService(): Int = Period.between(employmentDate, LocalDate.now()).years
-}
-
-enum class StaffType {
-    TEACHING, NON_TEACHING, ADMIN
-}
-
-enum class Qualification {
-    SSCE, NCE, OND, BACHELORS, MASTERS, PHD, OTHERS
 }
