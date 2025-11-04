@@ -120,6 +120,7 @@
                 (
                 LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(p.middle_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 OR LOWER(c.email) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 OR LOWER(c.phone_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 )
@@ -140,6 +141,7 @@
                 (
                 LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(p.middle_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 OR LOWER(c.email) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 OR LOWER(c.phone_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 )

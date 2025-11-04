@@ -119,6 +119,7 @@
         WHERE (
         LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
         OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        OR LOWER(p.middle_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
         OR LOWER(a.application_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
         )
         <if test="status != null">
@@ -160,9 +161,7 @@
     </select>
 
     <select id="countByGuardian" parameterType="long" resultType="int">
-        SELECT COUNT(*)
-        FROM applicants
-        WHERE guardian_id = #{guardianId}
+        SELECT COUNT(*) FROM applicants WHERE guardian_id = #{guardianId}
     </select>
 
     <update id="approveApplicant" parameterType="long">
@@ -259,6 +258,7 @@
                 (
                 LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(p.middle_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 OR LOWER(a.application_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 )
             </if>
@@ -280,6 +280,7 @@
                 (
                 LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+                OR LOWER(p.middle_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 OR LOWER(a.application_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
                 )
             </if>
@@ -287,6 +288,44 @@
                 AND a.application_status = #{status}
             </if>
         </where>
+    </select>
+    <!-- Paginated applicants by Guardian -->
+    <select id="findPageByGuardian" resultMap="applicantResultMap">
+        SELECT a.*, p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth, p.created_at, p.updated_at
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        WHERE a.guardian_id = #{guardianId}
+        ORDER BY p.created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- Search applicants by Guardian -->
+    <select id="searchApplicantsByGuardianPaginated" resultMap="applicantResultMap">
+        SELECT a.*, p.first_name, p.middle_name, p.last_name, p.gender, p.date_of_birth, p.created_at, p.updated_at
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        WHERE a.guardian_id = #{guardianId}
+        AND (
+        LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        OR LOWER(p.middle_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        OR LOWER(a.application_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        )
+        ORDER BY p.created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countSearchApplicantsByGuardian" resultType="int">
+        SELECT COUNT(*)
+        FROM applicants a
+        JOIN persons p ON a.id = p.id
+        WHERE a.guardian_id = #{guardianId}
+        AND (
+        LOWER(p.first_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        OR LOWER(p.last_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        OR LOWER(p.middle_name) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        OR LOWER(a.application_number) LIKE LOWER(CONCAT('%', #{query}, '%'))
+        )
     </select>
 
 </mapper>

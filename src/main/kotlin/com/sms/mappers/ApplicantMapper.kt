@@ -60,4 +60,22 @@ interface ApplicantMapper {
         @Param("query") query: String?,
         @Param("status") status: Applicant.ApplicationStatus?
     ): Int
+
+    fun findPageByGuardian(
+        @Param("guardianId") guardianId: Long,
+        @Param("pageSize") pageSize: Int,
+        @Param("offset") offset: Int
+    ): List<Applicant>
+
+    fun searchApplicantsByGuardianPaginated(
+        @Param("guardianId") guardianId: Long,
+        @Param("query") query: String,
+        @Param("pageSize") pageSize: Int,
+        @Param("offset") offset: Int
+    ): List<Applicant>
+
+    fun countSearchApplicantsByGuardian(
+        @Param("guardianId") guardianId: Long,
+        @Param("query") query: String
+    ): Int
 }

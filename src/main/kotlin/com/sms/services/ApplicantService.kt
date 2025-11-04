@@ -169,4 +169,26 @@ class ApplicantService(
         return PageResult(items, totalCount)
     }
 
+    suspend fun getApplicantsByGuardianPaged(
+        guardianId: Long,
+        page: Int,
+        pageSize: Int
+    ): PageResult<Applicant> = withContext(Dispatchers.IO) {
+        val offset = (page - 1) * pageSize
+        val applicants = applicantMapper.findPageByGuardian(guardianId, pageSize, offset)
+        val totalCount = applicantMapper.countByGuardian(guardianId)
+        PageResult(applicants, totalCount)
+    }
+
+    suspend fun searchApplicantsByGuardianPaged(
+        guardianId: Long,
+        query: String,
+        page: Int,
+        pageSize: Int
+    ): PageResult<Applicant> = withContext(Dispatchers.IO) {
+        val offset = (page - 1) * pageSize
+        val applicants = applicantMapper.searchApplicantsByGuardianPaginated(guardianId, query, pageSize, offset)
+        val totalCount = applicantMapper.countSearchApplicantsByGuardian(guardianId, query)
+        PageResult(applicants, totalCount)
+    }
 }

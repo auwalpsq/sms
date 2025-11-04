@@ -8,6 +8,8 @@ import com.sms.services.ApplicantService
 import com.sms.services.GuardianService
 import com.sms.services.SchoolClassService
 import com.sms.ui.components.ApplicationFormDialog
+import com.sms.ui.components.PaginationBar
+import com.sms.ui.components.SearchBar
 import com.sms.ui.guardian.GuardianLayout
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
@@ -16,8 +18,8 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
-import com.vaadin.flow.component.html.H2
 import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.renderer.ComponentRenderer
@@ -37,117 +39,145 @@ class GuardianApplicationView(
     private val guardianService: GuardianService,
     private val schoolClassService: SchoolClassService
 ) : VerticalLayout() {
-    val user = SecurityContextHolder.getContext().authentication.principal as User
+
+    private val ui = UI.getCurrent()
+    private val user = SecurityContextHolder.getContext().authentication.principal as User
     private val username = user.username
-    private val grid = Grid(Applicant::class.java, false)
-    private var formDialog: ApplicationFormDialog? = null
+
     private var currentGuardian: Guardian? = null
-    private val ui: UI? = UI.getCurrent()
+    private var formDialog: ApplicationFormDialog? = null
+
+    private val grid = Grid(Applicant::class.java, false)
+    private val searchBar = SearchBar("Search by name or application no...") { query -> loadApplicants(1, query) }
+    private val pagination = PaginationBar(pageSize = 3) { page -> loadApplicants(page) }
+
+    private val newApplicationBtn = Button("New Application").apply {
+        addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+        addClickListener { formDialog?.open(null) }
+    }
 
     init {
-        add(H2("Admission Applications"))
-
-        launchUiCoroutine {
-            val guardianId = user.person?.id
-            if(guardianId != null){
-                currentGuardian = guardianService.findById(guardianId)
-                ui?.withUi{
-                    createFormDialog()
-                    setupLayout()
-                    refreshGrid()
-                }
-            }
-        }
+        setSizeFull()
+        isSpacing = true
+        isPadding = true
 
         configureGrid()
+        configureLayout()
 
+        fetchGuardianAndInitialize()
         registerUpdateListener()
+    }
+
+    // --- Initialization ---
+    private fun fetchGuardianAndInitialize() {
+        launchUiCoroutine {
+            currentGuardian = guardianService.findById(user?.person?.id)
+            if (currentGuardian != null) {
+                ui?.withUi { createFormDialog(); loadApplicants() }
+            }
+        }
     }
 
     private fun createFormDialog() {
         formDialog = ApplicationFormDialog(
             guardian = currentGuardian!!,
             schoolClassService = schoolClassService,
-            onSave = { applicant ->
-                applicantService.save(applicant)
-            },
-            onDelete = { applicant ->
-                applicantService.delete(applicant.id!!)
-            },
-            onChange = { refreshGrid() }
+            onSave = { applicant -> applicantService.save(applicant) },
+            onDelete = { applicant -> applicantService.delete(applicant.id!!) },
+            onChange = { loadApplicants(pagination.getCurrentPage()) }
         )
     }
 
-    private fun setupLayout() {
-        add(
-            HorizontalLayout(
-                Button("New Application", {
-                    formDialog?.open(null)
-                }).apply { addThemeVariants(ButtonVariant.LUMO_PRIMARY) }
-            ),
-            grid
-        )
+    // --- Layout ---
+    private fun configureLayout() {
+        val filters = HorizontalLayout(searchBar, newApplicationBtn)
+        filters.setWidthFull()
+        filters.justifyContentMode = FlexComponent.JustifyContentMode.BETWEEN
+        filters.defaultVerticalComponentAlignment = FlexComponent.Alignment.CENTER
+
+        add(filters, grid, pagination)
     }
 
+    // --- Grid ---
     private fun configureGrid() {
-        grid.addColumn { it.applicationNumber }.setHeader("Application Number")
-            .isAutoWidth = true
-        grid.addColumn { it.getFullName() }.setHeader("Full Name")
-        grid.addColumn { it.gender }.setHeader("Gender")
-        grid.addColumn { it.dateOfBirth }.setHeader("Date of Birth")
+        grid.addColumn { it.applicationNumber }.setHeader("Application No.").isAutoWidth = true
+        grid.addColumn { it.getFullName() }.setHeader("Full Name").setAutoWidth(true).setFlexGrow(3)
+        grid.addColumn { it.gender ?: "" }.setHeader("Gender").isAutoWidth = true
+        grid.addColumn { it.dateOfBirth ?: "" }.setHeader("Date of Birth").isAutoWidth = true
+
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
                 Span(applicant.applicationStatus.name).apply {
-                    element.setAttribute("theme", when (applicant.applicationStatus) {
-                        Applicant.ApplicationStatus.PENDING -> "badge warning"
-                        Applicant.ApplicationStatus.APPROVED -> "badge success"
-                        Applicant.ApplicationStatus.REJECTED -> "badge error"
-                    })
+                    element.setAttribute(
+                        "theme",
+                        when (applicant.applicationStatus) {
+                            Applicant.ApplicationStatus.PENDING -> "badge warning"
+                            Applicant.ApplicationStatus.APPROVED -> "badge success"
+                            Applicant.ApplicationStatus.REJECTED -> "badge error"
+                        }
+                    )
                 }
             }
-        ).setHeader("Status")
+        ).setHeader("Status").setAutoWidth(true)
+
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
                 Span(applicant.paymentStatus.name).apply {
-                    element.setAttribute("theme", when (applicant.paymentStatus) {
-                        Applicant.PaymentStatus.UNPAID -> "badge error"
-                        Applicant.PaymentStatus.PAID -> "badge success"
-                        Applicant.PaymentStatus.PARTIALLY_PAID -> "badge contrast" // or "badge warning"
-                    })
+                    element.setAttribute(
+                        "theme",
+                        when (applicant.paymentStatus) {
+                            Applicant.PaymentStatus.UNPAID -> "badge error"
+                            Applicant.PaymentStatus.PAID -> "badge success"
+                            Applicant.PaymentStatus.PARTIALLY_PAID -> "badge contrast"
+                        }
+                    )
                 }
             }
-        ).setHeader("Payment")
+        ).setHeader("Payment").setAutoWidth(true)
 
         grid.addColumn(
             ComponentRenderer { applicant: Applicant ->
                 Button("Open Profile").apply {
                     addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE)
-                    addClickListener {
-                        ui?.get()?.navigate("guardian/applicant/${applicant.id}")
-                    }
+                    addClickListener { ui?.get()?.navigate("guardian/applicant/${applicant.id}") }
                 }
             }
-        ).setHeader("Actions")
+        ).setHeader("Actions").setAutoWidth(true)
 
-        grid.setWidthFull()
-        //grid.columns.forEach { column -> column.isAutoWidth = true }
+        grid.isAllRowsVisible = true
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
+        grid.emptyStateText = "No applications found."
+
     }
 
+    private fun loadApplicants(page: Int = 1, query: String = searchBar.value) {
+        val guardianId = currentGuardian?.id ?: return
 
-    private fun refreshGrid() {
-        currentGuardian?.id?.let { guardianId ->
-            launchUiCoroutine {
-                val applications = applicantService.findByGuardianId(guardianId)
-                    .sortedByDescending { it.submissionDate }
-
-                ui?.withUi { grid.setItems(applications) }
+        launchUiCoroutine {
+            val result = if (query.isBlank()) {
+                applicantService.getApplicantsByGuardianPaged(
+                    guardianId = guardianId,
+                    page = page,
+                    pageSize = pagination.pageSize
+                )
+            } else {
+                applicantService.searchApplicantsByGuardianPaged(
+                    guardianId = guardianId,
+                    query = query,
+                    page = page,
+                    pageSize = pagination.pageSize
+                )
             }
-        } ?: run {
-            ui?.access { grid.setItems(emptyList()) }
+
+            ui?.withUi {
+                grid.setItems(result.items)
+                pagination.update(result.totalCount)
+                grid.recalculateColumnWidths()
+            }
         }
     }
-    // ✅ Only listen for APPLICATION_UPDATE
+
+    // --- Broadcast Listener ---
     private fun registerUpdateListener() {
         val session = VaadinSession.getCurrent()
         val listenerKey = "guardianApplicationUpdate_$username"
@@ -155,7 +185,7 @@ class GuardianApplicationView(
         if (session.getAttribute(listenerKey) == null) {
             val listener: (String, Map<String, Any>) -> Unit = { type, _ ->
                 if (type == "APPLICATION_UPDATE") {
-                    ui?.access { refreshGrid() }
+                    ui?.access { loadApplicants(pagination.getCurrentPage()) }
                 }
             }
 
