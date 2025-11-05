@@ -11,19 +11,19 @@ import java.time.*
 data class Staff(
 
     @Column(unique = true)
-    val staffId: String = "",
+    var staffId: String = "",
 
     @Enumerated(EnumType.STRING)
-    val staffType: StaffType = StaffType.TEACHING,
+    var staffType: StaffType = StaffType.TEACHING,
 
     @Enumerated(EnumType.STRING)
-    val qualification: Qualification = Qualification.BACHELORS,
+    var qualification: Qualification = Qualification.BACHELORS,
 
-    val specialization: String? = null, // e.g. "Mathematics", "English", "ICT"
+    var specialization: String? = null, // e.g. "Mathematics", "English", "ICT"
 
-    val employmentDate: LocalDate = LocalDate.now(),
+    var employmentDate: LocalDate = LocalDate.now(),
 
-    val yearsOfExperience: Int? = null, // optional extra for HR reporting
+    var yearsOfExperience: Int? = null, // optional extra for HR reporting
 
 ) : ContactPerson() {
 

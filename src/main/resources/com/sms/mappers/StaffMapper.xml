@@ -21,8 +21,7 @@
 
     <update id="update" parameterType="com.sms.entities.Staff">
         UPDATE staff
-        SET staff_id = #{staffId},
-        staff_type = #{staffType},
+        SET staff_type = #{staffType},
         qualification = #{qualification},
         specialization = #{specialization},
         employment_date = #{employmentDate},
@@ -71,5 +70,14 @@
     <delete id="delete" parameterType="long">
         DELETE FROM staff WHERE id = #{id}
     </delete>
+
+    <select id="findByEmail" parameterType="string" resultMap="StaffResultMap">
+        SELECT p.*, c.*, s.*
+        FROM persons p
+        JOIN contact_details c ON p.id = c.id
+        JOIN staff s ON p.id = s.id
+        WHERE LOWER(c.email) = LOWER(#{email})
+        LIMIT 1
+    </select>
 
 </mapper>

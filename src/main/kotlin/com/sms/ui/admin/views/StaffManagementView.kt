@@ -11,9 +11,12 @@ import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
 import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
+import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.html.H3
+import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -26,7 +29,7 @@ import jakarta.annotation.security.RolesAllowed
 @RolesAllowed("ADMIN")
 @PageTitle("Manage Staff")
 @Route(value = "admin/staff", layout = AdminView::class)
-@Menu(order = 2.0, icon = "vaadin:users", title = "Manage Payments")
+@Menu(order = 2.0, icon = "vaadin:users", title = "Manage Staff")
 class StaffManagementView(
     private val staffService: StaffService
 ) : VerticalLayout() {
@@ -37,6 +40,7 @@ class StaffManagementView(
     private val pagination = PaginationBar(pageSize = 10) { loadPage(it) }
 
     private var currentQuery: String? = null
+    private val loadingIndicator = Notification("Loading staff...", 1500, Notification.Position.MIDDLE)
 
     init {
         setSizeFull()
@@ -45,7 +49,6 @@ class StaffManagementView(
 
         configureGrid()
         configureLayout()
-
         loadPage(1)
     }
 
@@ -59,8 +62,13 @@ class StaffManagementView(
         grid.addColumn { it.email }.setHeader("Email").setAutoWidth(true)
 
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
-        grid.isAllRowsVisible = false
         grid.setSizeFull()
+
+        // Empty state
+        grid.emptyStateComponent = Div(H3("No staff found")).apply {
+            val text = Div().apply { text = "Add a new staff member to get started." }
+            add(text)
+        }
 
         grid.addItemDoubleClickListener {
             openFormDialog(it.item)
@@ -68,8 +76,9 @@ class StaffManagementView(
     }
 
     private fun configureLayout() {
-        val addBtn = Button("Add Staff") {
-            openFormDialog(Staff())
+        val addBtn = Button("Add Staff", VaadinIcon.PLUS.create()).apply {
+            addClickListener { openFormDialog(null) }
+            addThemeVariants(ButtonVariant.LUMO_PRIMARY)
         }
 
         val header = HorizontalLayout(H3("Staff Management"), addBtn)
@@ -87,52 +96,70 @@ class StaffManagementView(
 
     private fun loadPage(page: Int) {
         launchUiCoroutine {
-            val result = staffService.findAll(
-                search = currentQuery,
-                page = page - 1,
-                size = pagination.pageSize
-            )
+            try {
+                ui?.withUi { loadingIndicator.open() }
 
-            val total = staffService.countAll(currentQuery)
+                val result = staffService.findAll(
+                    search = currentQuery,
+                    page = page - 1,
+                    size = pagination.pageSize
+                )
 
-            ui?.withUi {
-                grid.setItems(result)
-                pagination.update(total)
+                val total = staffService.countAll(currentQuery)
+
+                ui?.withUi {
+                    if(!result.isNullOrEmpty()){
+                        grid.setItems(result)
+                        pagination.update(total)
+                    }
+                }
+            } catch (e: Exception) {
+                ui?.withUi {
+                    showError("Failed to load staff: ${e.message ?: "Unknown error"}")
+                }
+            } finally {
+                ui?.withUi { loadingIndicator.close() }
             }
         }
     }
 
-    private fun openFormDialog(staff: Staff) {
+    private fun openFormDialog(staff: Staff?) {
         val dialog = StaffFormDialog(
-            title = if (staff.id == 0L) "Add New Staff" else "Edit Staff",
+            title = if (staff == null) "Add New Staff" else "Edit Staff",
             onSaveCallback = { saved ->
                 launchUiCoroutine {
-                    if (saved.id == 0L) {
-                        staffService.save(saved)
-                        showSuccess("Staff added successfully.")
-                    } else {
-                        staffService.update(saved)
-                        showError("Staff updated successfully.")
+                    try {
+                        if (saved.id == 0L) {
+                            staffService.save(saved)
+                            showSuccess("Staff added successfully.")
+                        } else {
+                            staffService.update(saved)
+                            showSuccess("Staff updated successfully.")
+                        }
+                        loadPage(pagination.getCurrentPage())
+                    } catch (e: Exception) {
+                        showError("Failed to save staff: ${e.message}")
                     }
-                    loadPage(pagination.getCurrentPage())
                 }
             },
             onDeleteCallback = { toDelete ->
                 launchUiCoroutine {
-                    staffService.delete(toDelete.id)
-                    Notification.show("Staff deleted successfully.")
-                    loadPage(pagination.getCurrentPage())
+                    try {
+                        staffService.delete(toDelete.id)
+                        showSuccess("Staff deleted successfully.")
+                        loadPage(pagination.getCurrentPage())
+                    } catch (e: Exception) {
+                        showError("Failed to delete staff: ${e.message}")
+                    }
                 }
             },
-            onChangeCallback = {
-                // refresh grid or any dynamic UI updates if needed
-                loadPage(pagination.getCurrentPage())
-            }
-        )
-
-        // Preload data into the dialog for editing
-        dialog.populateForm(staff)
-
-        dialog.open()
+            onChangeCallback = { loadPage(pagination.getCurrentPage()) },
+            onEmailCheck = {email -> staffService.existsByEmail(email)}
+        ).apply {
+            configureDialogAppearance()
+            width = "50%"
+            populateForm(staff)
+        }
+        dialog.open(staff)
     }
 }

@@ -30,6 +30,7 @@ class PaginationBar(
 
     private val nextButton = Button("Next").apply {
         addThemeVariants(ButtonVariant.LUMO_TERTIARY)
+        isEnabled = false
         addClickListener {
             if (currentPage < totalPages) {
                 currentPage++

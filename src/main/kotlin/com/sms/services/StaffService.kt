@@ -1,6 +1,7 @@
 package com.sms.services
 
 import com.sms.entities.Staff
+import com.sms.enums.StaffType
 import com.sms.mappers.PersonMapper
 import com.sms.mappers.ContactPersonMapper
 import com.sms.mappers.StaffMapper
@@ -13,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional
 class StaffService(
     private val personMapper: PersonMapper,
     private val contactPersonMapper: ContactPersonMapper,
-    private val staffMapper: StaffMapper
+    private val staffMapper: StaffMapper,
+    private val userDetailsManager: MyUserDetailsManager
 ) {
 
     /**
@@ -43,6 +45,10 @@ class StaffService(
      */
     @Transactional
     suspend fun save(staff: Staff): Staff = withContext(Dispatchers.IO) {
+        if(staff.staffId.isBlank()){
+            staff.staffId = generateStaffId(staff)
+        }
+
         // 1️⃣ Insert into persons table
         personMapper.save(staff)
         // ID is auto-generated
@@ -52,6 +58,16 @@ class StaffService(
 
         // 3️⃣ Insert into staff table
         staffMapper.save(staff)
+
+        // Auto-create user account for staff
+        userDetailsManager.createUserWithRoles(
+            username = staff.email,
+            password = staff.phoneNumber,
+            email = staff.email,
+            roleNames = setOf("ROLE_STAFF"),
+            enabled = true,
+            person = staff
+        )
 
         staff
     }
@@ -77,4 +93,15 @@ class StaffService(
         contactPersonMapper.delete(id)
         personMapper.delete(id)
     }
+
+    private suspend fun generateStaffId(staff: Staff): String {
+        val prefix = if (staff.staffType == StaffType.TEACHING) "TCH" else "ADM"
+        val timestamp = System.currentTimeMillis().toString().takeLast(5)
+        return "$prefix-${timestamp}"
+    }
+
+    suspend fun existsByEmail(email: String): Boolean = withContext(Dispatchers.IO) {
+        staffMapper.findByEmail(email) != null
+    }
+
 }
