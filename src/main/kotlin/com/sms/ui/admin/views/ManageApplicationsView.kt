@@ -1,6 +1,7 @@
 package com.sms.ui.admin.views
 
 import com.sms.services.ApplicantService
+import com.sms.services.ContactPersonService
 import com.sms.services.GuardianService
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.component.tabs.TabSheet
@@ -15,14 +16,15 @@ import jakarta.annotation.security.RolesAllowed
 @Menu(order = 0.0, icon = "vaadin:folder-open", title = "Manage Applications")
 class ManageApplicationsView(
     guardianService: GuardianService,
-    applicantService: ApplicantService
+    applicantService: ApplicantService,
+    contactPersonService: ContactPersonService
 ) : VerticalLayout() {
 
     init {
         setSizeFull()
         val tabSheet = TabSheet()
 
-        val guardianView = GuardiansView(guardianService, applicantService)
+        val guardianView = GuardiansView(guardianService, applicantService, contactPersonService)
         val applicants = ApplicantsView(applicantService)
 
         tabSheet.add("Applicants", applicants)

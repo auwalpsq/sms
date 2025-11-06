@@ -27,6 +27,7 @@ class Person(
     @Column(nullable = true)
     open var gender: Gender = Gender.UNSPECIFIED,
 
+    @Column(nullable = true)
     open var dateOfBirth: LocalDate? = null,
 
     @CreationTimestamp

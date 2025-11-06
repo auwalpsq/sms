@@ -1,6 +1,7 @@
 package com.sms.ui.admin.views
 
 import com.sms.entities.Staff
+import com.sms.services.ContactPersonService
 import com.sms.services.StaffService
 import com.sms.ui.admin.components.StaffFormDialog
 import com.sms.ui.common.showError
@@ -31,7 +32,8 @@ import jakarta.annotation.security.RolesAllowed
 @Route(value = "admin/staff", layout = AdminView::class)
 @Menu(order = 2.0, icon = "vaadin:users", title = "Manage Staff")
 class StaffManagementView(
-    private val staffService: StaffService
+    private val staffService: StaffService,
+    private val contactPersonService: ContactPersonService
 ) : VerticalLayout() {
 
     private val ui: UI? = UI.getCurrent()
@@ -108,10 +110,8 @@ class StaffManagementView(
                 val total = staffService.countAll(currentQuery)
 
                 ui?.withUi {
-                    if(!result.isNullOrEmpty()){
                         grid.setItems(result)
                         pagination.update(total)
-                    }
                 }
             } catch (e: Exception) {
                 ui?.withUi {
@@ -126,26 +126,18 @@ class StaffManagementView(
     private fun openFormDialog(staff: Staff?) {
         val dialog = StaffFormDialog(
             title = if (staff == null) "Add New Staff" else "Edit Staff",
-            onSaveCallback = { saved ->
-                launchUiCoroutine {
-                    try {
-                        if (saved.id == 0L) {
-                            staffService.save(saved)
-                            showSuccess("Staff added successfully.")
+            onSaveCallback = { staff ->
+                        if (staff.id == 0L) {
+                            staffService.save(staff)
                         } else {
-                            staffService.update(saved)
-                            showSuccess("Staff updated successfully.")
+                            staffService.update(staff)
                         }
                         loadPage(pagination.getCurrentPage())
-                    } catch (e: Exception) {
-                        showError("Failed to save staff: ${e.message}")
-                    }
-                }
             },
-            onDeleteCallback = { toDelete ->
+            onDeleteCallback = { staff ->
                 launchUiCoroutine {
                     try {
-                        staffService.delete(toDelete.id)
+                        staffService.delete(staff.id)
                         showSuccess("Staff deleted successfully.")
                         loadPage(pagination.getCurrentPage())
                     } catch (e: Exception) {
@@ -154,7 +146,7 @@ class StaffManagementView(
                 }
             },
             onChangeCallback = { loadPage(pagination.getCurrentPage()) },
-            onEmailCheck = {email -> staffService.existsByEmail(email)}
+            onEmailCheck = {email -> contactPersonService.emailExists(email)}
         ).apply {
             configureDialogAppearance()
             width = "50%"

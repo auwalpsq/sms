@@ -38,4 +38,18 @@
         DELETE FROM contact_details WHERE id = #{id}
     </delete>
 
+    <select id="findByEmail" parameterType="string" resultMap="ContactPersonResultMap">
+        SELECT p.*, c.*
+        FROM persons p
+        JOIN contact_details c ON p.id = c.id
+        WHERE LOWER(c.email) = LOWER(#{email})
+        LIMIT 1
+    </select>
+
+    <select id="emailExists" parameterType="string" resultType="boolean">
+        SELECT EXISTS(
+        SELECT 1 FROM contact_details WHERE LOWER(email) = LOWER(#{email})
+        )
+    </select>
+
 </mapper>

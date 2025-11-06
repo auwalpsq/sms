@@ -22,10 +22,34 @@
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO persons (
-        first_name, middle_name, last_name, gender, date_of_birth
+        first_name, middle_name, last_name, gender, date_of_birth, created_at, updated_at, person_type
         ) VALUES (
-        #{firstName}, #{middleName}, #{lastName}, #{gender}, #{dateOfBirth}
+        #{firstName}, #{middleName}, #{lastName}, #{gender}, #{dateOfBirth}, #{createdAt}, #{updatedAt}, 'PERSON'
         )
+    </insert>
+
+    <insert id="saveWithType" useGeneratedKeys="true" keyProperty="person.id">
+        INSERT INTO persons (
+        first_name,
+        middle_name,
+        last_name,
+        gender,
+        date_of_birth,
+        created_at,
+        updated_at,
+        person_type
+        ) VALUES (
+        #{person.firstName},
+        #{person.middleName},
+        #{person.lastName},
+        #{person.gender},
+        #{person.dateOfBirth},
+        #{person.createdAt},
+        #{person.updatedAt},
+        #{type}
+        )
+
+        RETURNING id
     </insert>
 
     <update id="update" parameterType="com.sms.entities.Person">

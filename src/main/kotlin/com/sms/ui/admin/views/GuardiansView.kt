@@ -2,6 +2,7 @@ package com.sms.ui.admin.views
 
 import com.sms.entities.Guardian
 import com.sms.services.ApplicantService
+import com.sms.services.ContactPersonService
 import com.sms.services.GuardianService
 import com.sms.ui.components.GuardianDialogForm
 import com.sms.ui.components.SearchBar
@@ -21,7 +22,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout
 
 class GuardiansView(
     private val guardianService: GuardianService,
-    private val applicantService: ApplicantService
+    private val applicantService: ApplicantService,
+    private val contactPersonService: ContactPersonService
 ) : VerticalLayout() {
 
     private val ui = UI.getCurrent()
@@ -72,7 +74,7 @@ class GuardiansView(
         return GuardianDialogForm(
             applicantService = applicantService,
             adminMode = true,
-            isEmailTaken = { email -> guardianService.existsByEmail(email) },
+            isEmailTaken = { email -> contactPersonService.emailExists(email) },
             onSave = { guardian ->
                 launchUiCoroutine {
                     guardianService.save(guardian)

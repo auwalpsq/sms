@@ -2,6 +2,7 @@ package com.sms.api
 
 import com.sms.entities.Guardian
 import com.sms.mappers.GuardianMapper
+import com.sms.services.ContactPersonService
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.web.bind.annotation.*
 
@@ -9,7 +10,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/guardians")
 class GuardianController(
-    private val guardianMapper: GuardianMapper
+    private val guardianMapper: GuardianMapper,
+    private val contactPersonService: ContactPersonService
 ) {
 
     @GetMapping

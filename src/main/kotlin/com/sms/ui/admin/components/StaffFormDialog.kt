@@ -5,6 +5,8 @@ import com.sms.enums.Gender
 import com.sms.enums.Qualification
 import com.sms.enums.StaffType
 import com.sms.ui.common.BaseFormDialog
+import com.sms.ui.common.showError
+import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.datepicker.DatePicker
@@ -16,10 +18,10 @@ import com.vaadin.flow.data.binder.ValidationResult
 
 class StaffFormDialog(
     title: String,
-    private val onSaveCallback: suspend (Staff) -> Unit,
-    private val onDeleteCallback: suspend (Staff) -> Unit,
-    private val onChangeCallback: () -> Unit,
-    var onEmailCheck: (suspend  (String) -> Boolean)? = null
+    onSaveCallback: suspend (Staff) -> Unit,
+    onDeleteCallback: suspend (Staff) -> Unit,
+    onChangeCallback: () -> Unit,
+    private val onEmailCheck: (suspend  (String) -> Boolean)? = null
 ) : BaseFormDialog<Staff>(title, onSaveCallback, onDeleteCallback, onChangeCallback) {
 
     private val firstName = TextField("First Name")
@@ -56,6 +58,17 @@ class StaffFormDialog(
                 value.contains("@") && value.contains(".")
             }, "Invalid email format")
             .withValidator { value, _ ->
+                // Only perform duplicate check if the email was changed
+                val currentEmail = currentEntity?.email?.trim()?.lowercase()
+                val newEmail = value.trim().lowercase()
+
+                if (currentEmail == newEmail) {
+                    // Email hasn't changed — skip validation
+                    email.isInvalid = false
+                    email.errorMessage = ""
+                    return@withValidator ValidationResult.ok()
+                }
+
                 // This validator runs asynchronously to check duplicates
                 launchUiCoroutine {
                     val exists = onEmailCheck?.invoke(value.trim().lowercase()) ?: false
@@ -78,6 +91,22 @@ class StaffFormDialog(
         binder.bindInstanceFields(this)
     }
 
+    override fun onSaveClick() {
+        if (binder.writeBeanIfValid(currentEntity)) {
+            launchUiCoroutine {
+                try {
+                    onSave(currentEntity)
+                    ui?.withUi {
+                        onChange()
+                        close()
+                        showSuccess("Staff added successfully")
+                    }
+                } catch (ex: Exception) {
+                    ui?.withUi { showError(ex.message.toString()) }
+                }
+            }
+        }
+    }
     override fun createNewInstance(): Staff = Staff()
 
     override fun getEntityType(): Class<Staff> = Staff::class.java

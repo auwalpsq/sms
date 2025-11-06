@@ -13,4 +13,8 @@ interface ContactPersonMapper {
     fun findById(id: Long): ContactPerson?
 
     fun delete(id: Long): Int
+
+    fun findByEmail(email: String): ContactPerson?
+
+    fun emailExists(email: String): Boolean
 }

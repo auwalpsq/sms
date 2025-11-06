@@ -50,7 +50,7 @@ class StaffService(
         }
 
         // 1️⃣ Insert into persons table
-        personMapper.save(staff)
+        personMapper.saveWithType(staff, "STAFF")
         // ID is auto-generated
 
         // 2️⃣ Insert into contact_details table using same ID
@@ -98,10 +98,6 @@ class StaffService(
         val prefix = if (staff.staffType == StaffType.TEACHING) "TCH" else "ADM"
         val timestamp = System.currentTimeMillis().toString().takeLast(5)
         return "$prefix-${timestamp}"
-    }
-
-    suspend fun existsByEmail(email: String): Boolean = withContext(Dispatchers.IO) {
-        staffMapper.findByEmail(email) != null
     }
 
 }

@@ -51,14 +51,6 @@ class GuardianService(
         guardianMapper.findAll()
     }
 
-    suspend fun existsByEmail(email: String): Boolean = withContext(Dispatchers.IO) {
-        guardianMapper.existsByEmail(email)
-    }
-
-    suspend fun findByEmail(email: String): Guardian? = withContext(Dispatchers.IO) {
-        guardianMapper.findByEmail(email)
-    }
-
     fun generateGuardianId(latestId: Long): String {
         val year = LocalDate.now().year
         return "GDN-$year-${String.format("%04d", latestId)}"
