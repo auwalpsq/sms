@@ -110,7 +110,7 @@ abstract class BaseFormDialog<T : Any>(
         configureValidityListener()
     }
 
-    private fun configureValidityListener() {
+    open fun configureValidityListener() {
         binder.addStatusChangeListener { event ->
             saveBtn.isEnabled = event.binder.isValid
             saveBtn.element.style.set(
