@@ -18,7 +18,7 @@ class RoleBasedAuthenticationSuccessHandler : AuthenticationSuccessHandler {
 
         val targetUrl = when {
             "ROLE_ADMIN" in roles -> "/admin"
-            "ROLE_TEACHER" in roles -> "/teacher"
+            "ROLE_STAFF" in roles -> "/staff"
             "ROLE_GUARDIAN" in roles -> "/guardian"
             else -> "/access-denied"
         }

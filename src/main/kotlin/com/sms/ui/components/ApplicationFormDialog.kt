@@ -156,7 +156,8 @@ class ApplicationFormDialog(
     }
     override fun onSaveClick() {
         if (binder.writeBeanIfValid(currentEntity)) {
-            currentEntity.photoUrl = photoUpload.getPhotoUrl()
+            val savedFileName = photoUpload.savePhoto()
+            currentEntity.photoUrl = savedFileName
             launchUiCoroutine {
                 try {
                     onSave(currentEntity)

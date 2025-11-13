@@ -16,6 +16,10 @@ class PhotoUploadField(
     private val placeholderImage: String = "/images/passports/placeholder.png"
 ) : Composite<VerticalLayout>() {
 
+    private var uploadedBytes: ByteArray? = null
+    private var uploadedFileName: String? = null
+    private var savedFileName: String? = null // actual saved file
+
     var imagePreview = Image(placeholderImage, "Photo preview").apply {
         width = "150px"
         height = "150px"
@@ -23,17 +27,17 @@ class PhotoUploadField(
         isVisible = false
     }
 
-    private var uploadedFileUrl: String? = null
     val upload = Upload().apply {
         maxFiles = 1
         isDropAllowed = true
         addFileRejectedListener { e -> println("Rejected: ${e.errorMessage}") }
     }
+
     val replaceButton = Button("Replace Photo").apply {
         isVisible = false
     }
+
     init {
-        // Center everything inside the root VerticalLayout
         content.setSizeFull()
         content.defaultHorizontalComponentAlignment = FlexComponent.Alignment.CENTER
         content.justifyContentMode = FlexComponent.JustifyContentMode.CENTER
@@ -41,20 +45,8 @@ class PhotoUploadField(
         content.isSpacing = true
 
         val inMemoryHandler = UploadHandler.inMemory { metadata, data ->
-            val filePath: Path
-
-            if (uploadedFileUrl != null) {
-                // Overwrite existing file
-                filePath = uploadDirectory.resolve(uploadedFileUrl)
-            } else {
-                // New file
-                val fileName = UUID.randomUUID().toString() + "_" + metadata.fileName
-                filePath = uploadDirectory.resolve(fileName)
-                uploadedFileUrl = fileName
-            }
-
-            Files.createDirectories(uploadDirectory)
-            Files.write(filePath, data)
+            uploadedBytes = data
+            uploadedFileName = metadata.fileName
 
             val base64Data = Base64.getEncoder().encodeToString(data)
             imagePreview.src = "data:${metadata.contentType};base64,$base64Data"
@@ -66,6 +58,8 @@ class PhotoUploadField(
         upload.setUploadHandler(inMemoryHandler)
 
         replaceButton.addClickListener {
+            uploadedBytes = null
+            uploadedFileName = null
             imagePreview.isVisible = false
             replaceButton.isVisible = false
             upload.isVisible = true
@@ -75,49 +69,57 @@ class PhotoUploadField(
         content.add(imagePreview, upload, replaceButton)
     }
 
-    fun getPhotoUrl(): String? = uploadedFileUrl
+    /** Save the current photo to disk, returns the saved file name */
+    fun savePhoto(): String? {
+        val bytes = uploadedBytes ?: return savedFileName // nothing new to save
+        val fileName = UUID.randomUUID().toString() + "_" + (uploadedFileName ?: "photo.png")
+        val filePath = uploadDirectory.resolve(fileName)
 
-    fun setPhotoUrl(url: String?) {
-        uploadedFileUrl = url
-        if (!url.isNullOrBlank()) {
-            try {
-                // Resolve the actual file path
-                val filePath = uploadDirectory.resolve(
-                    uploadedFileUrl ?: ""
-                ).toFile()
+        Files.createDirectories(uploadDirectory)
+        Files.write(filePath, bytes)
 
-                if (filePath.exists()) {
-                    val bytes = filePath.readBytes()
-                    val base64 = Base64.getEncoder().encodeToString(bytes)
+        // Optionally delete previous saved file
+        savedFileName?.let {
+            val oldFile = uploadDirectory.resolve(it)
+            if (Files.exists(oldFile)) Files.delete(oldFile)
+        }
 
-                    // Guess MIME type (default to image/png if unknown)
-                    val mimeType = Files.probeContentType(filePath.toPath()) ?: "image/png"
+        savedFileName = fileName
+        uploadedBytes = null
+        uploadedFileName = null
+        return savedFileName
+    }
 
-                    // Set as base64 data URI
-                    imagePreview.src = "data:$mimeType;base64,$base64"
-                    imagePreview.isVisible = true
-                    upload.isVisible = false
-                    replaceButton.isVisible = true
-                } else {
-                    // File missing — show placeholder
-                    imagePreview.src = placeholderImage
-                    imagePreview.isVisible = false
-                    replaceButton.isVisible = false
-                    upload.isVisible = true
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                imagePreview.src = placeholderImage
-                imagePreview.isVisible = false
-                replaceButton.isVisible = false
-                upload.isVisible = true
-            }
-        } else {
-            // Show placeholder if no URL
+    /** Set photo from previously saved file */
+    fun setPhotoUrl(fileName: String?) {
+        if (fileName.isNullOrBlank()) {
             imagePreview.src = placeholderImage
             imagePreview.isVisible = false
-            replaceButton.isVisible = false
             upload.isVisible = true
+            replaceButton.isVisible = false
+            savedFileName = null
+            return
+        }
+
+        val filePath = uploadDirectory.resolve(fileName).toFile()
+        if (filePath.exists()) {
+            val bytes = filePath.readBytes()
+            val base64 = Base64.getEncoder().encodeToString(bytes)
+            val mimeType = Files.probeContentType(filePath.toPath()) ?: "image/png"
+            imagePreview.src = "data:$mimeType;base64,$base64"
+            imagePreview.isVisible = true
+            upload.isVisible = false
+            replaceButton.isVisible = true
+            savedFileName = fileName
+        } else {
+            // File missing
+            imagePreview.src = placeholderImage
+            imagePreview.isVisible = false
+            upload.isVisible = true
+            replaceButton.isVisible = false
+            savedFileName = null
         }
     }
+
+    fun getSavedPhoto(): String? = savedFileName
 }
