@@ -141,9 +141,7 @@ class MyUserDetailsManager(
         }
     }
     fun findByUsername(username: String): User? {
-        return userMapper.findByUsername(username)?.copy(
-            roles = roleMapper.findRolesByUsername(username).toSet()
-        )
+        return userMapper.findByUsername(username)
     }
 
     @Transactional

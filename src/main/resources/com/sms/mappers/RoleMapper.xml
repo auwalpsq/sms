@@ -4,7 +4,7 @@
 
 <mapper namespace="com.sms.mappers.RoleMapper">
     <resultMap id="roleResultMap" type="com.sms.entities.Role">
-        <id property="id" column="id"/>
+        <id property="id" column="id" javaType="long"/>
         <result property="name" column="name"/>
         <result property="description" column="description"/>
     </resultMap>
