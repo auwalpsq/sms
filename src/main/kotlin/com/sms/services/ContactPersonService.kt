@@ -35,4 +35,8 @@ class ContactPersonService(
     suspend fun emailExists(email: String): Boolean = withContext(Dispatchers.IO) {
         contactPersonMapper.emailExists(email)
     }
+    suspend fun phoneExists(phone: String): Boolean = withContext(Dispatchers.IO) {
+        contactPersonMapper.phoneExists(phone)
+    }
+
 }

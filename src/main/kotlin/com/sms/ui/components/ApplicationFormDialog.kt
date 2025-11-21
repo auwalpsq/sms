@@ -164,7 +164,7 @@ class ApplicationFormDialog(
                     ui?.withUi {
                         onChange()
                         close()
-                        showSuccess("Saved successfully")
+                        showSuccess("Applicant Added successfully")
                     }
                 } catch (ex: Exception) {
                     ui?.withUi { showError("Error: ${ex.message}") }

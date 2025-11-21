@@ -171,6 +171,7 @@ abstract class BaseFormDialog<T : Any>(
     open fun populateForm(entity: T?) {
         binder.readBean(entity)
     }
+
     protected abstract fun buildForm(formLayout: FormLayout)
     protected abstract fun configureBinder()
     protected abstract fun createNewInstance(): T

@@ -22,4 +22,7 @@ interface RoleMapper {
     fun countRoles(): Int
     fun roleExists(id: Long): Boolean
     fun roleNameExists(name: String): Boolean
+
+    /** 🔹 Remove all roles from a user */
+    fun removeAllRolesFromUser(userId: Long): Int
 }

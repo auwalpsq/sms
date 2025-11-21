@@ -146,7 +146,8 @@ class StaffManagementView(
                 }
             },
             onChangeCallback = { loadPage(pagination.getCurrentPage()) },
-            onEmailCheck = {email -> contactPersonService.emailExists(email)}
+            onEmailCheck = {email -> contactPersonService.emailExists(email)},
+            onPhoneCheck = { phone -> contactPersonService.phoneExists(phone) }
         ).apply {
             configureDialogAppearance()
             width = "50%"

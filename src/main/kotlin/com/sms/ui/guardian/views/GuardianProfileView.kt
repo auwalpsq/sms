@@ -107,6 +107,8 @@ class GuardianProfileView(
                 applicantService = applicantService,
                 adminMode = false, // guardian editing their own profile
                 isEmailTaken = { false }, // not needed in guardian mode
+                onAssignRoles = {_, _ -> },
+                loadExistingRoles = {_, -> emptySet()},
                 onSave = { updated ->
                     launchUiCoroutine {
                         guardianService.save(updated)
@@ -118,7 +120,8 @@ class GuardianProfileView(
                     }
                 },
                 onDelete = { /* Guardian should not delete themselves */ },
-                onChange = { }
+                onChange = { },
+
             )
             dialog.open(g)
         }

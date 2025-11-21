@@ -49,7 +49,7 @@ class GuardianApplicationView(
 
     private val grid = Grid(Applicant::class.java, false)
     private val searchBar = SearchBar("Search by name or application no...") { query -> loadApplicants(1, query) }
-    private val pagination = PaginationBar(pageSize = 3) { page -> loadApplicants(page) }
+    private val pagination = PaginationBar(pageSize = 10) { page -> loadApplicants(page) }
 
     private val newApplicationBtn = Button("New Application").apply {
         addThemeVariants(ButtonVariant.LUMO_PRIMARY)

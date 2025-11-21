@@ -87,7 +87,13 @@ class GuardiansView(
                     ui.withUi { refreshGrid(paginationBar.getCurrentPage()) }
                 }
             },
-            onChange = { refreshGrid(paginationBar.getCurrentPage()) }
+            onChange = { refreshGrid(paginationBar.getCurrentPage()) },
+            onAssignRoles = { guardian, roles ->
+                launchUiCoroutine {
+                    guardianService.updateGuardianRoles(guardian, roles)   // <-- ADD THIS
+                }
+            },
+            loadExistingRoles = { guardian -> guardianService.getGuardianRoles(guardian) },
         )
     }
 

@@ -20,7 +20,8 @@ class StaffFormDialog(
     onSaveCallback: suspend (Staff) -> Unit,
     onDeleteCallback: suspend (Staff) -> Unit,
     onChangeCallback: () -> Unit,
-    private val onEmailCheck: suspend (String) -> Boolean
+    private val onEmailCheck: suspend (String) -> Boolean,
+    private val onPhoneCheck: suspend (String) -> Boolean
 ) : BaseFormDialog<Staff>(title, onSaveCallback, onDeleteCallback, onChangeCallback) {
 
     private val firstName = TextField("First Name")
@@ -37,6 +38,8 @@ class StaffFormDialog(
     // Tracks the async email check result
     private var emailValid = false
 
+    private var phoneValid = false
+
     override fun buildForm(formLayout: FormLayout) {
         formLayout.add(
             firstName, middleName,
@@ -51,6 +54,7 @@ class StaffFormDialog(
         )
 
         setupEmailValidation()
+        setupPhoneValidation()
     }
 
     override fun configureBinder() {
@@ -96,9 +100,6 @@ class StaffFormDialog(
 
         // ensure binder tracks all fields
         binder.bindInstanceFields(this)
-
-        // update Save button whenever binder validity changes
-        binder.addStatusChangeListener { updateSaveButtonState() }
     }
 
     private fun setupEmailValidation() {
@@ -113,7 +114,6 @@ class StaffFormDialog(
             email.isInvalid = false
             email.errorMessage = null
             email.helperText = ""
-            updateSaveButtonState()
 
             // Required check
             if (value.isEmpty()) {
@@ -141,7 +141,6 @@ class StaffFormDialog(
                         email.isInvalid = true
                         email.errorMessage = "Unable to verify email"
                         email.helperText = ""
-                        updateSaveButtonState()
                     }
                     return@launchUiCoroutine
                 }
@@ -160,19 +159,73 @@ class StaffFormDialog(
                         email.element.style.set("color", "var(--lumo-success-color)")
                         emailValid = true
                     }
-                    updateSaveButtonState()
                 }
             }
         }
     }
 
-    private fun updateSaveButtonState() {
-        saveBtn.isEnabled = binder.isValid && emailValid
-        saveBtn.element.style.set("cursor", if (saveBtn.isEnabled) "pointer" else "not-allowed")
-        saveBtn.element.setAttribute(
-            "title",
-            if (saveBtn.isEnabled) "Click to save" else "Please complete all required fields"
-        )
+    private fun setupPhoneValidation() {
+        // Clear any default helper text
+        phone.helperText = ""
+
+        phone.addValueChangeListener { event ->
+            val value = event.value?.trim().orEmpty()
+
+            // Reset state
+            phoneValid = false
+            phone.isInvalid = false
+            phone.errorMessage = null
+            phone.helperText = ""
+            phone.element.style.remove("color")
+
+            // Required check
+            if (value.isEmpty()) {
+                phone.isInvalid = true
+                phone.errorMessage = "Phone number required"
+                return@addValueChangeListener
+            }
+
+            // Basic Nigeria-friendly digit check
+            if (!value.matches(Regex("^\\d{11,15}\$"))) {
+                phone.isInvalid = true
+                phone.errorMessage = "Invalid phone number format"
+                return@addValueChangeListener
+            }
+
+            // While async validation is happening:
+            phone.helperText = "Checking..."
+            phone.element.style.set("color", "var(--lumo-secondary-text-color)")
+
+            launchUiCoroutine {
+                val exists = try {
+                    onPhoneCheck(value)
+                } catch (ex: Exception) {
+                    ui?.withUi {
+                        phone.isInvalid = true
+                        phone.errorMessage = "Unable to verify phone number"
+                        phone.helperText = ""
+                    }
+                    return@launchUiCoroutine
+                }
+
+                ui?.withUi {
+                    val existing = currentEntity.phoneNumber?.trim()
+
+                    if (exists && !value.equals(existing, ignoreCase = true)) {
+                        phone.isInvalid = true
+                        phone.errorMessage = "Phone number already registered"
+                        phone.helperText = ""
+                        phoneValid = false
+                    } else {
+                        phone.isInvalid = false
+                        phone.errorMessage = null
+                        phone.helperText = "✅ Available"
+                        phone.element.style.set("color", "var(--lumo-success-color)")
+                        phoneValid = true
+                    }
+                }
+            }
+        }
     }
 
     override fun onSaveClick() {
@@ -193,7 +246,7 @@ class StaffFormDialog(
     }
     override fun configureValidityListener() {
         binder.addStatusChangeListener { event ->
-            saveBtn.isEnabled = event.binder.isValid && emailValid
+            saveBtn.isEnabled = event.binder.isValid && emailValid && phoneValid
             saveBtn.element.style.set(
                 "cursor",
                 if (event.binder.isValid) "pointer" else "not-allowed"

@@ -17,4 +17,6 @@ interface ContactPersonMapper {
     fun findByEmail(email: String): ContactPerson?
 
     fun emailExists(email: String): Boolean
+
+    fun phoneExists(phone: String): Boolean
 }

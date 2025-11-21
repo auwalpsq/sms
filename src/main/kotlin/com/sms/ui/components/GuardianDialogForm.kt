@@ -2,6 +2,7 @@ package com.sms.ui.components
 
 import com.sms.enums.Gender
 import com.sms.entities.Guardian
+import com.sms.enums.UserRole
 import com.sms.services.ApplicantService
 import com.sms.ui.common.BaseFormDialog
 import com.sms.ui.common.showError
@@ -9,6 +10,7 @@ import com.sms.ui.common.showSuccess
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.combobox.ComboBox
+import com.vaadin.flow.component.combobox.MultiSelectComboBox
 import com.vaadin.flow.component.formlayout.FormLayout
 import com.vaadin.flow.component.textfield.EmailField
 import com.vaadin.flow.component.textfield.TextField
@@ -20,6 +22,8 @@ class GuardianDialogForm(
     private val applicantService: ApplicantService,
     private val adminMode: Boolean,
     private val isEmailTaken: suspend (String) -> Boolean,
+    private val onAssignRoles: suspend (Guardian, Set<UserRole>) -> Unit = {_, _ ->},
+    private val loadExistingRoles: suspend (Guardian) -> Set<UserRole> = {_ -> emptySet()},
     onSave: suspend (Guardian) -> Unit,
     onDelete: suspend (Guardian) -> Unit,
     onChange: () -> Unit
@@ -52,12 +56,17 @@ class GuardianDialogForm(
     private val employer = TextField("Employer")
     private val alternatePhone = TextField("Alternate Phone")
 
+    private val roles = MultiSelectComboBox<UserRole>("Roles")
+
     override fun buildForm(formLayout: FormLayout) {
 
         if (adminMode) {
             // Admin only needs basic fields
             formLayout.responsiveSteps = listOf(FormLayout.ResponsiveStep("0", 1))
-            formLayout.add(firstName, lastName, gender, email, phoneNumber)
+            formLayout.add(firstName, lastName, gender, email, phoneNumber, roles)
+
+            roles.setItems(UserRole.GUARDIAN, UserRole.STAFF)
+
         } else {
             // Guardian sees all fields
             formLayout.add(
@@ -141,9 +150,11 @@ class GuardianDialogForm(
 
     override fun onSaveClick() {
         if (binder.writeBeanIfValid(currentEntity)) {
+            val selectedRoles = roles.value.toSet()
             launchUiCoroutine {
                 try {
                     onSave(currentEntity)
+                    onAssignRoles(currentEntity, selectedRoles)
                     ui?.withUi {
                         onChange()
                         close()
@@ -168,6 +179,31 @@ class GuardianDialogForm(
         configureDialogAppearance()
         width = if (adminMode) "25%" else "50%"
         maxWidth = "800px"
+    }
+
+    override fun populateForm(entity: Guardian?) {
+        super.populateForm(entity)
+
+        if (!adminMode) {
+            roles.isVisible = false
+            return
+        }
+
+        // Admin Mode → load roles for existing guardians
+        val guardian = currentEntity
+
+        if (guardian.id == 0L) {
+            // Newly created guardian → default role
+            roles.value = setOf(UserRole.GUARDIAN)
+        } else {
+            // Load saved roles using coroutine
+            launchUiCoroutine {
+                val assigned = loadExistingRoles(guardian)
+                ui?.withUi {
+                    roles.value = assigned
+                }
+            }
+        }
     }
 
     override fun createNewInstance(): Guardian = Guardian()

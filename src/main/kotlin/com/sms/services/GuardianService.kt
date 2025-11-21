@@ -1,7 +1,9 @@
 package com.sms.services
 
 import com.sms.entities.Guardian
+import com.sms.enums.UserRole
 import com.sms.mappers.GuardianMapper
+import com.sms.mappers.RoleMapper
 import com.sms.util.PageResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -13,7 +15,8 @@ import java.time.LocalDate
 @Transactional
 class GuardianService(
     private val guardianMapper: GuardianMapper,
-    private val userDetailsManager: MyUserDetailsManager
+    private val userDetailsManager: MyUserDetailsManager,
+    private val roleMapper: RoleMapper
 ) {
 
     suspend fun save(guardian: Guardian): Guardian = withContext(Dispatchers.IO) {
@@ -91,4 +94,29 @@ class GuardianService(
     suspend fun countFiltered(query: String?): Int = withContext(Dispatchers.IO) {
         guardianMapper.countFiltered(query)
     }
+    suspend fun updateGuardianRoles(guardian: Guardian, roles: Set<UserRole>) = withContext(Dispatchers.IO) {
+        val user = userDetailsManager.findByUsername(guardian.email)
+            ?: throw IllegalArgumentException("User not found for guardian: ${guardian.email}")
+
+        // Remove all existing roles
+        roleMapper.removeAllRolesFromUser(user.id)
+
+        // Add the new roles
+        val roleIds = roles.mapNotNull { role ->
+            roleMapper.findByName(role.name)?.id
+        }
+
+        if (roleIds.isNotEmpty()) {
+            roleMapper.addRolesToUser(user.id, roleIds)
+        }
+    }
+
+    suspend fun getGuardianRoles(guardian: Guardian): Set<UserRole> = withContext(Dispatchers.IO) {
+        val user = userDetailsManager.findByUsername(guardian.email)
+            ?: throw IllegalArgumentException("User not found for guardian: ${guardian.email}")
+        println(user)
+        user.roles.mapNotNull { role -> UserRole.values().find { it.name == role.name } }.toSet()
+    }
+
+
 }

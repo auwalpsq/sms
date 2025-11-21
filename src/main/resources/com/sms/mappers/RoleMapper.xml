@@ -76,4 +76,8 @@
     <select id="roleNameExists" resultType="boolean">
         SELECT EXISTS(SELECT 1 FROM roles WHERE name = #{name})
     </select>
+
+    <delete id="removeAllRolesFromUser">
+        DELETE FROM user_roles WHERE user_id = #{userId}
+    </delete>
 </mapper>

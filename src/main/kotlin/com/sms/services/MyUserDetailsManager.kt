@@ -146,4 +146,29 @@ class MyUserDetailsManager(
         )
     }
 
+    @Transactional
+    fun updateUserRoles(username: String, newRoles: Set<String>) {
+        val user = userMapper.findByUsername(username)
+            ?: throw IllegalArgumentException("User not found: $username")
+
+        val userId = user.id
+
+        // Remove all old roles
+        roleMapper.removeAllRolesFromUser(userId)
+
+        // Add new roles
+        val roles = newRoles.map { roleName ->
+            roleMapper.findByName(roleName) ?: run {
+                val newRole = Role(name = roleName)
+                roleMapper.insertRole(newRole)
+                newRole
+            }
+        }
+
+        roles.forEach { role ->
+            roleMapper.addRoleToUser(userId, role.id)
+        }
+    }
+
+
 }

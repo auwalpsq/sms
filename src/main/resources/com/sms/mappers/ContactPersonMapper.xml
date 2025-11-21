@@ -52,4 +52,10 @@
         )
     </select>
 
+    <select id="phoneExists" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM contact_details
+        WHERE phone_number = #{phone}
+    </select>
+
 </mapper>
