@@ -25,4 +25,7 @@ interface RoleMapper {
 
     /** 🔹 Remove all roles from a user */
     fun removeAllRolesFromUser(userId: Long): Int
+
+    fun findRolesByUsername(username: String): List<Role>
+
 }

@@ -89,7 +89,7 @@ class MyUserDetailsManager(
         val user = userMapper.findByUsername(username)
             ?: throw UsernameNotFoundException("User not found: $username")
         
-        val roles = userMapper.findRolesByUsername(username)
+        val roles = roleMapper.findRolesByUsername(username)
         return user.copy(
             roles = roles.toSet(),
             person = user.person
@@ -136,13 +136,13 @@ class MyUserDetailsManager(
 
     fun findAllUsers(): List<User> {
         return userMapper.findAllUsers().map { user ->
-            val roles = userMapper.findRolesByUsername(user.username)
+            val roles = roleMapper.findRolesByUsername(user.username)
             user.copy(roles = roles.toSet())
         }
     }
     fun findByUsername(username: String): User? {
         return userMapper.findByUsername(username)?.copy(
-            roles = userMapper.findRolesByUsername(username).toSet()
+            roles = roleMapper.findRolesByUsername(username).toSet()
         )
     }
 

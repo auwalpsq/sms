@@ -4,13 +4,6 @@
 
 <mapper namespace="com.sms.mappers.UserMapper">
 
-    <!-- Role ResultMap -->
-    <resultMap id="roleResultMap" type="com.sms.entities.Role">
-        <id property="id" column="id"/>
-        <result property="name" column="name"/>
-        <result property="description" column="description"/>
-    </resultMap>
-
     <resultMap id="userResultMap" type="com.sms.entities.User">
         <id property="id" column="id"/>
         <result property="username" column="username"/>
@@ -30,8 +23,6 @@
             <result property="updatedAt" column="updated_at" javaType="java.time.LocalDateTime" />
         </association>
 
-        <collection property="roles" ofType="com.sms.entities.Role"
-                    select="findRolesByUsername" column="username"/>
     </resultMap>
 
     <select id="findByUsername" resultMap="userResultMap">
@@ -86,13 +77,6 @@
     <delete id="deleteUser">
         DELETE FROM users WHERE username = #{username}
     </delete>
-
-    <select id="findRolesByUsername" resultType="com.sms.entities.Role">
-        SELECT r.* FROM roles r
-        JOIN user_roles ur ON r.id = ur.role_id
-        JOIN users u ON ur.user_id = u.id
-        WHERE u.username = #{username}
-    </select>
 
     <select id="findAllUsers" resultMap="userResultMap">
         SELECT * FROM users

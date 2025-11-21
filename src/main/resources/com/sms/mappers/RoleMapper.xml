@@ -80,4 +80,13 @@
     <delete id="removeAllRolesFromUser">
         DELETE FROM user_roles WHERE user_id = #{userId}
     </delete>
+
+    <select id="findRolesByUsername" resultMap="roleResultMap">
+        SELECT r.id, r.name, r.description
+        FROM roles r
+        INNER JOIN user_roles ur ON ur.role_id = r.id
+        INNER JOIN users u ON u.id = ur.user_id
+        WHERE u.username = #{username}
+    </select>
+
 </mapper>

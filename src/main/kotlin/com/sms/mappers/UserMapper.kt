@@ -15,7 +15,6 @@ interface UserMapper {
     fun updateUserPassword(@Param("id") id: Long, @Param("password") password: String): Int
     fun deleteUser(username: String): Int
     fun findRolesByUserId(userId: Long): List<Role>
-    fun findRolesByUsername(username: String): List<Role>
     fun findAllUsers(): List<User>
     fun addRoleToUser(@Param("userId") userId: Long, @Param("roleId") roleId: Long): Int
     fun removeRoleFromUser(@Param("userId") userId: Long, @Param("roleId") roleId: Long): Int

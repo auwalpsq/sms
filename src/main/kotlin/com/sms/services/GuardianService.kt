@@ -114,9 +114,8 @@ class GuardianService(
     suspend fun getGuardianRoles(guardian: Guardian): Set<UserRole> = withContext(Dispatchers.IO) {
         val user = userDetailsManager.findByUsername(guardian.email)
             ?: throw IllegalArgumentException("User not found for guardian: ${guardian.email}")
-        println(user)
+        println(user.roles)
         user.roles.mapNotNull { role -> UserRole.values().find { it.name == role.name } }.toSet()
     }
-
 
 }
