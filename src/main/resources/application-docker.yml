@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/sms_data
+    username: auwal
+    password: 051992
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+vaadin:
+  productionMode: false

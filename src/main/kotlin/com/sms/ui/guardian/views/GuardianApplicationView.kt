@@ -10,7 +10,7 @@ import com.sms.services.SchoolClassService
 import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.components.PaginationBar
 import com.sms.ui.components.SearchBar
-import com.sms.ui.guardian.GuardianLayout
+import com.sms.ui.guardian.GuardianDashboard
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -31,7 +31,7 @@ import jakarta.annotation.security.RolesAllowed
 import org.springframework.security.core.context.SecurityContextHolder
 
 @PageTitle("My Applications")
-@Route(value = "guardian/applications", layout = GuardianLayout::class)
+@Route(value = "guardian/applications", layout = GuardianDashboard::class)
 @RolesAllowed("GUARDIAN")
 @Menu(order = 2.0, icon = "vaadin:form", title = "Apply for Admission")
 class GuardianApplicationView(

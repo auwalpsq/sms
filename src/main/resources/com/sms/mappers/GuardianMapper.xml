@@ -80,6 +80,7 @@
     <select id="findById" parameterType="long" resultMap="guardianResultMap">
         SELECT
         g.*,
+        c.*,
         p.first_name,
         p.middle_name,
         p.last_name,
@@ -87,8 +88,9 @@
         p.date_of_birth,
         p.created_at,
         p.updated_at
-        FROM guardians g
-        JOIN persons p ON g.id = p.id
+        FROM persons p
+        JOIN guardians g ON g.id = p.id
+        JOIN contact_details c on c.id = p.id
         WHERE g.id = #{id}
     </select>
 

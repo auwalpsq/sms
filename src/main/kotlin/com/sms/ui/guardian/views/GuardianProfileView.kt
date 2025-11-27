@@ -7,7 +7,7 @@ import com.sms.services.GuardianService
 import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
 import com.sms.ui.components.GuardianDialogForm
-import com.sms.ui.guardian.GuardianLayout
+import com.sms.ui.guardian.GuardianDashboard
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -23,7 +23,7 @@ import com.vaadin.flow.router.Route
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.security.core.context.SecurityContextHolder
 
-@Route("guardian/profile", layout = GuardianLayout::class)
+@Route("guardian/profile", layout = GuardianDashboard::class)
 @RolesAllowed("GUARDIAN")
 @PageTitle("My Profile")
 @Menu(order = 1.0, icon = "vaadin:user", title = "My Profile")

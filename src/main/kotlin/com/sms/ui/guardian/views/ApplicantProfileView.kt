@@ -19,7 +19,7 @@ import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
 import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.components.PhotoUploadField
-import com.sms.ui.guardian.GuardianLayout
+import com.sms.ui.guardian.GuardianDashboard
 import com.sms.util.FormatUtil
 import com.sms.util.PaymentUiUtil
 import com.sms.util.launchUiCoroutine
@@ -47,7 +47,7 @@ import java.nio.file.Path
 import java.util.UUID
 
 @JavaScript("https://js.paystack.co/v2/inline.js")
-@Route(value = "guardian/applicant/:id", layout = GuardianLayout::class)
+@Route(value = "guardian/applicant/:id", layout = GuardianDashboard::class)
 @PageTitle("Applicant Profile")
 @RolesAllowed("GUARDIAN")
 class ApplicantProfileView(

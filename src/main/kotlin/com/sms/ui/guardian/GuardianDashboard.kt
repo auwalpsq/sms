@@ -35,7 +35,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 @PageTitle("Guardian Portal")
 @Route(value = "guardian")
 @RolesAllowed("GUARDIAN")
-class GuardianLayout(
+class GuardianDashboard(
     private val sessionService: AcademicSessionService
 ) : AppLayout() {
 

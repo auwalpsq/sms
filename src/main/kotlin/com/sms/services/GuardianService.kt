@@ -94,29 +94,45 @@ class GuardianService(
     suspend fun countFiltered(query: String?): Int = withContext(Dispatchers.IO) {
         guardianMapper.countFiltered(query)
     }
-    suspend fun updateGuardianRoles(guardian: Guardian, roles: Set<UserRole>) = withContext(Dispatchers.IO) {
+    suspend fun updateGuardianRoles(guardian: Guardian, roles: Set<UserRole>) =
+        withContext(Dispatchers.IO) {
+
+            val user = userDetailsManager.findByUsername(guardian.email)
+                ?: throw IllegalArgumentException("User not found for guardian: ${guardian.email}")
+
+            // Clear all existing roles first
+            roleMapper.removeAllRolesFromUser(user.id)
+
+            // Add ROLE_ prefix back when saving
+            val roleIds = roles.mapNotNull { roleEnum ->
+                val dbName = "ROLE_${roleEnum.name}"   // <-- ADD PREFIX BACK
+                roleMapper.findByName(dbName)?.id
+            }
+
+            if (roleIds.isNotEmpty()) {
+                roleMapper.addRolesToUser(user.id, roleIds)
+            }
+        }
+
+    suspend fun getGuardianRoles(guardian: Guardian): Set<UserRole> = withContext(Dispatchers.IO) {
         val user = userDetailsManager.findByUsername(guardian.email)
             ?: throw IllegalArgumentException("User not found for guardian: ${guardian.email}")
 
-        // Remove all existing roles
-        roleMapper.removeAllRolesFromUser(user.id)
+        // ACCESS THE USER ID HERE
+        val userId = user.id
 
-        // Add the new roles
-        val roleIds = roles.mapNotNull { role ->
-            roleMapper.findByName(role.name)?.id
-        }
-
-        if (roleIds.isNotEmpty()) {
-            roleMapper.addRolesToUser(user.id, roleIds)
-        }
-    }
-
-    suspend fun getGuardianRoles(guardian: Guardian): Set<UserRole> = withContext(Dispatchers.IO) {
-        val user = userDetailsManager.findByUsername(guardian.email)?.copy(
-            roles = roleMapper.findRolesByUserId(guardian.id).toSet()
+        val userWithRoles = user.copy(
+            roles = roleMapper.findRolesByUserId(userId).toSet()
         )
-            ?: throw IllegalArgumentException("User not found for guardian: ${guardian.email}")
-        user.roles.mapNotNull { role -> UserRole.values().find { it.name == role.name } }.toSet()
-    }
 
+        println(roleMapper.findRolesByUserId(userId))
+
+        userWithRoles.roles
+            .mapNotNull { role ->
+                val cleanName = role.name.removePrefix("ROLE_")
+                UserRole.values().find { it.name == cleanName }
+            }
+            .toSet()
+
+    }
 }

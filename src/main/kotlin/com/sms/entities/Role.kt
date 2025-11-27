@@ -10,7 +10,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "roles")
-class Role(
+data class Role(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 

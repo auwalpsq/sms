@@ -28,8 +28,8 @@ class GuardiansView(
 
     private val ui = UI.getCurrent()
     private val grid = Grid(Guardian::class.java, false)
-    private lateinit var dialog: GuardianDialogForm
-    private lateinit var paginationBar: PaginationBar
+    private var dialog: GuardianDialogForm
+    private var paginationBar: PaginationBar
 
     private var currentSearchQuery: String? = null
 

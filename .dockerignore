@@ -1,0 +1,77 @@
+# Version control
+.git/
+.gitignore
+.svn/
+.hg/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build outputs
+build/
+dist/
+out/
+target/
+
+# Test files and directories
+test/
+tests/
+*_test.go
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+
+# Go
+/vendor/
+*.test
+.go-cache/
+
+# Temporary and debug files
+tmp/
+temp/
+*.tmp
+debug/
+*.log
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# Documentation
+README*
+*.md
+docs/
+
+# Docker files
+Dockerfile*
+docker-compose*
+
+# Local development
+.local/
+local/
+
+# Project-specific
+.kotlin/sessions/
+
+# Exclude gradle wrapper and gradle directory (do not ignore)
+# (gradlew, gradlew.bat, gradle/wrapper/ are intentionally NOT ignored)
+
+# Exclude .mvnw, .mvn, .gradle (do not ignore)
+# (as per instructions, do not ignore these)

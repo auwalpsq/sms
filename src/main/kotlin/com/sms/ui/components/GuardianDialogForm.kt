@@ -63,7 +63,7 @@ class GuardianDialogForm(
         if (adminMode) {
             // Admin only needs basic fields
             formLayout.responsiveSteps = listOf(FormLayout.ResponsiveStep("0", 1))
-            formLayout.add(firstName, lastName, gender, email, phoneNumber, roles)
+            formLayout.add(firstName, middleName, lastName, gender, email, phoneNumber, roles)
 
             roles.setItems(UserRole.GUARDIAN, UserRole.STAFF)
 
@@ -78,6 +78,7 @@ class GuardianDialogForm(
 
             // Make some read-only
             firstName.isReadOnly = true
+            middleName.isReadOnly = true
             lastName.isReadOnly = true
             guardianId.isReadOnly = true
             email.isReadOnly = true

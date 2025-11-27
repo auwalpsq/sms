@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: postgres:16
+    container_name: sms_db
+    restart: always
+    environment:
+      POSTGRES_DB: sms_data
+      POSTGRES_USER: auwal
+      POSTGRES_PASSWORD: 051992
+    ports:
+      - "5433:5432"
+    volumes:
+      - sms_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auwal -d sms_data"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  sms_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sms_app
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/sms_data
+      SPRING_DATASOURCE_USERNAME: auwal
+      SPRING_DATASOURCE_PASSWORD: 051992
+    #command: ["java", "-jar", "/app/app.jar"]
+
+volumes:
+  sms_pgdata:

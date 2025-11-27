@@ -1,16 +1,16 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/sms_data
-    username: auwal
-    password: 051992
-    driver-class-name: org.postgresql.Driver
-  jpa:
+  profiles:
+    active: local
+jpa:
+  hibernate:
+    ddl-auto: update
+  properties:
     hibernate:
-      ddl-auto: update
-    sql:
-      init:
-        mode: always
-        continue-on-error: true
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
 
 vaadin:
   production-mode: false
@@ -20,7 +20,7 @@ mybatis:
   mapper-locations: classpath:com/sms/mappers/*.xml
   type-aliases-package: com.sms.entities
   configuration:
-    map-underscore-to-camel-case: true # Converts first_name to firstName
+    map-underscore-to-camel-case: true
 
 server:
   servlet:
@@ -31,6 +31,6 @@ paystack:
   secret-key: sk_test_e7fd3716c1beec1ca1c788208040db93d472ec93
 
 prince:
-  executable: C:\Program Files\Prince\engine\bin\prince # set to where prince is installed on your machine
-  log: C:\Users\pc\Documents\GitHub\sms\prince\prince.txt       # optional
-  enableJs: false               # optional (if you use JS in templates)
+  executable: C:\Program Files\Prince\engine\bin\prince
+  log: C:\Users\pc\Documents\GitHub\sms\prince\prince.txt
+  enableJs: false
