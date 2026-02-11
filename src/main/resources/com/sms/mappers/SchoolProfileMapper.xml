@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sms.mappers.SchoolProfileMapper">
+
+    <resultMap id="schoolProfileResultMap" type="com.sms.entities.SchoolProfile">
+        <id property="id" column="id" javaType="long"/>
+        <result property="name" column="name" javaType="string"/>
+        <result property="address" column="address" javaType="string"/>
+        <result property="email" column="email" javaType="string"/>
+        <result property="phoneNumber" column="phone_number" javaType="string"/>
+        <result property="motto" column="motto" javaType="string"/>
+        <result property="logoUrl" column="logo_url" javaType="string"/>
+        <result property="website" column="website" javaType="string"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="schoolProfileResultMap">
+        SELECT * FROM school_profile
+    </select>
+
+    <select id="findById" parameterType="long" resultMap="schoolProfileResultMap">
+        SELECT * FROM school_profile WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.sms.entities.SchoolProfile" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO school_profile (
+            name, address, email, phone_number, motto, logo_url, website
+        ) VALUES (
+            #{name}, #{address}, #{email}, #{phoneNumber}, #{motto}, #{logoUrl}, #{website}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.sms.entities.SchoolProfile">
+        UPDATE school_profile SET
+            name = #{name},
+            address = #{address},
+            email = #{email},
+            phone_number = #{phoneNumber},
+            motto = #{motto},
+            logo_url = #{logoUrl},
+            website = #{website}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

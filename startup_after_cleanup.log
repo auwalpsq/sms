@@ -1,0 +1,171 @@
+Starting a Gradle Daemon, 3 busy and 2 stopped Daemons could not be reused, use --status for details
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :copyThemeCss UP-TO-DATE
+> Task :vaadinPrepareFrontend
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName UP-TO-DATE
+
+> Task :bootRun
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.1)
+
+2026-02-11T17:19:09.910+01:00  INFO 19260 --- [           main] com.sms.SmsApplicationKt                 : Starting SmsApplicationKt using Java 21.0.6 with PID 19260 (C:\Users\HP\Documents\GitHub\sms\build\classes\kotlin\main started by HP in C:\Users\HP\Documents\GitHub\sms)
+2026-02-11T17:19:09.912+01:00  INFO 19260 --- [           main] com.sms.SmsApplicationKt                 : The following 1 profile is active: "local"
+2026-02-11T17:19:11.040+01:00  INFO 19260 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-11T17:19:11.091+01:00  INFO 19260 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 42 ms. Found 0 JPA repository interfaces.
+2026-02-11T17:19:11.813+01:00  INFO 19260 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-11T17:19:11.829+01:00  INFO 19260 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-11T17:19:11.829+01:00  INFO 19260 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2026-02-11T17:19:11.870+01:00  INFO 19260 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-11T17:19:11.870+01:00  INFO 19260 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1902 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-02-11T17:19:12.002+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereHandler com.vaadin.hilla.push.PushEndpoint mapped to context-path: /HILLA/push
+2026-02-11T17:19:12.003+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed the following AtmosphereInterceptor mapped to AtmosphereHandler com.vaadin.hilla.push.PushEndpoint
+2026-02-11T17:19:12.003+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor : Atmosphere LifeCycle
+2026-02-11T17:19:12.003+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.client.TrackMessageSizeInterceptor :  Track Message Size Interceptor using |
+2026-02-11T17:19:12.003+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.SuspendTrackerInterceptor : UUID Tracking Interceptor
+2026-02-11T17:19:12.115+01:00  INFO 19260 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-11T17:19:12.329+01:00  INFO 19260 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@dde6f87
+2026-02-11T17:19:12.330+01:00  INFO 19260 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-11T17:19:12.542+01:00  INFO 19260 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing AtmosphereFramework
+2026-02-11T17:19:13.347+01:00  INFO 19260 --- [           main] c.v.f.s.VaadinServletContextInitializer  : Search for subclasses and classes with annotations took 253 ms
+2026-02-11T17:19:13.783+01:00  INFO 19260 --- [           main] c.v.b.d.startup.DevModeStartupListener   : Starting dev-mode updaters in C:\Users\HP\Documents\GitHub\sms folder.
+2026-02-11T17:19:13.806+01:00  INFO 19260 --- [           main] c.v.f.s.f.s.FullDependenciesScanner      : Visited 28 classes. Took 7 ms.
+2026-02-11T17:19:13.808+01:00  INFO 19260 --- [           main] c.v.f.s.frontend.BundleValidationUtil    : Checking if a development mode bundle build is needed
+2026-02-11T17:19:13.865+01:00  INFO 19260 --- [           main] c.v.f.s.frontend.BundleValidationUtil    : A development mode bundle build is not needed
+2026-02-11T17:19:13.893+01:00  INFO 19260 --- [in-dev-server-1] c.v.f.s.frontend.TaskCopyFrontendFiles   : Copying frontend resources from jar files ...
+2026-02-11T17:19:13.953+01:00  INFO 19260 --- [in-dev-server-1] c.v.f.s.frontend.TaskCopyFrontendFiles   : Visited 19 resources. Took 59 ms.
+2026-02-11T17:19:14.019+01:00  INFO 19260 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-11T17:19:14.076+01:00  INFO 19260 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.18.Final
+2026-02-11T17:19:14.110+01:00  INFO 19260 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-11T17:19:14.433+01:00  INFO 19260 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-11T17:19:14.577+01:00  INFO 19260 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-11T17:19:15.720+01:00  INFO 19260 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-11T17:19:15.723+01:00  INFO 19260 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-11T17:19:16.218+01:00  WARN 19260 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-11T17:19:16.243+01:00  INFO 19260 --- [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsManager
+2026-02-11T17:19:16.611+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereHandler com.vaadin.flow.server.communication.PushAtmosphereHandler mapped to context-path: /*
+2026-02-11T17:19:16.611+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed the following AtmosphereInterceptor mapped to AtmosphereHandler com.vaadin.flow.server.communication.PushAtmosphereHandler
+2026-02-11T17:19:16.631+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere is using org.atmosphere.util.VoidAnnotationProcessor for processing annotation
+2026-02-11T17:19:16.634+01:00  INFO 19260 --- [           main] org.atmosphere.util.ForkJoinPool         : Using ForkJoinPool  java.util.concurrent.ForkJoinPool. Set the org.atmosphere.cpr.broadcaster.maxAsyncWriteThreads to -1 to fully use its power.
+2026-02-11T17:19:16.638+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed WebSocketProtocol org.atmosphere.websocket.protocol.SimpleHttpProtocol 
+2026-02-11T17:19:16.640+01:00  INFO 19260 --- [           main] o.a.container.JSR356AsyncSupport         : JSR 356 Mapping path /VAADIN/push
+2026-02-11T17:19:16.646+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installing Default AtmosphereInterceptors
+2026-02-11T17:19:16.647+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.CorsInterceptor : CORS Interceptor Support
+2026-02-11T17:19:16.647+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.CacheHeadersInterceptor : Default Response's Headers Interceptor
+2026-02-11T17:19:16.648+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.PaddingAtmosphereInterceptor : Browser Padding Interceptor Support
+2026-02-11T17:19:16.649+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.AndroidAtmosphereInterceptor : Android Interceptor Support
+2026-02-11T17:19:16.649+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.HeartbeatInterceptor : Heartbeat Interceptor Support
+2026-02-11T17:19:16.650+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.SSEAtmosphereInterceptor : SSE Interceptor Support
+2026-02-11T17:19:16.650+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.JSONPAtmosphereInterceptor : JSONP Interceptor Support
+2026-02-11T17:19:16.650+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.JavaScriptProtocol : Atmosphere JavaScript Protocol
+2026-02-11T17:19:16.650+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor : org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor
+2026-02-11T17:19:16.650+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.OnDisconnectInterceptor : Browser disconnection detection
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.IdleResourceInterceptor : org.atmosphere.interceptor.IdleResourceInterceptor
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Set org.atmosphere.cpr.AtmosphereInterceptor.disableDefaults to disable them.
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor CORS Interceptor Support with priority FIRST_BEFORE_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Default Response's Headers Interceptor with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Browser Padding Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Android Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] o.a.interceptor.HeartbeatInterceptor     : HeartbeatInterceptor configured with padding value 'X', client frequency 0 seconds and server frequency 60 seconds
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Heartbeat Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor SSE Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor JSONP Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Atmosphere JavaScript Protocol with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Browser disconnection detection with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor org.atmosphere.interceptor.IdleResourceInterceptor with priority BEFORE_DEFAULT 
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Using EndpointMapper class org.atmosphere.util.DefaultEndpointMapper
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Using BroadcasterCache: org.atmosphere.cache.UUIDBroadcasterCache
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Default Broadcaster Class: org.atmosphere.cpr.DefaultBroadcaster
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Broadcaster Shared List Resources: false
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Broadcaster Polling Wait Time 100
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Shared ExecutorService supported: true
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Messaging ExecutorService Pool Size unavailable - Not instance of ThreadPoolExecutor
+2026-02-11T17:19:16.651+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Async I/O Thread Pool Size: 200
+2026-02-11T17:19:16.652+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Using BroadcasterFactory: org.atmosphere.cpr.DefaultBroadcasterFactory
+2026-02-11T17:19:16.652+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Using AtmosphereResurceFactory: org.atmosphere.cpr.DefaultAtmosphereResourceFactory
+2026-02-11T17:19:16.652+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Using WebSocketProcessor: org.atmosphere.websocket.DefaultWebSocketProcessor
+2026-02-11T17:19:16.653+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Invoke AtmosphereInterceptor on WebSocket message true
+2026-02-11T17:19:16.653+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : HttpSession supported: true
+2026-02-11T17:19:16.653+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere is using org.atmosphere.inject.InjectableObjectFactory for dependency injection and object creation
+2026-02-11T17:19:16.653+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere is using async support: org.atmosphere.container.JSR356AsyncSupport running under container: Apache Tomcat/10.1.42 using jakarta.servlet/3.0 and jsr356/WebSocket API
+2026-02-11T17:19:16.653+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere Framework 3.0.5.slf4jvaadin1 started.
+2026-02-11T17:19:16.656+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor  Track Message Size Interceptor using | with priority BEFORE_DEFAULT 
+2026-02-11T17:19:16.688+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere is using org.atmosphere.cpr.DefaultAnnotationProcessor for processing annotation
+2026-02-11T17:19:16.688+01:00  INFO 19260 --- [           main] o.a.cpr.DefaultAnnotationProcessor       : AnnotationProcessor class org.atmosphere.cpr.DefaultAnnotationProcessor$BytecodeBasedAnnotationProcessor being used
+2026-02-11T17:19:16.702+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Auto detecting WebSocketHandler in /WEB-INF/classes/
+2026-02-11T17:19:16.703+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed WebSocketProtocol org.atmosphere.websocket.protocol.SimpleHttpProtocol 
+2026-02-11T17:19:16.703+01:00  INFO 19260 --- [           main] o.a.container.JSR356AsyncSupport         : JSR 356 Mapping path /HILLA/push
+2026-02-11T17:19:16.703+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installing Default AtmosphereInterceptors
+2026-02-11T17:19:16.703+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.CorsInterceptor : CORS Interceptor Support
+2026-02-11T17:19:16.703+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.CacheHeadersInterceptor : Default Response's Headers Interceptor
+2026-02-11T17:19:16.703+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.PaddingAtmosphereInterceptor : Browser Padding Interceptor Support
+2026-02-11T17:19:16.703+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.AndroidAtmosphereInterceptor : Android Interceptor Support
+2026-02-11T17:19:16.703+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.HeartbeatInterceptor : Heartbeat Interceptor Support
+2026-02-11T17:19:16.703+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.SSEAtmosphereInterceptor : SSE Interceptor Support
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.JSONPAtmosphereInterceptor : JSONP Interceptor Support
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.JavaScriptProtocol : Atmosphere JavaScript Protocol
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor : org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.OnDisconnectInterceptor : Browser disconnection detection
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.IdleResourceInterceptor : org.atmosphere.interceptor.IdleResourceInterceptor
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Set org.atmosphere.cpr.AtmosphereInterceptor.disableDefaults to disable them.
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor CORS Interceptor Support with priority FIRST_BEFORE_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Default Response's Headers Interceptor with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Browser Padding Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Android Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] o.a.interceptor.HeartbeatInterceptor     : HeartbeatInterceptor configured with padding value 'X', client frequency 0 seconds and server frequency 60 seconds
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Heartbeat Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor SSE Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor JSONP Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Atmosphere JavaScript Protocol with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Browser disconnection detection with priority AFTER_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor org.atmosphere.interceptor.IdleResourceInterceptor with priority BEFORE_DEFAULT 
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Using EndpointMapper class org.atmosphere.util.DefaultEndpointMapper
+2026-02-11T17:19:16.704+01:00  WARN 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : No BroadcasterCache configured. Broadcasted message between client reconnection will be LOST. It is recommended to configure the org.atmosphere.cache.UUIDBroadcasterCache
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Default Broadcaster Class: org.atmosphere.util.SimpleBroadcaster
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Broadcaster Shared List Resources: false
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Broadcaster Polling Wait Time 100
+2026-02-11T17:19:16.704+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Shared ExecutorService supported: true
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.util.ForkJoinPool         : Using ForkJoinPool  java.util.concurrent.ForkJoinPool. Set the org.atmosphere.cpr.broadcaster.maxAsyncWriteThreads to -1 to fully use its power.
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Messaging ExecutorService Pool Size unavailable - Not instance of ThreadPoolExecutor
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Async I/O Thread Pool Size: 200
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Using BroadcasterFactory: org.atmosphere.cpr.DefaultBroadcasterFactory
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Using AtmosphereResurceFactory: org.atmosphere.cpr.DefaultAtmosphereResourceFactory
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Using WebSocketProcessor: org.atmosphere.websocket.DefaultWebSocketProcessor
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Invoke AtmosphereInterceptor on WebSocket message true
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : HttpSession supported: false
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere is using org.atmosphere.inject.InjectableObjectFactory for dependency injection and object creation
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere is using async support: org.atmosphere.container.JSR356AsyncSupport running under container: Apache Tomcat/10.1.42 using jakarta.servlet/3.0 and jsr356/WebSocket API
+2026-02-11T17:19:16.705+01:00  INFO 19260 --- [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere Framework 3.0.5.slf4jvaadin1 started.
+2026-02-11T17:19:16.729+01:00  INFO 19260 --- [           main] c.v.f.s.DefaultDeploymentConfiguration   : 
+Vaadin is running in DEVELOPMENT mode - do not use for production deployments.
+2026-02-11T17:19:16.763+01:00  INFO 19260 --- [           main] c.vaadin.flow.spring.SpringInstantiator  : The number of beans implementing 'I18NProvider' is 0. Cannot use Spring beans for I18N, falling back to the default behavior
+2026-02-11T17:19:16.815+01:00  INFO 19260 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-02-11T17:19:16.821+01:00  INFO 19260 --- [           main] com.sms.SmsApplicationKt                 : Started SmsApplicationKt in 7.306 seconds (process running for 7.648)
+2026-02-11T17:19:16.872+01:00  INFO 19260 --- [           main] c.v.b.d.DevModeHandlerManagerImpl        : Application running at http://localhost:8080/
+2026-02-11T17:19:16.903+01:00  INFO 19260 --- [nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-11T17:19:16.903+01:00  INFO 19260 --- [nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-02-11T17:19:16.904+01:00  INFO 19260 --- [nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-02-11T17:19:17.379+01:00  INFO 19260 --- [       Thread-2] org.atmosphere.cpr.AtmosphereFramework   : Latest version of Atmosphere's JavaScript Client 3.1.4
+login view loaded
+login view loaded

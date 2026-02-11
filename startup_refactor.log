@@ -1,0 +1,149 @@
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :copyThemeCss UP-TO-DATE
+> Task :vaadinPrepareFrontend UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName UP-TO-DATE
+
+> Task :bootRun
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.1)
+
+2026-02-11T17:05:47.080+01:00  INFO 4104 --- [sms] [           main] com.sms.SmsApplicationKt                 : Starting SmsApplicationKt using Java 21.0.6 with PID 4104 (C:\Users\HP\Documents\GitHub\sms\build\classes\kotlin\main started by HP in C:\Users\HP\Documents\GitHub\sms)
+2026-02-11T17:05:47.085+01:00  INFO 4104 --- [sms] [           main] com.sms.SmsApplicationKt                 : The following 1 profile is active: "local"
+2026-02-11T17:05:49.180+01:00  INFO 4104 --- [sms] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-11T17:05:49.296+01:00  INFO 4104 --- [sms] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 97 ms. Found 0 JPA repository interfaces.
+2026-02-11T17:05:50.666+01:00  INFO 4104 --- [sms] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-02-11T17:05:50.699+01:00  INFO 4104 --- [sms] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-11T17:05:50.700+01:00  INFO 4104 --- [sms] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.42]
+2026-02-11T17:05:50.773+01:00  INFO 4104 --- [sms] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-11T17:05:50.773+01:00  INFO 4104 --- [sms] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3590 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-02-11T17:05:51.023+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereHandler com.vaadin.hilla.push.PushEndpoint mapped to context-path: /HILLA/push
+2026-02-11T17:05:51.023+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed the following AtmosphereInterceptor mapped to AtmosphereHandler com.vaadin.hilla.push.PushEndpoint
+2026-02-11T17:05:51.023+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor : Atmosphere LifeCycle
+2026-02-11T17:05:51.023+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.client.TrackMessageSizeInterceptor :  Track Message Size Interceptor using |
+2026-02-11T17:05:51.023+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.SuspendTrackerInterceptor : UUID Tracking Interceptor
+2026-02-11T17:05:51.237+01:00  INFO 4104 --- [sms] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-11T17:05:51.501+01:00  INFO 4104 --- [sms] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2f0cab82
+2026-02-11T17:05:51.510+01:00  INFO 4104 --- [sms] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-11T17:05:51.880+01:00  INFO 4104 --- [sms] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing AtmosphereFramework
+2026-02-11T17:05:53.603+01:00  INFO 4104 --- [sms] [           main] c.v.f.s.VaadinServletContextInitializer  : Search for subclasses and classes with annotations took 598 ms
+2026-02-11T17:05:54.469+01:00  INFO 4104 --- [sms] [           main] c.v.b.d.startup.DevModeStartupListener   : Starting dev-mode updaters in C:\Users\HP\Documents\GitHub\sms folder.
+2026-02-11T17:05:54.502+01:00  INFO 4104 --- [sms] [           main] c.v.f.s.f.s.FullDependenciesScanner      : Visited 28 classes. Took 8 ms.
+2026-02-11T17:05:54.505+01:00  INFO 4104 --- [sms] [           main] c.v.f.s.frontend.BundleValidationUtil    : Checking if a development mode bundle build is needed
+2026-02-11T17:05:54.585+01:00  INFO 4104 --- [sms] [           main] c.v.f.s.frontend.BundleValidationUtil    : A development mode bundle build is not needed
+2026-02-11T17:05:54.619+01:00  INFO 4104 --- [sms] [in-dev-server-1] c.v.f.s.frontend.TaskCopyFrontendFiles   : Copying frontend resources from jar files ...
+2026-02-11T17:05:54.702+01:00  INFO 4104 --- [sms] [in-dev-server-1] c.v.f.s.frontend.TaskCopyFrontendFiles   : Visited 19 resources. Took 83 ms.
+2026-02-11T17:05:54.748+01:00  INFO 4104 --- [sms] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-11T17:05:54.813+01:00  INFO 4104 --- [sms] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.18.Final
+2026-02-11T17:05:54.844+01:00  INFO 4104 --- [sms] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-11T17:05:55.104+01:00  INFO 4104 --- [sms] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-11T17:05:55.248+01:00  INFO 4104 --- [sms] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-11T17:05:56.333+01:00  INFO 4104 --- [sms] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-11T17:05:56.336+01:00  INFO 4104 --- [sms] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-11T17:05:56.761+01:00  WARN 4104 --- [sms] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-11T17:05:56.786+01:00  INFO 4104 --- [sms] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name myUserDetailsManager
+2026-02-11T17:05:57.168+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereHandler com.vaadin.flow.server.communication.PushAtmosphereHandler mapped to context-path: /*
+2026-02-11T17:05:57.168+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed the following AtmosphereInterceptor mapped to AtmosphereHandler com.vaadin.flow.server.communication.PushAtmosphereHandler
+2026-02-11T17:05:57.188+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere is using org.atmosphere.util.VoidAnnotationProcessor for processing annotation
+2026-02-11T17:05:57.192+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.util.ForkJoinPool         : Using ForkJoinPool  java.util.concurrent.ForkJoinPool. Set the org.atmosphere.cpr.broadcaster.maxAsyncWriteThreads to -1 to fully use its power.
+2026-02-11T17:05:57.196+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed WebSocketProtocol org.atmosphere.websocket.protocol.SimpleHttpProtocol 
+2026-02-11T17:05:57.198+01:00  INFO 4104 --- [sms] [           main] o.a.container.JSR356AsyncSupport         : JSR 356 Mapping path /VAADIN/push
+2026-02-11T17:05:57.204+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installing Default AtmosphereInterceptors
+2026-02-11T17:05:57.205+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.CorsInterceptor : CORS Interceptor Support
+2026-02-11T17:05:57.205+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.CacheHeadersInterceptor : Default Response's Headers Interceptor
+2026-02-11T17:05:57.205+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.PaddingAtmosphereInterceptor : Browser Padding Interceptor Support
+2026-02-11T17:05:57.206+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.AndroidAtmosphereInterceptor : Android Interceptor Support
+2026-02-11T17:05:57.206+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.HeartbeatInterceptor : Heartbeat Interceptor Support
+2026-02-11T17:05:57.207+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.SSEAtmosphereInterceptor : SSE Interceptor Support
+2026-02-11T17:05:57.207+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.JSONPAtmosphereInterceptor : JSONP Interceptor Support
+2026-02-11T17:05:57.208+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.JavaScriptProtocol : Atmosphere JavaScript Protocol
+2026-02-11T17:05:57.208+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor : org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor
+2026-02-11T17:05:57.208+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.OnDisconnectInterceptor : Browser disconnection detection
+2026-02-11T17:05:57.208+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : 	org.atmosphere.interceptor.IdleResourceInterceptor : org.atmosphere.interceptor.IdleResourceInterceptor
+2026-02-11T17:05:57.208+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Set org.atmosphere.cpr.AtmosphereInterceptor.disableDefaults to disable them.
+2026-02-11T17:05:57.208+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor CORS Interceptor Support with priority FIRST_BEFORE_DEFAULT 
+2026-02-11T17:05:57.208+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Default Response's Headers Interceptor with priority AFTER_DEFAULT 
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Browser Padding Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Android Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] o.a.interceptor.HeartbeatInterceptor     : HeartbeatInterceptor configured with padding value 'X', client frequency 0 seconds and server frequency 60 seconds
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Heartbeat Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor SSE Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor JSONP Interceptor Support with priority AFTER_DEFAULT 
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Atmosphere JavaScript Protocol with priority AFTER_DEFAULT 
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor with priority AFTER_DEFAULT 
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor Browser disconnection detection with priority AFTER_DEFAULT 
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor org.atmosphere.interceptor.IdleResourceInterceptor with priority BEFORE_DEFAULT 
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Using EndpointMapper class org.atmosphere.util.DefaultEndpointMapper
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Using BroadcasterCache: org.atmosphere.cache.UUIDBroadcasterCache
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Default Broadcaster Class: org.atmosphere.cpr.DefaultBroadcaster
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Broadcaster Shared List Resources: false
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Broadcaster Polling Wait Time 100
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Shared ExecutorService supported: true
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Messaging ExecutorService Pool Size unavailable - Not instance of ThreadPoolExecutor
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Async I/O Thread Pool Size: 200
+2026-02-11T17:05:57.209+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Using BroadcasterFactory: org.atmosphere.cpr.DefaultBroadcasterFactory
+2026-02-11T17:05:57.210+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Using AtmosphereResurceFactory: org.atmosphere.cpr.DefaultAtmosphereResourceFactory
+2026-02-11T17:05:57.210+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Using WebSocketProcessor: org.atmosphere.websocket.DefaultWebSocketProcessor
+2026-02-11T17:05:57.212+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Invoke AtmosphereInterceptor on WebSocket message true
+2026-02-11T17:05:57.212+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : HttpSession supported: true
+2026-02-11T17:05:57.212+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere is using org.atmosphere.inject.InjectableObjectFactory for dependency injection and object creation
+2026-02-11T17:05:57.212+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere is using async support: org.atmosphere.container.JSR356AsyncSupport running under container: Apache Tomcat/10.1.42 using jakarta.servlet/3.0 and jsr356/WebSocket API
+2026-02-11T17:05:57.212+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Atmosphere Framework 3.0.5.slf4jvaadin1 started.
+2026-02-11T17:05:57.214+01:00  INFO 4104 --- [sms] [           main] org.atmosphere.cpr.AtmosphereFramework   : Installed AtmosphereInterceptor  Track Message Size Interceptor using | with priority BEFORE_DEFAULT 
+2026-02-11T17:05:57.242+01:00  WARN 4104 --- [sms] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-02-11T17:05:57.244+01:00  INFO 4104 --- [sms] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-11T17:05:57.247+01:00  INFO 4104 --- [sms] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-11T17:05:57.250+01:00  INFO 4104 --- [sms] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-11T17:05:57.266+01:00  INFO 4104 --- [sms] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-02-11T17:05:57.279+01:00 ERROR 4104 --- [sms] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+
+> Task :bootRun FAILED
+6 actionable tasks: 1 executed, 5 up-to-date
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':bootRun'.
+> Process 'command 'C:\Program Files\Java\jdk-21.0.6+7\bin\java.exe'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 21s

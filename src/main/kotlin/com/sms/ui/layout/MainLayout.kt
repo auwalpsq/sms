@@ -1,6 +1,7 @@
 package com.sms.ui.layout
 
 import com.sms.entities.User
+import com.sms.services.SchoolConfigService
 import com.vaadin.flow.component.Component
 import com.vaadin.flow.component.Composite
 import com.vaadin.flow.component.HasElement
@@ -17,7 +18,8 @@ import com.vaadin.flow.server.VaadinServletRequest
 import com.vaadin.flow.server.menu.MenuConfiguration
 import org.springframework.security.core.context.SecurityContextHolder
 
-class MainLayout : Composite<Div>(), RouterLayout, AfterNavigationObserver {
+class MainLayout(private val schoolConfigService: SchoolConfigService) :
+        Composite<Div>(), RouterLayout, AfterNavigationObserver {
 
     private val navLinks = mutableListOf<Div>()
     private lateinit var contentArea: Div
@@ -41,6 +43,7 @@ class MainLayout : Composite<Div>(), RouterLayout, AfterNavigationObserver {
 
     private fun buildHeader(): Div {
         val header = Div().apply { addClassName("app-header") }
+        val schoolProfile = schoolConfigService.getSchoolProfile()
 
         val inner =
                 Div().apply {
@@ -60,7 +63,7 @@ class MainLayout : Composite<Div>(), RouterLayout, AfterNavigationObserver {
                             }
 
                     val title =
-                            H3("School Management").apply {
+                            H3(schoolProfile.name).apply {
                                 style.set("margin-left", "16px")
                                 style.set("margin-top", "0")
                                 style.set("margin-bottom", "0")
@@ -134,7 +137,11 @@ class MainLayout : Composite<Div>(), RouterLayout, AfterNavigationObserver {
             link.addClassName("nav-link")
             link.element.setAttribute("data-route", entry.path)
 
-            val text = Span(entry.title).apply { addClassName("nav-label") }
+            val text =
+                    Span(entry.title).apply {
+                        addClassName("nav-label")
+                        element.setAttribute("title", entry.title)
+                    }
 
             val wrapper = Div(link, text).apply { addClassName("nav-item") }
             navLinks.add(link)
