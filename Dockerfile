@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- Build Stage ----
-FROM gradle:8.5-jdk17 AS build
+FROM gradle:8.5-jdk21 AS build
 
 # Set workdir
 WORKDIR /app
@@ -21,7 +21,7 @@ COPY --link .kotlin .kotlin
 RUN ./gradlew build --no-daemon -x test
 
 # ---- Runtime Stage ----
-FROM eclipse-temurin:17-jre-alpine AS runtime
+FROM eclipse-temurin:21-jre-alpine AS runtime
 
 # Create a non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup

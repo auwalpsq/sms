@@ -7,7 +7,7 @@ import com.sms.services.GuardianService
 import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
 import com.sms.ui.components.GuardianDialogForm
-import com.sms.ui.guardian.GuardianDashboard
+import com.sms.ui.layout.MainLayout
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -23,13 +23,13 @@ import com.vaadin.flow.router.Route
 import jakarta.annotation.security.RolesAllowed
 import org.springframework.security.core.context.SecurityContextHolder
 
-@Route("guardian/profile", layout = GuardianDashboard::class)
+@Route("guardian/profile", layout = MainLayout::class)
 @RolesAllowed("GUARDIAN")
 @PageTitle("My Profile")
 @Menu(order = 1.0, icon = "vaadin:user", title = "My Profile")
 class GuardianProfileView(
-    private val guardianService: GuardianService,
-    private val applicantService: ApplicantService
+        private val guardianService: GuardianService,
+        private val applicantService: ApplicantService
 ) : VerticalLayout() {
 
     private val ui = UI.getCurrent()
@@ -39,9 +39,7 @@ class GuardianProfileView(
     private val contactInfo = createSectionLayout()
     private val guardianInfo = createSectionLayout()
 
-    private val editButton = Button("Edit").apply {
-        addClickListener { openEditDialog() }
-    }
+    private val editButton = Button("Edit").apply { addClickListener { openEditDialog() } }
 
     init {
         setSizeFull()
@@ -49,11 +47,14 @@ class GuardianProfileView(
         isPadding = true
 
         add(
-            H3("My Profile"),
-            H4("Personal Information"), personalInfo,
-            H4("Contact Information"), contactInfo,
-            H4("Guardian Information"), guardianInfo,
-            editButton
+                H3("My Profile"),
+                H4("Personal Information"),
+                personalInfo,
+                H4("Contact Information"),
+                contactInfo,
+                H4("Guardian Information"),
+                guardianInfo,
+                editButton
         )
 
         loadGuardianData()
@@ -103,26 +104,29 @@ class GuardianProfileView(
 
     private fun openEditDialog() {
         guardian?.let { g ->
-            val dialog = GuardianDialogForm(
-                applicantService = applicantService,
-                adminMode = false, // guardian editing their own profile
-                isEmailTaken = { false }, // not needed in guardian mode
-                onAssignRoles = {_, _ -> },
-                loadExistingRoles = {_, -> emptySet()},
-                onSave = { updated ->
-                    launchUiCoroutine {
-                        guardianService.save(updated)
-                        ui.withUi {
-                            guardian = updated
-                            renderProfile()
-                            showSuccess("Profile updated successfully")
-                        }
-                    }
-                },
-                onDelete = { /* Guardian should not delete themselves */ },
-                onChange = { },
-
-            )
+            val dialog =
+                    GuardianDialogForm(
+                            applicantService = applicantService,
+                            adminMode = false, // guardian editing their own profile
+                            isEmailTaken = { false }, // not needed in guardian mode
+                            onAssignRoles = { _, _ -> },
+                            loadExistingRoles = { _,
+                                ->
+                                emptySet()
+                            },
+                            onSave = { updated ->
+                                launchUiCoroutine {
+                                    guardianService.save(updated)
+                                    ui.withUi {
+                                        guardian = updated
+                                        renderProfile()
+                                        showSuccess("Profile updated successfully")
+                                    }
+                                }
+                            },
+                            onDelete = { /* Guardian should not delete themselves */},
+                            onChange = {},
+                    )
             dialog.open(g)
         }
     }
@@ -136,9 +140,9 @@ class GuardianProfileView(
     private fun createSectionLayout(): FormLayout {
         return FormLayout().apply {
             setResponsiveSteps(
-                FormLayout.ResponsiveStep("0", 1),   // mobile → 1 column
-                //FormLayout.ResponsiveStep("600px", 2) // tablet/desktop → 2 columns
-            )
+                    FormLayout.ResponsiveStep("0", 1), // mobile → 1 column
+                    // FormLayout.ResponsiveStep("600px", 2) // tablet/desktop → 2 columns
+                    )
         }
     }
 }

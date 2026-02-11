@@ -2,7 +2,6 @@ import '@vaadin/polymer-legacy-adapter/style-modules.js';
 import '@vaadin/vertical-layout/src/vaadin-vertical-layout.js';
 import '@vaadin/dialog/src/vaadin-dialog.js';
 import 'Frontend/generated/jar-resources/flow-component-renderer.js';
-import '@vaadin/app-layout/src/vaadin-app-layout.js';
 import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
 const loadOnDemand = (key) => { return Promise.resolve(0); }
 window.Vaadin = window.Vaadin || {};

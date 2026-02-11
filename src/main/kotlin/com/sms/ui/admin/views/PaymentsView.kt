@@ -6,6 +6,7 @@ import com.sms.enums.PaymentStatus
 import com.sms.services.PaymentService
 import com.sms.ui.components.PaginationBar
 import com.sms.ui.components.SearchBar
+import com.sms.ui.layout.MainLayout
 import com.sms.util.FormatUtil
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
@@ -22,9 +23,9 @@ import com.vaadin.flow.router.Route
 import java.time.format.DateTimeFormatter
 
 @PageTitle("Manage Payments")
-@Route(value = "admin/payments", layout = AdminView::class)
+@Route(value = "admin/payments", layout = MainLayout::class)
 class PaymentsView(
-    private val paymentService: PaymentService,
+        private val paymentService: PaymentService,
 ) : VerticalLayout() {
 
     private val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm")
@@ -73,14 +74,30 @@ class PaymentsView(
     }
 
     private fun configureGrid() {
-        grid.addColumn { it.applicant?.getFullName() ?: "" }.setHeader("Applicant").setAutoWidth(true).setFlexGrow(2)
-        grid.addColumn { it.paymentType?.category ?: "" }.setHeader("Payment Type").setAutoWidth(true)
-        grid.addColumn { it.academicSession?.displaySession ?: "" }.setHeader("Session").setAutoWidth(true)
+        grid
+                .addColumn { it.applicant?.getFullName() ?: "" }
+                .setHeader("Applicant")
+                .setAutoWidth(true)
+                .setFlexGrow(2)
+        grid
+                .addColumn { it.paymentType?.category ?: "" }
+                .setHeader("Payment Type")
+                .setAutoWidth(true)
+        grid
+                .addColumn { it.academicSession?.displaySession ?: "" }
+                .setHeader("Session")
+                .setAutoWidth(true)
         grid.addColumn { it.term?.name ?: "" }.setHeader("Term").setAutoWidth(true)
-        grid.addColumn { FormatUtil.formatCurrency(it.paymentType?.amount ?: 0.0)}.setHeader("Amount").setAutoWidth(true)
+        grid
+                .addColumn { FormatUtil.formatCurrency(it.paymentType?.amount ?: 0.0) }
+                .setHeader("Amount")
+                .setAutoWidth(true)
         grid.addColumn { it.reference ?: "" }.setHeader("Reference").setAutoWidth(true)
         grid.addComponentColumn { statusBadge(it.status) }.setHeader("Status").setAutoWidth(true)
-        grid.addColumn { it.createdAt?.format(formatter) ?: "" }.setHeader("Date").setAutoWidth(true)
+        grid
+                .addColumn { it.createdAt?.format(formatter) ?: "" }
+                .setHeader("Date")
+                .setAutoWidth(true)
 
         add(grid)
 
@@ -92,12 +109,12 @@ class PaymentsView(
     private fun statusBadge(status: PaymentStatus?): Span {
         val badge = Span(status?.name ?: "UNKNOWN")
         badge.element.themeList.add(
-            when (status) {
-                PaymentStatus.PENDING -> "badge warning"
-                PaymentStatus.SUCCESS -> "badge success"
-                PaymentStatus.FAILED -> "badge error"
-                else -> "badge contrast"
-            }
+                when (status) {
+                    PaymentStatus.PENDING -> "badge warning"
+                    PaymentStatus.SUCCESS -> "badge success"
+                    PaymentStatus.FAILED -> "badge error"
+                    else -> "badge contrast"
+                }
         )
         return badge
     }
@@ -108,12 +125,13 @@ class PaymentsView(
 
     private fun loadPage(page: Int) {
         launchUiCoroutine {
-            val result = paymentService.findPaged(
-                searchQuery = currentQuery,
-                status = currentStatus,
-                page = page,
-                pageSize = pagination.pageSize
-            )
+            val result =
+                    paymentService.findPaged(
+                            searchQuery = currentQuery,
+                            status = currentStatus,
+                            page = page,
+                            pageSize = pagination.pageSize
+                    )
 
             ui?.withUi {
                 grid.setItems(result.items)
@@ -132,9 +150,7 @@ class PaymentsView(
 
         val listener: (String, Map<String, Any>) -> Unit = { eventType, data ->
             if (eventType == "PAYMENT_SUCCESS") {
-                ui?.access {
-                    loadPage(pagination.getCurrentPage())
-                }
+                ui?.access { loadPage(pagination.getCurrentPage()) }
             }
         }
 

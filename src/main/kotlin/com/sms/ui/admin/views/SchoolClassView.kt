@@ -3,31 +3,27 @@ package com.sms.ui.admin.views
 import com.sms.entities.SchoolClass
 import com.sms.services.SchoolClassService
 import com.sms.ui.admin.components.SchoolClassDialog
-import com.vaadin.flow.component.button.Button
-import com.vaadin.flow.component.button.ButtonVariant
-import com.vaadin.flow.component.grid.Grid
-import com.vaadin.flow.component.icon.Icon
-import com.vaadin.flow.component.icon.VaadinIcon
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout
-import com.vaadin.flow.component.orderedlayout.VerticalLayout
-import com.vaadin.flow.router.PageTitle
-import com.vaadin.flow.router.Route
+import com.sms.ui.layout.MainLayout
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
+import com.vaadin.flow.component.button.Button
+import com.vaadin.flow.component.button.ButtonVariant
+import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
+import com.vaadin.flow.component.html.Span
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout
+import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.Menu
+import com.vaadin.flow.router.PageTitle
+import com.vaadin.flow.router.Route
 import jakarta.annotation.security.RolesAllowed
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @PageTitle("School Classes")
-@Route(value = "classes", layout = AdminView::class)
+@Route(value = "classes", layout = MainLayout::class)
 @RolesAllowed("ADMIN")
 @Menu(order = 4.0, icon = "vaadin:group", title = "Manage Classes")
-class SchoolClassView(
-    private val schoolClassService: SchoolClassService
-) : VerticalLayout() {
+class SchoolClassView(private val schoolClassService: SchoolClassService) : VerticalLayout() {
 
     private val grid = Grid(SchoolClass::class.java, false)
     private lateinit var dialog: SchoolClassDialog
@@ -40,10 +36,11 @@ class SchoolClassView(
         configureGrid()
         configureDialog()
 
-        val addButton = Button("Add Class", Icon(VaadinIcon.PLUS)).apply {
-            addThemeVariants(ButtonVariant.LUMO_PRIMARY)
-            addClickListener { dialog.open(null) }
-        }
+        val addButton =
+                Button("Add Class", Span().apply { addClassNames("ph", "ph-plus") }).apply {
+                    addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+                    addClickListener { dialog.open(null) }
+                }
 
         add(HorizontalLayout(addButton), grid)
         refreshGrid()
@@ -65,16 +62,20 @@ class SchoolClassView(
     }
 
     private fun configureDialog() {
-        dialog = SchoolClassDialog(
-            emptyList(),
-            onSave = {schoolClass -> schoolClassService.save(schoolClass)},
-            onDelete = {schoolClass -> schoolClassService.deleteById(schoolClass.id)},
-            onChange = { refreshGrid() }
-        ).apply {
-            configureDialogAppearance()
-            width = "25%"
-            maxWidth = "400px"
-        }
+        dialog =
+                SchoolClassDialog(
+                                emptyList(),
+                                onSave = { schoolClass -> schoolClassService.save(schoolClass) },
+                                onDelete = { schoolClass ->
+                                    schoolClassService.deleteById(schoolClass.id)
+                                },
+                                onChange = { refreshGrid() }
+                        )
+                        .apply {
+                            configureDialogAppearance()
+                            width = "25%"
+                            maxWidth = "400px"
+                        }
     }
 
     private fun refreshGrid() {

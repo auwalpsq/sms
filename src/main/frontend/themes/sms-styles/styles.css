@@ -1,41 +1,163 @@
 @import url('./application-form.css');
 @import url('./admission-letter.css');
 @import url('./school-header.css');
+@import url('./dashboard-css.css');
+@import url('./sidebar.css');
+@import url('./components.css');
 
-/* global defaults */
-html, :host() {
-  font-family: 'Roboto', sans-serif;
-  background-color: #f9f9f9;
-  color: #333;
+/* =========================================================
+   MATERIAL 3 TOKENS (CUSTOM WARM BEIGE PALETTE)
+========================================================= */
+:root {
+  --app-font-family: 'Inter', system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Helvetica, Arial, sans-serif;
+  --m3-font-ui: "Inter", "SF Pro Text", "Segoe UI", Roboto, system-ui;
+  --m3-font-jp: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --m3-bg: #fbf7f4;
+  --m3-surface: #EFEDEB;
+  --m3-surface-variant: #f1e7e0;
+  --m3-primary: #e6a58a;
+  --m3-on-primary: #3b2b26;
+  --m3-muted: #cdbfb6;
+  --m3-card-shadow: 0 6px 20px rgba(21, 16, 14, 0.06);
+  --m3-radius-lg: 16px;
+  --m3-radius-md: 12px;
+  --m3-radius-sm: 10px;
+  --m3-text: #2b2623;
+  --m3-subtle: #6A625C;
+  --m3-accent: #f6d8c8;
+  --m3-quiet: rgba(43, 38, 35, 0.06);
+  --m3-error: #B3261E;
+  --m3-on-error: #FFFFFF;
+  --m3-surface-container-high: #ECE6F0;
+  --m3-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+  --m3-on-surface: #1C1B1F;
+  --m3-on-surface-variant: #49454F;
+
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
+.main-view,
+.content-wrapper {
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  /* allow vertical scroll */
+
+}
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+body {
+  background: var(--m3-bg);
+  color: var(--m3-text);
+  font-family: var(--app-font-family);
+  font-size: 14px;
+  line-height: 1.4;
+  color: #1F1F1F;
+}
+
+vaadin-text-field::part(value),
+vaadin-number-field::part(value),
+vaadin-select::part(value),
+vaadin-text-area::part(value) {
+  font-family: Inter, "Noto Sans JP", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #3A3734;
+}
+
+/* Form field labels — match Figma */
+vaadin-text-field::part(label),
+vaadin-number-field::part(label),
+vaadin-select::part(label),
+vaadin-text-area::part(label) {
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 400;
+  /* NOT bold */
+  font-size: 13px;
+  color: #6A6864;
+  /* Figma muted gray */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: Inter, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* ============================
+   GLOBAL ACTION BUTTONS
+   (Matches Vocabulary Grid)
+   ============================ */
+.app-grid-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  border: none;
+  padding: 0;
+}
+
+.app-grid-action-btn:hover {
+  opacity: 0.8;
+}
+
+.app-grid-action-btn-edit {
+  background-color: #FFC0CB;
+  /* Pink (Swapped) */
+  color: #FF4500;
+  /* OrangeRed */
+}
+
+.app-grid-action-btn-delete {
+  background-color: #FFE4E1;
+  /* MistyRose (Swapped) */
+  color: #DC143C;
+  /* Crimson */
+}
+
+/* Legacy SMS Styles */
 .success-notification {
   --lumo-primary-color: green;
   color: white;
-  background-color: #2e7d32; /* dark green */
+  background-color: #2e7d32;
+  /* dark green */
   border-radius: var(--lumo-border-radius-m);
 }
 
 .error-notification {
   --lumo-primary-color: red;
   color: white;
-  background-color: #c62828; /* dark red */
+  background-color: #c62828;
+  /* dark red */
   border-radius: var(--lumo-border-radius-m);
 }
+
 .application-form .button-bar {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 
 .application-form .action-button {
-    background-color: #007BFF; /* Bootstrap blue */
-    color: white;
-    border-radius: 6px;
-    font-weight: 500;
-    padding: 0.6rem 1.2rem;
-    transition: background-color 0.2s ease-in-out;
+  background-color: #007BFF;
+  /* Bootstrap blue */
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .application-form .action-button:hover {
-    background-color: #0056b3;
-    cursor: pointer;
+  background-color: #0056b3;
+  cursor: pointer;
 }

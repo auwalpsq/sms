@@ -39,3 +39,6 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### User Specific ###
+src/main/resources/static/images/passports/

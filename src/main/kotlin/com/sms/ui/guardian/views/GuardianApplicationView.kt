@@ -10,7 +10,7 @@ import com.sms.services.SchoolClassService
 import com.sms.ui.components.ApplicationFormDialog
 import com.sms.ui.components.PaginationBar
 import com.sms.ui.components.SearchBar
-import com.sms.ui.guardian.GuardianDashboard
+import com.sms.ui.layout.MainLayout
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -31,13 +31,13 @@ import jakarta.annotation.security.RolesAllowed
 import org.springframework.security.core.context.SecurityContextHolder
 
 @PageTitle("My Applications")
-@Route(value = "guardian/applications", layout = GuardianDashboard::class)
+@Route(value = "guardian/applications", layout = MainLayout::class)
 @RolesAllowed("GUARDIAN")
 @Menu(order = 2.0, icon = "vaadin:form", title = "Apply for Admission")
 class GuardianApplicationView(
-    private val applicantService: ApplicantService,
-    private val guardianService: GuardianService,
-    private val schoolClassService: SchoolClassService
+        private val applicantService: ApplicantService,
+        private val guardianService: GuardianService,
+        private val schoolClassService: SchoolClassService
 ) : VerticalLayout() {
 
     private val ui = UI.getCurrent()
@@ -48,13 +48,15 @@ class GuardianApplicationView(
     private var formDialog: ApplicationFormDialog? = null
 
     private val grid = Grid(Applicant::class.java, false)
-    private val searchBar = SearchBar("Search by name or application no...") { query -> loadApplicants(1, query) }
+    private val searchBar =
+            SearchBar("Search by name or application no...") { query -> loadApplicants(1, query) }
     private val pagination = PaginationBar(pageSize = 10) { page -> loadApplicants(page) }
 
-    private val newApplicationBtn = Button("New Application").apply {
-        addThemeVariants(ButtonVariant.LUMO_PRIMARY)
-        addClickListener { formDialog?.open(null) }
-    }
+    private val newApplicationBtn =
+            Button("New Application").apply {
+                addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+                addClickListener { formDialog?.open(null) }
+            }
 
     init {
         setSizeFull()
@@ -73,19 +75,23 @@ class GuardianApplicationView(
         launchUiCoroutine {
             currentGuardian = guardianService.findById(user?.person?.id)
             if (currentGuardian != null) {
-                ui?.withUi { createFormDialog(); loadApplicants() }
+                ui?.withUi {
+                    createFormDialog()
+                    loadApplicants()
+                }
             }
         }
     }
 
     private fun createFormDialog() {
-        formDialog = ApplicationFormDialog(
-            guardian = currentGuardian!!,
-            schoolClassService = schoolClassService,
-            onSave = { applicant -> applicantService.save(applicant) },
-            onDelete = { applicant -> applicantService.delete(applicant.id!!) },
-            onChange = { loadApplicants(pagination.getCurrentPage()) }
-        )
+        formDialog =
+                ApplicationFormDialog(
+                        guardian = currentGuardian!!,
+                        schoolClassService = schoolClassService,
+                        onSave = { applicant -> applicantService.save(applicant) },
+                        onDelete = { applicant -> applicantService.delete(applicant.id!!) },
+                        onChange = { loadApplicants(pagination.getCurrentPage()) }
+                )
     }
 
     // --- Layout ---
@@ -106,68 +112,77 @@ class GuardianApplicationView(
         grid.addColumn { it.dateOfBirth ?: "" }.setHeader("Date of Birth").isAutoWidth = true
 
         grid.addColumn(
-            ComponentRenderer { applicant: Applicant ->
-                Span(applicant.applicationStatus.name).apply {
-                    element.setAttribute(
-                        "theme",
-                        when (applicant.applicationStatus) {
-                            Applicant.ApplicationStatus.PENDING -> "badge warning"
-                            Applicant.ApplicationStatus.APPROVED -> "badge success"
-                            Applicant.ApplicationStatus.REJECTED -> "badge error"
+                        ComponentRenderer { applicant: Applicant ->
+                            Span(applicant.applicationStatus.name).apply {
+                                element.setAttribute(
+                                        "theme",
+                                        when (applicant.applicationStatus) {
+                                            Applicant.ApplicationStatus.PENDING -> "badge warning"
+                                            Applicant.ApplicationStatus.APPROVED -> "badge success"
+                                            Applicant.ApplicationStatus.REJECTED -> "badge error"
+                                        }
+                                )
+                            }
                         }
-                    )
-                }
-            }
-        ).setHeader("Status").setAutoWidth(true)
+                )
+                .setHeader("Status")
+                .setAutoWidth(true)
 
         grid.addColumn(
-            ComponentRenderer { applicant: Applicant ->
-                Span(applicant.paymentStatus.name).apply {
-                    element.setAttribute(
-                        "theme",
-                        when (applicant.paymentStatus) {
-                            Applicant.PaymentStatus.UNPAID -> "badge error"
-                            Applicant.PaymentStatus.PAID -> "badge success"
-                            Applicant.PaymentStatus.PARTIALLY_PAID -> "badge contrast"
+                        ComponentRenderer { applicant: Applicant ->
+                            Span(applicant.paymentStatus.name).apply {
+                                element.setAttribute(
+                                        "theme",
+                                        when (applicant.paymentStatus) {
+                                            Applicant.PaymentStatus.UNPAID -> "badge error"
+                                            Applicant.PaymentStatus.PAID -> "badge success"
+                                            Applicant.PaymentStatus.PARTIALLY_PAID ->
+                                                    "badge contrast"
+                                        }
+                                )
+                            }
                         }
-                    )
-                }
-            }
-        ).setHeader("Payment").setAutoWidth(true)
+                )
+                .setHeader("Payment")
+                .setAutoWidth(true)
 
         grid.addColumn(
-            ComponentRenderer { applicant: Applicant ->
-                Button("Open Profile").apply {
-                    addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE)
-                    addClickListener { ui?.get()?.navigate("guardian/applicant/${applicant.id}") }
-                }
-            }
-        ).setHeader("Actions").setAutoWidth(true)
+                        ComponentRenderer { applicant: Applicant ->
+                            Button("Open Profile").apply {
+                                addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE)
+                                addClickListener {
+                                    ui?.get()?.navigate("guardian/applicant/${applicant.id}")
+                                }
+                            }
+                        }
+                )
+                .setHeader("Actions")
+                .setAutoWidth(true)
 
         grid.isAllRowsVisible = true
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES)
         grid.emptyStateText = "No applications found."
-
     }
 
     private fun loadApplicants(page: Int = 1, query: String = searchBar.value) {
         val guardianId = currentGuardian?.id ?: return
 
         launchUiCoroutine {
-            val result = if (query.isBlank()) {
-                applicantService.getApplicantsByGuardianPaged(
-                    guardianId = guardianId,
-                    page = page,
-                    pageSize = pagination.pageSize
-                )
-            } else {
-                applicantService.searchApplicantsByGuardianPaged(
-                    guardianId = guardianId,
-                    query = query,
-                    page = page,
-                    pageSize = pagination.pageSize
-                )
-            }
+            val result =
+                    if (query.isBlank()) {
+                        applicantService.getApplicantsByGuardianPaged(
+                                guardianId = guardianId,
+                                page = page,
+                                pageSize = pagination.pageSize
+                        )
+                    } else {
+                        applicantService.searchApplicantsByGuardianPaged(
+                                guardianId = guardianId,
+                                query = query,
+                                page = page,
+                                pageSize = pagination.pageSize
+                        )
+                    }
 
             ui?.withUi {
                 grid.setItems(result.items)

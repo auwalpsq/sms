@@ -1,8 +1,9 @@
 package com.sms.ui.admin.views
 
-import com.sms.ui.admin.components.AcademicSessionFormDialog
 import com.sms.entities.AcademicSession
 import com.sms.services.AcademicSessionService
+import com.sms.ui.admin.components.AcademicSessionFormDialog
+import com.sms.ui.layout.MainLayout
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -10,8 +11,7 @@ import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
-import com.vaadin.flow.component.icon.Icon
-import com.vaadin.flow.component.icon.VaadinIcon
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.router.Menu
@@ -19,13 +19,12 @@ import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
 import jakarta.annotation.security.RolesAllowed
 
-@Route("admin/sessions", layout = AdminView::class)
+@Route("admin/sessions", layout = MainLayout::class)
 @PageTitle("Manage Academic Sessions")
 @RolesAllowed("ADMIN")
 @Menu(order = 4.0, icon = "vaadin:calendar", title = "Manage Academic Sessions")
-class ManageAcademicSessionsView(
-    private val sessionService: AcademicSessionService
-) : VerticalLayout() {
+class ManageAcademicSessionsView(private val sessionService: AcademicSessionService) :
+        VerticalLayout() {
 
     private val grid = Grid(AcademicSession::class.java, false)
     private lateinit var formDialog: AcademicSessionFormDialog
@@ -52,22 +51,30 @@ class ManageAcademicSessionsView(
     }
 
     private fun configureDialog() {
-        formDialog = AcademicSessionFormDialog(
-            onSave = { academicSession -> sessionService.save(academicSession) },
-            onDelete = { academicSession -> sessionService.deleteById(academicSession.id) },
-            onChange = { refreshGrid() }
-        ).apply {
-            configureDialogAppearance()
-            maxWidth = "400px"
-            width = "25%"
-        }
+        formDialog =
+                AcademicSessionFormDialog(
+                                onSave = { academicSession ->
+                                    sessionService.save(academicSession)
+                                },
+                                onDelete = { academicSession ->
+                                    sessionService.deleteById(academicSession.id)
+                                },
+                                onChange = { refreshGrid() }
+                        )
+                        .apply {
+                            configureDialogAppearance()
+                            maxWidth = "400px"
+                            width = "25%"
+                        }
     }
 
     private fun buildToolbar(): HorizontalLayout {
-        val addBtn = Button("Add Academic Session", Icon(VaadinIcon.PLUS)).apply {
-            addThemeVariants(ButtonVariant.LUMO_PRIMARY)
-            addClickListener {  formDialog.open(null)}
-        }
+        val addBtn =
+                Button("Add Academic Session", Span().apply { addClassNames("ph", "ph-plus") })
+                        .apply {
+                            addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+                            addClickListener { formDialog.open(null) }
+                        }
         return HorizontalLayout(addBtn)
     }
 

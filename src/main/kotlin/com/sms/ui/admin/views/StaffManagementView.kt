@@ -8,6 +8,7 @@ import com.sms.ui.common.showError
 import com.sms.ui.common.showSuccess
 import com.sms.ui.components.PaginationBar
 import com.sms.ui.components.SearchBar
+import com.sms.ui.layout.MainLayout
 import com.sms.util.launchUiCoroutine
 import com.sms.util.withUi
 import com.vaadin.flow.component.UI
@@ -17,7 +18,7 @@ import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant
 import com.vaadin.flow.component.html.Div
 import com.vaadin.flow.component.html.H3
-import com.vaadin.flow.component.icon.VaadinIcon
+import com.vaadin.flow.component.html.Span
 import com.vaadin.flow.component.notification.Notification
 import com.vaadin.flow.component.orderedlayout.FlexComponent
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout
@@ -29,11 +30,11 @@ import jakarta.annotation.security.RolesAllowed
 
 @RolesAllowed("ADMIN")
 @PageTitle("Manage Staff")
-@Route(value = "admin/staff", layout = AdminView::class)
+@Route(value = "admin/staff", layout = MainLayout::class)
 @Menu(order = 2.0, icon = "vaadin:users", title = "Manage Staff")
 class StaffManagementView(
-    private val staffService: StaffService,
-    private val contactPersonService: ContactPersonService
+        private val staffService: StaffService,
+        private val contactPersonService: ContactPersonService
 ) : VerticalLayout() {
 
     private val ui: UI? = UI.getCurrent()
@@ -42,7 +43,8 @@ class StaffManagementView(
     private val pagination = PaginationBar(pageSize = 10) { loadPage(it) }
 
     private var currentQuery: String? = null
-    private val loadingIndicator = Notification("Loading staff...", 1500, Notification.Position.MIDDLE)
+    private val loadingIndicator =
+            Notification("Loading staff...", 1500, Notification.Position.MIDDLE)
 
     init {
         setSizeFull()
@@ -67,21 +69,21 @@ class StaffManagementView(
         grid.setSizeFull()
 
         // Empty state
-        grid.emptyStateComponent = Div(H3("No staff found")).apply {
-            val text = Div().apply { text = "Add a new staff member to get started." }
-            add(text)
-        }
+        grid.emptyStateComponent =
+                Div(H3("No staff found")).apply {
+                    val text = Div().apply { text = "Add a new staff member to get started." }
+                    add(text)
+                }
 
-        grid.addItemDoubleClickListener {
-            openFormDialog(it.item)
-        }
+        grid.addItemDoubleClickListener { openFormDialog(it.item) }
     }
 
     private fun configureLayout() {
-        val addBtn = Button("Add Staff", VaadinIcon.PLUS.create()).apply {
-            addClickListener { openFormDialog(null) }
-            addThemeVariants(ButtonVariant.LUMO_PRIMARY)
-        }
+        val addBtn =
+                Button("Add Staff", Span().apply { addClassNames("ph", "ph-plus") }).apply {
+                    addClickListener { openFormDialog(null) }
+                    addThemeVariants(ButtonVariant.LUMO_PRIMARY)
+                }
 
         val header = HorizontalLayout(H3("Staff Management"), addBtn)
         header.setWidthFull()
@@ -101,22 +103,21 @@ class StaffManagementView(
             try {
                 ui?.withUi { loadingIndicator.open() }
 
-                val result = staffService.findAll(
-                    search = currentQuery,
-                    page = page - 1,
-                    size = pagination.pageSize
-                )
+                val result =
+                        staffService.findAll(
+                                search = currentQuery,
+                                page = page - 1,
+                                size = pagination.pageSize
+                        )
 
                 val total = staffService.countAll(currentQuery)
 
                 ui?.withUi {
-                        grid.setItems(result)
-                        pagination.update(total)
+                    grid.setItems(result)
+                    pagination.update(total)
                 }
             } catch (e: Exception) {
-                ui?.withUi {
-                    showError("Failed to load staff: ${e.message ?: "Unknown error"}")
-                }
+                ui?.withUi { showError("Failed to load staff: ${e.message ?: "Unknown error"}") }
             } finally {
                 ui?.withUi { loadingIndicator.close() }
             }
@@ -124,35 +125,37 @@ class StaffManagementView(
     }
 
     private fun openFormDialog(staff: Staff?) {
-        val dialog = StaffFormDialog(
-            title = if (staff == null) "Add New Staff" else "Edit Staff",
-            onSaveCallback = { staff ->
-                        if (staff.id == 0L) {
-                            staffService.save(staff)
-                        } else {
-                            staffService.update(staff)
+        val dialog =
+                StaffFormDialog(
+                                title = if (staff == null) "Add New Staff" else "Edit Staff",
+                                onSaveCallback = { staff ->
+                                    if (staff.id == 0L) {
+                                        staffService.save(staff)
+                                    } else {
+                                        staffService.update(staff)
+                                    }
+                                    loadPage(pagination.getCurrentPage())
+                                },
+                                onDeleteCallback = { staff ->
+                                    launchUiCoroutine {
+                                        try {
+                                            staffService.delete(staff.id)
+                                            showSuccess("Staff deleted successfully.")
+                                            loadPage(pagination.getCurrentPage())
+                                        } catch (e: Exception) {
+                                            showError("Failed to delete staff: ${e.message}")
+                                        }
+                                    }
+                                },
+                                onChangeCallback = { loadPage(pagination.getCurrentPage()) },
+                                onEmailCheck = { email -> contactPersonService.emailExists(email) },
+                                onPhoneCheck = { phone -> contactPersonService.phoneExists(phone) }
+                        )
+                        .apply {
+                            configureDialogAppearance()
+                            width = "50%"
+                            populateForm(staff)
                         }
-                        loadPage(pagination.getCurrentPage())
-            },
-            onDeleteCallback = { staff ->
-                launchUiCoroutine {
-                    try {
-                        staffService.delete(staff.id)
-                        showSuccess("Staff deleted successfully.")
-                        loadPage(pagination.getCurrentPage())
-                    } catch (e: Exception) {
-                        showError("Failed to delete staff: ${e.message}")
-                    }
-                }
-            },
-            onChangeCallback = { loadPage(pagination.getCurrentPage()) },
-            onEmailCheck = {email -> contactPersonService.emailExists(email)},
-            onPhoneCheck = { phone -> contactPersonService.phoneExists(phone) }
-        ).apply {
-            configureDialogAppearance()
-            width = "50%"
-            populateForm(staff)
-        }
         dialog.open(staff)
     }
 }

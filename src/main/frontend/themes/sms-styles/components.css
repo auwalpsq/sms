@@ -1,0 +1,151 @@
+/* =========================================================
+   COMPONENT STYLES (Japanese Learning App "Global" Look)
+   Ref: vocabulary.css from JL App
+========================================================= */
+
+/* --- Buttons --- */
+vaadin-button {
+    border-radius: 50px;
+    /* Pill shape */
+    font-weight: 600;
+    font-family: var(--app-font-family);
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+vaadin-button:hover {
+    transform: translateY(-1px);
+}
+
+vaadin-button:active {
+    transform: translateY(0);
+}
+
+/* Primary Button */
+vaadin-button[theme~="primary"] {
+    background-color: var(--m3-primary);
+    color: var(--m3-on-primary);
+    box-shadow: 0 4px 12px rgba(230, 165, 138, 0.4);
+    /* soft shadow matching primary */
+    border: none;
+}
+
+vaadin-button[theme~="primary"]:hover {
+    background-color: #dcbfae;
+    /* slightly darker/desaturated on hover */
+}
+
+/* Tertiary/Ghost Button */
+vaadin-button[theme~="tertiary"] {
+    color: var(--m3-text);
+}
+
+/* Error/Delete Button */
+vaadin-button[theme~="error"] {
+    background-color: var(--m3-error);
+    color: var(--m3-on-error);
+}
+
+/* --- Text Fields & Inputs --- */
+vaadin-text-field,
+vaadin-email-field,
+vaadin-password-field,
+vaadin-number-field,
+vaadin-select,
+vaadin-date-picker,
+vaadin-combo-box {
+    --vaadin-input-field-border-width: 0;
+    /* Remove default underline */
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+vaadin-text-field::part(input-field),
+vaadin-email-field::part(input-field),
+vaadin-password-field::part(input-field),
+vaadin-number-field::part(input-field),
+vaadin-select::part(input-field),
+vaadin-date-picker::part(input-field),
+vaadin-combo-box::part(input-field) {
+    background-color: #F0EFED;
+    /* Surface variant / input bg */
+    border-radius: 12px;
+    border: 1px solid transparent;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Focus State */
+vaadin-text-field:focus-within::part(input-field),
+vaadin-email-field:focus-within::part(input-field),
+vaadin-password-field:focus-within::part(input-field),
+vaadin-number-field:focus-within::part(input-field),
+vaadin-select:focus-within::part(input-field),
+vaadin-date-picker:focus-within::part(input-field),
+vaadin-combo-box:focus-within::part(input-field) {
+    background-color: #FFFFFF;
+    border-color: var(--m3-primary);
+    box-shadow: 0 0 0 3px rgba(230, 165, 138, 0.2);
+    /* ring */
+}
+
+/* --- Grids --- */
+vaadin-grid {
+    border-radius: 20px;
+    border: none;
+    background-color: var(--m3-surface);
+
+    /* Variables for transparency/colors */
+    --vaadin-grid-header-background-color: var(--m3-surface);
+    --vaadin-grid-body-row-background-color: var(--m3-surface);
+    --vaadin-grid-cell-background-color: var(--m3-surface);
+
+    /* Remove selection highlight overlay */
+    --vaadin-grid-row-selected-overlay-opacity: 0;
+    --vaadin-selection-color: transparent;
+}
+
+/* Header */
+vaadin-grid::part(header-cell) {
+    background-color: var(--m3-surface);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--m3-subtle);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    /* subtle separator */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+/* Rows */
+vaadin-grid::part(row) {
+    border-radius: 12px;
+    /* if we want floating rows, but simpler to just round grid */
+}
+
+vaadin-grid::part(body-cell) {
+    background-color: transparent;
+    /* let row bg show through */
+    color: var(--m3-text);
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    font-size: 14px;
+}
+
+/* Row Hover */
+vaadin-grid::part(row):hover {
+    background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Remove cell borders on last row if needed, but Vaadin handles usually */
+
+/* --- Icons --- */
+vaadin-icon {
+    /* Ensure icons aren't too massive by default, mimicking the .ph size usually */
+    /* font-size: 20px; */
+    /* Removing forced size as it might break specific UI, but setting a default color helps */
+    color: inherit;
+}

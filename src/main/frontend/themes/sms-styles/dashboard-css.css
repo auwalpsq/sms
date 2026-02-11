@@ -1,0 +1,602 @@
+/* =========================================================
+   DASHBOARD — PIXEL PERFECT STYLE
+========================================================= */
+
+.dashboard-container {
+    max-width: 1500px;
+    margin: 0;
+    width: 100%;
+}
+
+/* ROOT SPACING */
+.dashboard-root {
+    display: flex;
+    flex-direction: column;
+    padding: 32px 24px;
+    gap: 16px;
+}
+
+/* FILTER CHIP -------------------------------------------------- */
+.dash-filter-chip {
+    background: white;
+    border-radius: 20px;
+    padding: 6px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b4b4b;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+
+    transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.dash-filter-chip:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.filter-icon {
+    font-size: 18px;
+    color: #a67c52;
+    /* warm tone like figma */
+}
+
+/* HEADER */
+.dash-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.dash-subtitle {
+    font-size: 13px;
+    color: #6E6E6E;
+    margin-top: 4px;
+}
+
+/* =========================================================
+   TOP STAT CARDS
+========================================================= */
+/* DESKTOP — Figma default */
+.dash-stats-grid {
+    display: grid;
+    gap: 20px;
+    padding: 10px;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* TABLET — 2 cards per row */
+@media (max-width: 1100px) {
+    .dash-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* MOBILE — 1 card per row */
+@media (max-width: 680px) {
+    .dash-stats-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+/* STAT CARD - safe, Figma-like layout */
+.dash-stat-card {
+    background: var(--m3-surface);
+    border-radius: 24px;
+    padding: 20px 22px;
+    /* slightly tighter than before for Figma match */
+    min-width: 140px;
+    max-width: 380px;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    /* IMPORTANT: use gap to control internal spacing - matches Figma auto-layout */
+    gap: 10px;
+    box-shadow: none;
+    /* let plastic-card provide the shadow if used */
+    position: relative;
+    overflow: visible;
+}
+
+/* top small row: icon + percent badge aligned to top, NOT stretched */
+.stat-top-row {
+    display: flex;
+    justify-content: flex-start;
+    /* keeps icon left and badge right in small row */
+    align-items: center;
+    /* center vertically inside top row */
+    gap: 12px;
+    margin: 0;
+    /* remove extra margins that push body down */
+    padding: 0;
+}
+
+/* icon blob exact placement */
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+/* percent container inside top row (Figma right-aligned badge) */
+.percent-wrap {
+    display: flex;
+    align-items: center;
+
+    border-radius: 16px;
+
+    background: #ffe2b8;
+    color: #b9763d;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    /* ensures it hugs the right side of the stat-top-row */
+    margin-left: auto;
+}
+
+/* the numeric value + label group — keep together, don't stretch */
+.stat-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    /* distance between value and label */
+    align-items: flex-start;
+    /* label sits directly under value */
+    margin-top: 4px;
+    /* small breathing space under top row */
+}
+
+/* value - big and centered left (not vertically centered by space-between) */
+.stat-value {
+    font-size: 34px;
+    line-height: 1;
+    margin: 0;
+    font-weight: 600;
+    color: #2b2623;
+}
+
+/* label - small, muted and close to the value */
+.stat-label {
+    font-size: 14px;
+    margin: 0;
+    color: #5a5553;
+    opacity: 0.95;
+}
+
+/* percent badge look */
+.stat-percent-badge-text {
+    background: #ffe2b8;
+    color: #b9763d;
+    padding: 6px 10px;
+    border-radius: 16px;
+    font-size: 13px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+.trend-icon {
+    font-size: 18px;
+    color: #b9763d;
+    opacity: 0.9;
+}
+
+/* =========================================================
+   MAIN LAYOUT GRID (Recent + Right Column)
+========================================================= */
+
+/* ===========================
+   MAIN GRID — EXACT FIGMA LOGIC
+=========================== */
+.dash-main-grid {
+    display: grid;
+    grid-template-columns: minmax(600px, 1fr) 500px;
+    gap: 24px;
+    padding: 10px;
+}
+
+/* Tablet breakpoint */
+@media (max-width: 1100px) {
+    .dash-main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ============================
+   RECENT ACTIVITY — CLEAN FIX
+=============================== */
+
+.dash-recent {
+    background: var(--m3-surface);
+    border-radius: 20px;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.06),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.recent-inner {
+    padding: 24px;
+}
+
+/* Header block */
+.recent-header-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.recent-sub {
+    font-size: 13px;
+    color: #6E6E6E;
+    margin: 6px 0 16px 0;
+}
+
+/* Divider */
+.recent-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.10);
+    margin: 0;
+}
+
+.recent-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.02);
+    /* soft cream background */
+    padding: 18px 20px;
+    border-radius: 18px;
+
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    /* soft outline */
+    box-shadow: none;
+    /* no hover shadow */
+
+    margin-bottom: 12px;
+
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.recent-item:hover {
+    transform: scale(0.98);
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.06),
+        0 8px 18px rgba(0, 0, 0, 0.10);
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.section-subtitle {
+    font-size: 13px;
+    margin: 4px 0 0 0;
+    color: var(--m3-subtle);
+}
+
+.more-icon {
+    background: var(--m3-surface-variant);
+    padding: 6px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.recent-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.recent-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.recent-icon .ph {
+    font-size: 22px;
+    color: inherit;
+}
+
+.ri-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.ri-desc {
+    margin: 2px 0 0 0;
+    font-size: 12px;
+    color: #6E6E6E;
+}
+
+.recent-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #6E6E6E;
+    font-size: 13px;
+}
+
+.time-icon {
+    font-size: 16px;
+    opacity: 0.6;
+}
+
+.ri-time {
+    font-size: 11px;
+    color: #6E6E6E;
+}
+
+/* =========================================================
+   RIGHT SIDEBAR
+========================================================= */
+
+.dash-right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* QUICK ACTIONS BOX */
+.quick-actions {
+    background: var(--m3-surface);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.qa-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.02);
+    padding: 18px 20px;
+    border-radius: 18px;
+
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: none;
+
+    margin-bottom: 10px;
+
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Animation like recent activity */
+.qa-item:hover {
+    transform: scale(0.98);
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.06),
+        0 8px 18px rgba(0, 0, 0, 0.10);
+}
+
+.qa-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.qa-icon {
+    width: 44px;
+    height: 44px;
+    background: #F8E0D3;
+    border-radius: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #A65638;
+}
+
+.qa-arrow {
+    color: #4a4a4a;
+    opacity: 0.7;
+}
+
+.system-health {
+    background: #F6D9C7;
+    padding: 22px;
+    border-radius: 20px;
+    color: #5A3325;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Header row for system health */
+.sh-header-row {
+    display: flex;
+    justify-content: space-between;
+    /* title left, dot right */
+    align-items: center;
+    width: 100%;
+}
+
+/* SYSTEM HEALTH STATUS DOT (Solid + Pulse Animation) */
+.health-status-dot {
+    width: 16px;
+    height: 16px;
+    background: #4CAF50;
+    /* strong green */
+    border-radius: 50%;
+    display: inline-block;
+
+    animation: healthPulse 1.8s infinite ease-in-out;
+}
+
+/* Pulse animation: bright → faint → bright */
+@keyframes healthPulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(0.85);
+        opacity: 0.55;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.sh-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+}
+
+.sh-sub {
+    margin: 0 0 16px 0;
+    font-size: 13px;
+}
+
+.sh-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+.sh-value {
+    font-weight: 600;
+}
+
+/* STAT ICON BLOB (base) */
+.stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+}
+
+/* Make material symbol inherit from the blob's text color */
+.stat-icon .ph {
+    font-size: 28px;
+    color: currentColor;
+    /* use currentColor so we can set color on the container */
+}
+
+/* Per-card colors — set color (icon) and background on the .stat-icon itself */
+.stat-icon.icon-total {
+    color: #A65638;
+    background-color: #F8E0D3;
+}
+
+.stat-icon.icon-users {
+    color: #FF7043;
+    background-color: #FFD9CC;
+}
+
+.stat-icon.icon-audio {
+    color: #FFA726;
+    background-color: #FFE4B3;
+}
+
+.stat-icon.icon-vocab {
+    color: #D36C47;
+    background-color: #F7DCCC;
+}
+
+.ri-icon-characters {
+    background-color: #F8E0D3;
+    color: #A65638;
+}
+
+.ri-icon-users {
+    background-color: #FFD9CC;
+    color: #FF7043;
+}
+
+.ri-icon-audio {
+    background-color: #FFE4B3;
+    color: #FFA726;
+}
+
+.ri-icon-vocab {
+    background-color: #F7DCCC;
+    color: #D36C47;
+}
+
+.plastic-card {
+    background: var(--m3-surface);
+    border-radius: 24px;
+
+    /* 1) Thin outer border */
+    border: 1px solid rgba(0, 0, 0, 0.08);
+
+    /* 2) Soft shadow – gives depth */
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.05),
+        0 8px 20px rgba(0, 0, 0, 0.09);
+
+    /* 3) Subtle top highlight */
+    position: relative;
+    padding: 24px;
+}
+
+/* Stat card hover animation — Figma accurate */
+.stat-card-hover {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.stat-card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.05),
+        0 12px 32px rgba(0, 0, 0, 0.14);
+    /* deeper but same style */
+}
+
+.plastic-card::before {
+    /* highlight layer */
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+
+    /* faint white highlight like a real card edge */
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+/* CARD HOVER ANIMATION — ONLY FOR STATS */
+.stat-animate {
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.stat-animate:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.06),
+        0 12px 28px rgba(0, 0, 0, 0.14);
+}
